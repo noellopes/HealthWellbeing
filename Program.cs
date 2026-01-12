@@ -1,6 +1,8 @@
 ﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations.Internal;
 using Microsoft.Extensions.DependencyInjection;
 
 // Add services to the container.
@@ -49,6 +51,7 @@ else
 {
     using (var scope = app.Services.CreateScope())
     {
+
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         SeedData.SeedRoles(roleManager);
 
@@ -59,16 +62,12 @@ else
 
         var context = scope.ServiceProvider.GetRequiredService<HealthWellbeingDbContext>();
         SeedData.Populate(context);
+        SeedDataExercicio.Populate(context);
+        SeedDataTipoExercicio.Populate(context);
+        SeedDataProblemaSaude.Populate(context);
     }
 
-	using (var serviceScope = app.Services.CreateScope())
-	{
-        var dbContext = serviceScope.ServiceProvider.GetService<HealthWellbeingDbContext>();
-        SeedData.Populate(dbContext);
-        SeedDataExercicio.Populate(dbContext);
-        SeedDataTipoExercicio.Populate(dbContext);
-        SeedDataProblemaSaude.Populate(dbContext);
-	}
+	
 }
 
 app.UseHttpsRedirection();

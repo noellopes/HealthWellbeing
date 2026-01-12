@@ -1,0 +1,60 @@
+﻿@model HealthWellbeing.Models.Food
+
+@{
+    ViewData["Title"] = "Delete Food";
+}
+
+<div class="container my-4">
+    <div class="fh-wrapper">
+
+        <div class="fh-header">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-trash-fill" style="color: var(--fi-cyan); font-size:1.15rem;"></i>
+                    <h1 class="h5 fh-title mb-0">Delete Food</h1>
+                </div>
+
+                <a asp-action="Index" class="btn btn-secondary" style="border-radius:12px;">
+                    <i class="bi bi-arrow-left-circle me-1"></i>Back
+                </a>
+            </div>
+
+            <div class="mt-2 fh-badge">
+                <i class="bi bi-basket3-fill" style="color: var(--fi-cyan);"></i>
+                <span>@Model.Name</span>
+            </div>
+        </div>
+
+        <div class="fh-panel">
+            <div class="alert alert-warning fh-alert d-flex align-items-center gap-2" role="alert">
+                <i class="bi bi-exclamation-triangle-fill" style="font-size:1.2rem;"></i>
+                <div>
+                    <div class="fw-bold">Are you sure?</div>
+                    <div>This action cannot be undone.</div>
+                </div>
+            </div>
+
+            <div class="fh-card p-3">
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">Name</dt>
+                    <dd class="col-sm-9 fw-bold">@Model.Name</dd>
+
+                    <dt class="col-sm-3">Category</dt>
+                    <dd class="col-sm-9">@((Model.Category?.Category) ?? "-")</dd>
+                </dl>
+
+                <hr />
+
+                <form asp-action="Delete" method="post" class="d-flex gap-2">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="FoodId" />
+                    <button type="submit" class="btn btn-danger" style="border-radius:12px; font-weight:800;">
+                        <i class="bi bi-trash-fill me-1"></i>Delete
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-light">Cancel</a>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>

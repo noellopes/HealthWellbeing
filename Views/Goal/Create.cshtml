@@ -1,0 +1,64 @@
+@model HealthWellbeing.Models.Goal
+
+@{
+    ViewData["Title"] = "Create Goal";
+}
+
+<div class="container my-4">
+    <div class="fh-wrapper">
+        <div class="fh-header">
+            <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-plus-circle" style="color: var(--fi-cyan); font-size:1.15rem;"></i>
+                    <h1 class="h5 fh-title mb-0">Create Goal</h1>
+                </div>
+                <a asp-action="Index" class="btn btn-outline-light" style="border-radius:12px;">
+                    <i class="bi bi-arrow-left me-1"></i>Back
+                </a>
+            </div>
+        </div>
+
+        <div class="fh-panel">
+            <div class="fh-card p-3">
+                <form asp-action="Create" class="fh-form">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <!-- Cliente -->
+                    <div class="mb-3">
+                        <label asp-for="ClientId" class="form-label">Client</label>
+                        <select asp-for="ClientId" class="form-select" asp-items="ViewBag.ClientId">
+                            <option value="">— Select —</option>
+                        </select>
+                        <span asp-validation-for="ClientId" class="text-danger"></span>
+                    </div>
+
+                    <!-- Goal Name (seleção fixa) -->
+                    <div class="mb-3">
+                        <label asp-for="GoalName" class="form-label">Goal</label>
+                        <select asp-for="GoalName" class="form-select">
+                            <option value="">— Select —</option>
+                            <option value="lose">Weight Loss</option>
+                            <option value="maintain">Maintenance</option>
+                            <option value="gain">Muscle Gain</option>
+                        </select>
+                        <span asp-validation-for="GoalName" class="text-danger"></span>
+                    </div>
+
+                    <!-- Botões -->
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary" style="border-radius:12px;">Cancel</a>
+                        <button type="submit" class="btn fh-btn-primary">
+                            <i class="bi bi-check2-circle me-1"></i>Create
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

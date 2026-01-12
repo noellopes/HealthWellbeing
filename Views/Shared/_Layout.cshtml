@@ -6,8 +6,10 @@
     <title>@ViewData["Title"] - HealthWellbeing</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/foodhabits-theme.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/HealthWellbeing.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
 </head>
 <body>
     <header>
@@ -20,38 +22,58 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
 
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="ReceitasParaPlanosAlimentares"
+                               asp-action="ReceitasParaPlanosAlimentares">Receitas Para Planos Alimentares</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="ReceitasParaPlanosAlimentares"
-                                asp-action="ReceitasParaPlanosAlimentares">Receitas Para Planos Alimentares</a>
+
+                        <!-- Dropdown FoodHabits -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white" href="#" id="navHealthDropdown"
+                               role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Food Habits
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navHealthDropdown">
+                                <li><a class="dropdown-item" asp-controller="FoodHabitsPlan" asp-action="Index">Food Plan</a></li>
+                                <li><a class="dropdown-item" asp-controller="FoodIntake" asp-action="Index">Food Intake</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Food" asp-action="Index">Foods</a></li>
+                                <li><a class="dropdown-item" asp-controller="FoodCategory" asp-action="Index">Food Categories</a></li>
+                                <li><a class="dropdown-item" asp-controller="Portion" asp-action="Index">Food Portions</a></li>
+                                <li><a class="dropdown-item" asp-controller="NutritionalComponent" asp-action="Index">Nutritional Components</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Nutritionist" asp-action="Index">Nutritionists</a></li>
+                                <li><a class="dropdown-item" asp-controller="Goal" asp-action="Index">Goals</a></li>
+                            </ul>
                         </li>
-                        <partial name="_LoginPartial" />
                     </ul>
+
+                    <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
     <div class="container">
-        <div class="container mt-4">
-            <main role="main" class="pb-3">
-                @RenderBody()
-            </main>
-        </div>
-
-        <footer class="border-top footer text-muted">
-            <div class="container">
-                &copy; 2025 - HealthWellbeing - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-            </div>
-        </footer>
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
     </div>
 
-
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - HealthWellbeing - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

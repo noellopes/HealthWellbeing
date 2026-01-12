@@ -1,38 +1,48 @@
-using HealthWellbeing.Data;
+﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 internal class SeedData
 {
-    public static void Populate(HealthWellbeingDbContext? dbContext)
+       public static void Populate(HealthWellbeingDbContext? dbContext)
     {
         if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
 
         dbContext.Database.EnsureCreated();
 
+        // --- Your existing seeds (keep if needed) ---
         PopulateCategorias(dbContext);
         PopulateAlimentos(dbContext);
-        PopulateAlergias(dbContext);
+        PopulateAlergias(dbContext);              // Portuguese allergy system (keep if other modules need it)
         PopulateRestricoesAlimentares(dbContext);
         PopulateAlimentoSubstitutos(dbContext);
         PopulateReceitas(dbContext);
         PopulateComponentesReceita(dbContext);
 
+        // --- FoodHabits ---
+        PopulateClients(dbContext);
+        PopulateAlergies(dbContext);
+        PopulateClientAlergies(dbContext);
+
+        PopulateCategories(dbContext);            
+        PopulatePortions(dbContext);
+        PopulateFoods(dbContext);
+        PopulateGoals(dbContext);
+        PopulateFoodHabitsPlans(dbContext);
+        PopulateFoodPlan(dbContext);
+        PopulateFoodPlanDays(dbContext);
+        PopulateFoodIntakes(dbContext);
+
+        // --- other modules ---
         PopulateSpecialities(dbContext);
-        // PopulateConsultas IS NOT WORKING
-        // PopulateConsultas(dbContext);
         PopulateDoctor(dbContext);
         PopulateUtenteSaude(dbContext);
 
-        var clients = PopulateClients(dbContext);
-        PopulateMember(dbContext, clients);
         PopulateTrainingType(dbContext);
         PopulatePlan(dbContext);
 
-        // --- ALTERAÇÃO AQUI: Capturamos a lista de Trainers ---
         var trainers = PopulateTrainer(dbContext);
-
-        // --- NOVO MÉTODO: Povoamento dos Treinos Agendados ---
         PopulateTraining(dbContext, trainers);
 
         PopulateEventTypes(dbContext);
@@ -44,9 +54,13 @@ internal class SeedData
 
     internal static void SeedRoles(RoleManager<IdentityRole> roleManager)
     {
-        EnsureRoleIsCreatedAsync(roleManager, "Administrator").Wait();
+        EnsureRoleIsCreatedAsync(roleManager, "Administrador").Wait();
         EnsureRoleIsCreatedAsync(roleManager, "Cliente").Wait();
         EnsureRoleIsCreatedAsync(roleManager, "Nutricionista").Wait();
+
+        EnsureRoleIsCreatedAsync(roleManager, "Administrator").Wait();
+        EnsureRoleIsCreatedAsync(roleManager, "Client").Wait();
+        EnsureRoleIsCreatedAsync(roleManager, "Nutritionist").Wait();
     }
 
     private static async Task EnsureRoleIsCreatedAsync(RoleManager<IdentityRole> roleManager, string role)
@@ -59,9 +73,25 @@ internal class SeedData
 
     internal static void SeedUsers(UserManager<IdentityUser> userManager)
     {
-        EnsureUserIsCreatedAsync(userManager, "cliente@health.com", "Secret123$", new[] { "Cliente" }).Wait();
+
+        // Admins
+        EnsureUserIsCreatedAsync(userManager, "admin@health.com", "Secret123$", new[] { "Administrador" }).Wait();
+        EnsureUserIsCreatedAsync(userManager, "administrator@health.com", "Secret123$", new[] { "Administrator" }).Wait();
+
+        // Nutritionists
         EnsureUserIsCreatedAsync(userManager, "nutri@health.com", "Secret123$", new[] { "Nutricionista" }).Wait();
+        EnsureUserIsCreatedAsync(userManager, "nutri2@health.com", "Secret123$", new[] { "Nutricionista" }).Wait();
+        EnsureUserIsCreatedAsync(userManager, "nutritionist@health.com", "Secret123$", new[] { "Nutritionist" }).Wait();
+
+        // Clients
+        EnsureUserIsCreatedAsync(userManager, "cliente@health.com", "Secret123$", new[] { "Cliente" }).Wait();
+        EnsureUserIsCreatedAsync(userManager, "client@health.com", "Secret123$", new[] { "Client" }).Wait();
+        EnsureUserIsCreatedAsync(userManager, "client2@health.com", "Secret123$", new[] { "Client" }).Wait();
+        EnsureUserIsCreatedAsync(userManager, "client3@health.com", "Secret123$", new[] { "Client" }).Wait();
+        EnsureUserIsCreatedAsync(userManager, "client4@health.com", "Secret123$", new[] { "Client" }).Wait();
+        EnsureUserIsCreatedAsync(userManager, "alice@health.com", "Secret123$", new[] { "Client" }).Wait();
     }
+
 
     private static async Task EnsureUserIsCreatedAsync(
         UserManager<IdentityUser> userManager,
@@ -86,17 +116,309 @@ internal class SeedData
 
     internal static void SeedDefaultAdmin(UserManager<IdentityUser> userManager)
     {
-        EnsureUserIsCreatedAsync(userManager, "admin@ipg.pt", "Secret123$", ["Administrator"]).Wait();
+        EnsureUserIsCreatedAsync(userManager, "admin@ipg.pt", "Secret123$", ["Administrador"]).Wait();
     }
 
-    private static void PopulateCategorias(HealthWellbeingDbContext context)
+
+
+    private static void PopulateCategories(HealthWellbeingDbContext dbContext)
     {
-        if (context.CategoriaAlimento.Any())
+        if (dbContext.FoodCategory != null && !dbContext.FoodCategory.Any())
+        {
+            dbContext.FoodCategory.AddRange(new[]
+            {
+            new FoodCategory { Category = "Vegetables" },
+            new FoodCategory { Category = "Fruits" },
+            new FoodCategory { Category = "Proteins" },
+            new FoodCategory { Category = "Dairy" },
+            new FoodCategory { Category = "Grains" },
+            new FoodCategory { Category = "Fats" },
+            new FoodCategory { Category = "Beverages" },
+            new FoodCategory { Category = "Snacks" }
+        });
+
+            dbContext.SaveChanges();
+        }
+    }
+    private static void PopulateNutritionists(HealthWellbeingDbContext context)
+    {
+        if (context.Nutritionist != null && !context.Nutritionist.Any())
+        {
+            context.Nutritionist.AddRange(new[]
+            {
+            new Nutritionist { Name = "Inês Almeida", Gender = "F", Email = "ines.almeida@health.com" },
+            new Nutritionist { Name = "Tiago Carvalho", Gender = "M", Email = "tiago.carvalho@health.com" },
+            new Nutritionist { Name = "Marta Sousa", Gender = "F", Email = "marta.sousa@health.com" },
+            new Nutritionist { Name = "Rui Fernandes", Gender = "M", Email = "rui.fernandes@health.com" },
+            new Nutritionist { Name = "Beatriz Costa", Gender = "F", Email = "beatriz.costa@health.com" },
+            new Nutritionist { Name = "João Ribeiro", Gender = "M", Email = "joao.ribeiro@health.com" }
+        });
+
+            context.SaveChanges();
+        }
+    }
+
+    private static void PopulatePortions(HealthWellbeingDbContext dbContext)
+    {
+        if (dbContext.Portion != null && !dbContext.Portion.Any())
+        {
+            dbContext.Portion.AddRange(new[]
+            {
+            new Portion { PortionName = "Small" },
+            new Portion { PortionName = "Medium" },
+            new Portion { PortionName = "Large" },
+            new Portion { PortionName = "1 serving" }
+        });
+
+            dbContext.SaveChanges();
+        }
+    }
+
+    private static void PopulateFoods(HealthWellbeingDbContext dbContext)
+    {
+        if (dbContext.Food != null && !dbContext.Food.Any())
+        {
+            var cats = dbContext.FoodCategory.ToList();
+            int Cat(string name) => cats.First(c => c.Category == name).CategoryId;
+
+            dbContext.Food.AddRange(new[]
+            {
+            new Food { Name = "Chicken breast", CategoryId = Cat("Proteins") },
+            new Food { Name = "Eggs", CategoryId = Cat("Proteins") },
+            new Food { Name = "Salmon", CategoryId = Cat("Proteins") },
+            new Food { Name = "Tofu", CategoryId = Cat("Proteins") },
+
+            new Food { Name = "Broccoli", CategoryId = Cat("Vegetables") },
+            new Food { Name = "Spinach", CategoryId = Cat("Vegetables") },
+            new Food { Name = "Carrots", CategoryId = Cat("Vegetables") },
+
+            new Food { Name = "Apple", CategoryId = Cat("Fruits") },
+            new Food { Name = "Banana", CategoryId = Cat("Fruits") },
+            new Food { Name = "Orange", CategoryId = Cat("Fruits") },
+
+            new Food { Name = "Greek yogurt", CategoryId = Cat("Dairy") },
+            new Food { Name = "Milk", CategoryId = Cat("Dairy") },
+
+            new Food { Name = "Rice", CategoryId = Cat("Grains") },
+            new Food { Name = "Oats", CategoryId = Cat("Grains") },
+            new Food { Name = "Whole wheat bread", CategoryId = Cat("Grains") },
+
+            new Food { Name = "Olive oil", CategoryId = Cat("Fats") },
+            new Food { Name = "Almonds", CategoryId = Cat("Fats") },
+
+            new Food { Name = "Water", CategoryId = Cat("Beverages") },
+            new Food { Name = "Tea", CategoryId = Cat("Beverages") },
+
+            new Food { Name = "Dark chocolate", CategoryId = Cat("Snacks") }
+        });
+
+            dbContext.SaveChanges();
+        }
+    }
+
+    private static void PopulateGoals(HealthWellbeingDbContext context)
+    {
+        if (context.Goal == null) return;
+
+        // Evitar duplicar (se já houver goals, não mexe)
+        if (context.Goal.Any()) return;
+
+        var clients = context.Client
+            .AsNoTracking()
+            .OrderBy(c => c.ClientId)
+            .ToList();
+
+        if (!clients.Any()) return;
+
+        var rnd = new Random(123);
+
+        // Templates simples para variar valores
+        var templates = new[]
+        {
+        new { Name = "Maintenance", Cal = 2100, Prot = 120, Fat = 70, Hyd = 260, Vit = 60 },
+        new { Name = "Weight Loss", Cal = 1700, Prot = 140, Fat = 55, Hyd = 220, Vit = 65 },
+        new { Name = "Muscle Gain", Cal = 2600, Prot = 170, Fat = 80, Hyd = 300, Vit = 70 },
+        new { Name = "Recomposition", Cal = 2200, Prot = 150, Fat = 65, Hyd = 260, Vit = 65 },
+    };
+
+        var goals = new List<Goal>();
+
+        foreach (var c in clients)
+        {
+            var t = templates[rnd.Next(templates.Length)];
+
+            // Pequena variação para não serem todos iguais
+            int calVar = rnd.Next(-150, 151);          // -150..+150
+            int protVar = rnd.Next(-10, 11);           // -10..+10
+            int fatVar = rnd.Next(-8, 9);              // -8..+8
+            int hydVar = rnd.Next(-40, 41);            // -40..+40
+            int vitVar = rnd.Next(-5, 6);              // -5..+5
+
+            goals.Add(new Goal
+            {
+                ClientId = c.ClientId,
+                GoalName = t.Name,
+                DailyCalories = Math.Max(1200, t.Cal + calVar),
+                DailyProtein = Math.Max(50, t.Prot + protVar),
+                DailyFat = Math.Max(30, t.Fat + fatVar),
+                DailyHydrates = Math.Max(100, t.Hyd + hydVar),
+                DailyVitamins = Math.Max(30, t.Vit + vitVar)
+            });
+        }
+
+        context.Goal.AddRange(goals);
+        context.SaveChanges();
+    }
+
+
+    private static void PopulateFoodHabitsPlans(HealthWellbeingDbContext dbContext)
+    {
+        if (dbContext.FoodHabitsPlan != null && !dbContext.FoodHabitsPlan.Any())
+        {
+            var today = DateTime.Today;
+            var clients = dbContext.Client.OrderBy(c => c.ClientId).ToList();
+
+            var plans = new List<FoodHabitsPlan>();
+
+            for (int i = 0; i < 10 && i < clients.Count; i++)
+            {
+                var clientId = clients[i].ClientId;
+
+                var goalId = dbContext.Goal
+                    .Where(g => g.ClientId == clientId)
+                    .OrderByDescending(g => g.GoalId)
+                    .Select(g => g.GoalId)
+                    .FirstOrDefault();
+
+                if (goalId == 0) continue;
+
+                plans.Add(new FoodHabitsPlan
+                {
+                    ClientId = clientId,
+                    GoalId = goalId,
+                    StartingDate = today.AddDays(-14),
+                    EndingDate = today.AddDays(14)
+                });
+            }
+
+            dbContext.FoodHabitsPlan.AddRange(plans);
+            dbContext.SaveChanges();
+        }
+    }
+
+    private static void PopulateFoodPlan(HealthWellbeingDbContext dbContext)
+    {
+        if (dbContext.FoodPlan != null && !dbContext.FoodPlan.Any())
+        {
+            var rnd = new Random(1);
+            var plans = dbContext.FoodHabitsPlan.OrderBy(p => p.FoodHabitsPlanId).ToList();
+            var foods = dbContext.Food.OrderBy(f => f.FoodId).ToList();
+            var portions = dbContext.Portion.OrderBy(p => p.PortionId).ToList();
+
+            foreach (var plan in plans)
+            {
+                var pickFoods = foods.OrderBy(_ => rnd.Next()).Take(6).ToList();
+
+                foreach (var food in pickFoods)
+                {
+                    var portionId = portions[rnd.Next(portions.Count)].PortionId;
+
+                    dbContext.FoodPlan.Add(new PlanFood
+                    {
+                        PlanId = plan.FoodHabitsPlanId,
+                        FoodId = food.FoodId,
+                        PortionId = portionId
+                    });
+                }
+            }
+
+            dbContext.SaveChanges();
+        }
+    }
+
+    private static void PopulateFoodPlanDays(HealthWellbeingDbContext dbContext)
+    {
+        if (dbContext.FoodPlanDay != null && !dbContext.FoodPlanDay.Any())
+        {
+            var plans = dbContext.FoodHabitsPlan.OrderBy(p => p.FoodHabitsPlanId).ToList();
+            var planFoods = dbContext.FoodPlan.OrderBy(x => x.PlanId).ToList();
+
+            foreach (var plan in plans)
+            {
+                var foodsForPlan = planFoods.Where(x => x.PlanId == plan.FoodHabitsPlanId).ToList();
+                if (foodsForPlan.Count == 0) continue;
+
+                // Seed only a 7-day window to keep DB small
+                var start = DateTime.Today.AddDays(-6).Date;
+                if (start < plan.StartingDate.Date) start = plan.StartingDate.Date;
+
+                var end = DateTime.Today.Date;
+                if (end > plan.EndingDate.Date) end = plan.EndingDate.Date;
+
+                for (var d = start; d <= end; d = d.AddDays(1))
+                {
+                    foreach (var pf in foodsForPlan)
+                    {
+                        dbContext.FoodPlanDay.Add(new FoodPlanDay
+                        {
+                            PlanId = plan.FoodHabitsPlanId,
+                            FoodId = pf.FoodId,
+                            PortionId = pf.PortionId,
+                            Date = d,
+                            PortionsPlanned = 1,
+                            ScheduledTime = null,
+                            MealType = null
+                        });
+                    }
+                }
+            }
+
+            dbContext.SaveChanges();
+        }
+    }
+
+    private static void PopulateFoodIntakes(HealthWellbeingDbContext dbContext)
+    {
+        if (dbContext.FoodIntake != null && !dbContext.FoodIntake.Any())
+        {
+            var rnd = new Random(2);
+            var planned = dbContext.FoodPlanDay
+                .OrderBy(x => x.PlanId)
+                .ThenBy(x => x.Date)
+                .ToList();
+
+            // Create some "eaten" records so charts show progress
+            foreach (var p in planned)
+            {
+                // ~60% chance it was eaten
+                bool eaten = rnd.NextDouble() < 0.60;
+
+                dbContext.FoodIntake.Add(new FoodIntake
+                {
+                    PlanId = p.PlanId,
+                    FoodId = p.FoodId,
+                    PortionId = p.PortionId,
+                    Date = p.Date,
+                    PortionsPlanned = p.PortionsPlanned,
+                    PortionsEaten = eaten ? p.PortionsPlanned : 0,
+                    ScheduledTime = p.ScheduledTime ?? p.Date.AddHours(12)
+                });
+            }
+
+            dbContext.SaveChanges();
+        }
+    }
+
+
+
+    private static void PopulateCategorias(HealthWellbeingDbContext dbContext)
+    {
+        if (dbContext.CategoriaAlimento.Any())
         {
             return;
         }
 
-        context.CategoriaAlimento.AddRange(
+        dbContext.CategoriaAlimento.AddRange(
             new CategoriaAlimento { Name = "Frutas", Description = "Categoria de frutas." },
             new CategoriaAlimento { Name = "Vegetais", Description = "Categoria de vegetais." },
             new CategoriaAlimento { Name = "Grãos", Description = "Categoria de grãos." },
@@ -104,17 +426,17 @@ internal class SeedData
             new CategoriaAlimento { Name = "Carnes", Description = "Categoria de carnes." }
         );
 
-        context.SaveChanges();
+        dbContext.SaveChanges();
     }
 
-    private static void PopulateAlimentos(HealthWellbeingDbContext context)
+    private static void PopulateAlimentos(HealthWellbeingDbContext dbCcontext)
     {
-        if (context.Alimentos.Any())
+        if (dbCcontext.Alimentos.Any())
         {
             return;
         }
 
-        context.Alimentos.AddRange(
+        dbCcontext.Alimentos.AddRange(
             new Alimento { Name = "Maçã", Description = "Fruta doce e crocante.", CategoriaAlimentoId = 1, Calories = 52, KcalPor100g = 52, ProteinaGPor100g = 0.3m, HidratosGPor100g = 14m, GorduraGPor100g = 0.2m },
             new Alimento { Name = "Cenoura", Description = "Vegetal rico em vitamina A.", CategoriaAlimentoId = 2, Calories = 41, KcalPor100g = 41, ProteinaGPor100g = 0.9m, HidratosGPor100g = 10m, GorduraGPor100g = 0.2m },
             new Alimento { Name = "Arroz", Description = "Grão básico na alimentação.", CategoriaAlimentoId = 3, Calories = 130, KcalPor100g = 130, ProteinaGPor100g = 2.7m, HidratosGPor100g = 28m, GorduraGPor100g = 0.3m },
@@ -134,12 +456,140 @@ internal class SeedData
             new Alimento { Name = "Batata Doce", Description = "Tubérculo rico em betacaroteno e fibras.", CategoriaAlimentoId = 3, Calories = 86, KcalPor100g = 86, ProteinaGPor100g = 1.6m, HidratosGPor100g = 20m, GorduraGPor100g = 0.1m }
         );
 
-        context.SaveChanges();
+        dbCcontext.SaveChanges();
     }
 
-    private static void PopulateAlergias(HealthWellbeingDbContext context)
+
+    private static void PopulateClients(HealthWellbeingDbContext dbContext)
     {
-        if (context.Alergia.Any())
+        if (dbContext.Client.Any()) return;
+
+        var clients = new List<Client>
+    {
+        new Client
+        {
+            Name = "Sofia Almeida",
+            Email = "cliente@health.com",
+            BirthDate = new DateTime(1992, 5, 14),
+            Gender = "Female"
+        },
+        new Client
+        {
+            Name = "Tiago Martins",
+            Email = "client@health.com",
+            BirthDate = new DateTime(1987, 2, 8),
+            Gender = "Male"
+        },
+        new Client
+        {
+            Name = "Beatriz Costa",
+            Email = "client2@health.com",
+            BirthDate = new DateTime(1998, 10, 20),
+            Gender = "Female"
+        },
+        new Client
+        {
+            Name = "Rui Ferreira",
+            Email = "client3@health.com",
+            BirthDate = new DateTime(1994, 7, 11),
+            Gender = "Male"
+        },
+        new Client
+        {
+            Name = "Inês Rodrigues",
+            Email = "client4@health.com",
+            BirthDate = new DateTime(1990, 1, 30),
+            Gender = "Female"
+        }
+    };
+
+        // Extra clients (no Identity users needed)
+        var rnd = new Random(10);
+
+        string[] firstNamesF = { "Ana", "Mariana", "Catarina", "Joana", "Matilde", "Leonor", "Carolina", "Diana", "Filipa", "Raquel" };
+        string[] firstNamesM = { "João", "Pedro", "Miguel", "Gonçalo", "André", "Bruno", "Diogo", "Nuno", "Rafael", "Vítor" };
+        string[] lastNames = { "Silva", "Santos", "Ferreira", "Pereira", "Costa", "Oliveira", "Martins", "Rodrigues", "Almeida", "Nunes", "Gomes", "Carvalho", "Lopes", "Ribeiro", "Sousa", "Mendes" };
+
+        string MakeName(bool female)
+        {
+            var first = female ? firstNamesF[rnd.Next(firstNamesF.Length)] : firstNamesM[rnd.Next(firstNamesM.Length)];
+            var last1 = lastNames[rnd.Next(lastNames.Length)];
+            var last2 = lastNames[rnd.Next(lastNames.Length)];
+            return $"{first} {last1} {last2}";
+        }
+
+        for (int i = 6; i <= 30; i++)
+        {
+            bool female = rnd.Next(0, 2) == 0;
+            var year = rnd.Next(1975, 2006);
+            var month = rnd.Next(1, 13);
+            var day = rnd.Next(1, DateTime.DaysInMonth(year, month) + 1);
+
+            clients.Add(new Client
+            {
+                Name = MakeName(female),
+                Email = $"testclient{i}@health.com",
+                BirthDate = new DateTime(year, month, day),
+                Gender = female ? "Female" : "Male"
+            });
+        }
+
+        dbContext.Client.AddRange(clients);
+        dbContext.SaveChanges();
+    }
+
+
+    private static void PopulateAlergies(HealthWellbeingDbContext dbContext)
+    {
+        if (dbContext.Alergy != null && dbContext.Alergy.Any()) return;
+
+        dbContext.Alergy.AddRange(new[]
+        {
+        new Alergy { AlergyName = "Peanuts" },
+        new Alergy { AlergyName = "Tree Nuts" },
+        new Alergy { AlergyName = "Milk" },
+        new Alergy { AlergyName = "Eggs" },
+        new Alergy { AlergyName = "Fish" },
+        new Alergy { AlergyName = "Shellfish" },
+        new Alergy { AlergyName = "Soy" },
+        new Alergy { AlergyName = "Wheat (Gluten)" }
+    });
+
+        dbContext.SaveChanges();
+    }
+
+    private static void PopulateClientAlergies(HealthWellbeingDbContext dbContext)
+    {
+        if (dbContext.ClientAlergy != null && dbContext.ClientAlergy.Any()) return;
+
+        var rnd = new Random(7);
+        var clients = dbContext.Client.OrderBy(c => c.ClientId).ToList();
+        var alergies = dbContext.Alergy.OrderBy(a => a.AlergyId).ToList();
+
+        foreach (var c in clients)
+        {
+            // 0-3 allergies per client
+            var pick = alergies.OrderBy(_ => rnd.Next()).Take(rnd.Next(0, 4)).ToList();
+
+            foreach (var a in pick)
+            {
+                dbContext.ClientAlergy.Add(new ClientAlergy
+                {
+                    ClientId = c.ClientId,
+                    AlergyId = a.AlergyId
+                });
+            }
+        }
+
+        dbContext.SaveChanges();
+    }
+
+
+
+
+    private static void PopulateAlergias(HealthWellbeingDbContext dbContext)
+    {
+        if (dbContext.Alergia.Any())
         {
             return;
         }
@@ -225,11 +675,11 @@ internal class SeedData
         }
     };
 
-        context.Alergia.AddRange(alergias);
-        context.SaveChanges();
+        dbContext.Alergia.AddRange(alergias);
+        dbContext.SaveChanges();
 
         // Associa os alimentos existentes às alergias
-        var alimentos = context.Alimentos.ToList();
+        var alimentos = dbContext.Alimentos.ToList();
 
         var alergiaAlimentos = new List<AlergiaAlimento>
     {
@@ -248,143 +698,143 @@ internal class SeedData
         new AlergiaAlimento { AlergiaId = alergias[10].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Leite")?.AlimentoId ?? 4 }
     };
 
-        context.AlergiaAlimento.AddRange(alergiaAlimentos);
-        context.SaveChanges();
+        dbContext.AlergiaAlimento.AddRange(alergiaAlimentos);
+        dbContext.SaveChanges();
     }
 
 
-    private static void PopulateRestricoesAlimentares(HealthWellbeingDbContext context)
+    private static void PopulateRestricoesAlimentares(HealthWellbeingDbContext dbContext)
     {
-        if (context.RestricaoAlimentar.Any())
+        if (dbContext.RestricaoAlimentar.Any())
         {
             return;
         }
 
         var restricoes = new List<RestricaoAlimentar>
         {
-            new RestricaoAlimentar 
-            { 
-                Nome = "Intolerância à Lactose", 
-                Tipo = TipoRestricao.IntoleranciaLactose, 
-                Gravidade = GravidadeRestricao.Moderada, 
-                Descricao = "Dificuldade em digerir lactose presente em laticínios." 
+            new RestricaoAlimentar
+            {
+                Nome = "Intolerância à Lactose",
+                Tipo = TipoRestricao.IntoleranciaLactose,
+                Gravidade = GravidadeRestricao.Moderada,
+                Descricao = "Dificuldade em digerir lactose presente em laticínios."
             },
-            new RestricaoAlimentar 
-            { 
-                Nome = "Dieta Vegana", 
-                Tipo = TipoRestricao.Vegana, 
-                Gravidade = GravidadeRestricao.Leve, 
-                Descricao = "Exclusão total de produtos de origem animal." 
+            new RestricaoAlimentar
+            {
+                Nome = "Dieta Vegana",
+                Tipo = TipoRestricao.Vegana,
+                Gravidade = GravidadeRestricao.Leve,
+                Descricao = "Exclusão total de produtos de origem animal."
             },
-            new RestricaoAlimentar 
-            { 
-                Nome = "Restrição de Sódio", 
-                Tipo = TipoRestricao.BaixoSodio, 
-                Gravidade = GravidadeRestricao.Moderada, 
-                Descricao = "Controle rigoroso de consumo de sódio para hipertensos." 
+            new RestricaoAlimentar
+            {
+                Nome = "Restrição de Sódio",
+                Tipo = TipoRestricao.BaixoSodio,
+                Gravidade = GravidadeRestricao.Moderada,
+                Descricao = "Controle rigoroso de consumo de sódio para hipertensos."
             },
-            new RestricaoAlimentar 
-            { 
-                Nome = "Doença Celíaca", 
-                Tipo = TipoRestricao.IntoleranciaGluten, 
-                Gravidade = GravidadeRestricao.Grave, 
-                Descricao = "Intolerância permanente ao glúten. Pode causar danos intestinais." 
+            new RestricaoAlimentar
+            {
+                Nome = "Doença Celíaca",
+                Tipo = TipoRestricao.IntoleranciaGluten,
+                Gravidade = GravidadeRestricao.Grave,
+                Descricao = "Intolerância permanente ao glúten. Pode causar danos intestinais."
             },
-            new RestricaoAlimentar 
-            { 
-                Nome = "Diabetes - Controle de Açúcar", 
-                Tipo = TipoRestricao.SemAcucar, 
-                Gravidade = GravidadeRestricao.Grave, 
-                Descricao = "Restrição total de açúcares refinados e controle de carboidratos." 
+            new RestricaoAlimentar
+            {
+                Nome = "Diabetes - Controle de Açúcar",
+                Tipo = TipoRestricao.SemAcucar,
+                Gravidade = GravidadeRestricao.Grave,
+                Descricao = "Restrição total de açúcares refinados e controle de carboidratos."
             },
-            new RestricaoAlimentar 
-            { 
-                Nome = "Vegetariana Estrita", 
-                Tipo = TipoRestricao.Vegetariana, 
-                Gravidade = GravidadeRestricao.Leve, 
-                Descricao = "Dieta sem carne, mas pode incluir laticínios e ovos." 
+            new RestricaoAlimentar
+            {
+                Nome = "Vegetariana Estrita",
+                Tipo = TipoRestricao.Vegetariana,
+                Gravidade = GravidadeRestricao.Leve,
+                Descricao = "Dieta sem carne, mas pode incluir laticínios e ovos."
             },
-            new RestricaoAlimentar 
-            { 
-                Nome = "Alergia a Frutos do Mar", 
-                Tipo = TipoRestricao.Outra, 
-                Gravidade = GravidadeRestricao.Grave, 
-                Descricao = "Alergia severa a crustáceos e moluscos." 
+            new RestricaoAlimentar
+            {
+                Nome = "Alergia a Frutos do Mar",
+                Tipo = TipoRestricao.Outra,
+                Gravidade = GravidadeRestricao.Grave,
+                Descricao = "Alergia severa a crustáceos e moluscos."
             },
-            new RestricaoAlimentar 
-            { 
-                Nome = "Restrição Religiosa - Halal", 
-                Tipo = TipoRestricao.Religiosa, 
-                Gravidade = GravidadeRestricao.Moderada, 
-                Descricao = "Alimentação de acordo com preceitos islâmicos." 
+            new RestricaoAlimentar
+            {
+                Nome = "Restrição Religiosa - Halal",
+                Tipo = TipoRestricao.Religiosa,
+                Gravidade = GravidadeRestricao.Moderada,
+                Descricao = "Alimentação de acordo com preceitos islâmicos."
             },
-            new RestricaoAlimentar 
-            { 
-                Nome = "Sensibilidade ao Glúten", 
-                Tipo = TipoRestricao.IntoleranciaGluten, 
-                Gravidade = GravidadeRestricao.Leve, 
-                Descricao = "Sensibilidade não celíaca ao glúten." 
+            new RestricaoAlimentar
+            {
+                Nome = "Sensibilidade ao Glúten",
+                Tipo = TipoRestricao.IntoleranciaGluten,
+                Gravidade = GravidadeRestricao.Leve,
+                Descricao = "Sensibilidade não celíaca ao glúten."
             },
-            new RestricaoAlimentar 
-            { 
-                Nome = "Dieta Low Carb", 
-                Tipo = TipoRestricao.SemAcucar, 
-                Gravidade = GravidadeRestricao.Leve, 
-                Descricao = "Redução de carboidratos e açúcares para controle de peso." 
+            new RestricaoAlimentar
+            {
+                Nome = "Dieta Low Carb",
+                Tipo = TipoRestricao.SemAcucar,
+                Gravidade = GravidadeRestricao.Leve,
+                Descricao = "Redução de carboidratos e açúcares para controle de peso."
             },
-            new RestricaoAlimentar 
-            { 
-                Nome = "Alergia a Amendoim", 
-                Tipo = TipoRestricao.Outra, 
-                Gravidade = GravidadeRestricao.Grave, 
-                Descricao = "Alergia severa a amendoim e derivados." 
+            new RestricaoAlimentar
+            {
+                Nome = "Alergia a Amendoim",
+                Tipo = TipoRestricao.Outra,
+                Gravidade = GravidadeRestricao.Grave,
+                Descricao = "Alergia severa a amendoim e derivados."
             },
-            new RestricaoAlimentar 
-            { 
-                Nome = "Restrição Religiosa - Kosher", 
-                Tipo = TipoRestricao.Religiosa, 
-                Gravidade = GravidadeRestricao.Moderada, 
-                Descricao = "Alimentação de acordo com leis dietéticas judaicas." 
+            new RestricaoAlimentar
+            {
+                Nome = "Restrição Religiosa - Kosher",
+                Tipo = TipoRestricao.Religiosa,
+                Gravidade = GravidadeRestricao.Moderada,
+                Descricao = "Alimentação de acordo com leis dietéticas judaicas."
             },
-            new RestricaoAlimentar 
-            { 
-                Nome = "Intolerância à Frutose", 
-                Tipo = TipoRestricao.Outra, 
-                Gravidade = GravidadeRestricao.Moderada, 
-                Descricao = "Dificuldade em digerir frutose presente em frutas e mel." 
+            new RestricaoAlimentar
+            {
+                Nome = "Intolerância à Frutose",
+                Tipo = TipoRestricao.Outra,
+                Gravidade = GravidadeRestricao.Moderada,
+                Descricao = "Dificuldade em digerir frutose presente em frutas e mel."
             },
-            new RestricaoAlimentar 
-            { 
-                Nome = "Dieta Paleolítica", 
-                Tipo = TipoRestricao.Outra, 
-                Gravidade = GravidadeRestricao.Leve, 
-                Descricao = "Baseada em alimentos supostamente disponíveis na era paleolítica." 
+            new RestricaoAlimentar
+            {
+                Nome = "Dieta Paleolítica",
+                Tipo = TipoRestricao.Outra,
+                Gravidade = GravidadeRestricao.Leve,
+                Descricao = "Baseada em alimentos supostamente disponíveis na era paleolítica."
             },
-            new RestricaoAlimentar 
-            { 
-                Nome = "Alergia a Ovos", 
-                Tipo = TipoRestricao.Outra, 
-                Gravidade = GravidadeRestricao.Moderada, 
-                Descricao = "Alergia a proteínas presentes em ovos." 
+            new RestricaoAlimentar
+            {
+                Nome = "Alergia a Ovos",
+                Tipo = TipoRestricao.Outra,
+                Gravidade = GravidadeRestricao.Moderada,
+                Descricao = "Alergia a proteínas presentes em ovos."
             }
         };
 
-        context.RestricaoAlimentar.AddRange(restricoes);
-        context.SaveChanges();
+        dbContext.RestricaoAlimentar.AddRange(restricoes);
+        dbContext.SaveChanges();
 
         // Agora cria as associações N:N com alimentos
-        PopulateRestricaoAlimentarAssociacoes(context, restricoes);
+        PopulateRestricaoAlimentarAssociacoes(dbContext, restricoes);
     }
 
 
 
-    private static void PopulateRestricaoAlimentarAssociacoes(HealthWellbeingDbContext context, List<RestricaoAlimentar> restricoes)
+    private static void PopulateRestricaoAlimentarAssociacoes(HealthWellbeingDbContext dbContext, List<RestricaoAlimentar> restricoes)
     {
         var associacoes = new List<RestricaoAlimentarAlimento>();
-        
+
         // Obtém todos os alimentos disponíveis
-        var alimentos = context.Alimentos.ToList();
-        
+        var alimentos = dbContext.Alimentos.ToList();
+
         if (!alimentos.Any()) return;
 
         // Intolerância à Lactose - associa com laticínios
@@ -392,10 +842,10 @@ internal class SeedData
         var laticinios = alimentos.Where(a => a.Name.Contains("Leite") || a.Name.Contains("Queijo")).Take(3);
         foreach (var alimento in laticinios)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = lactose.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
+            associacoes.Add(new RestricaoAlimentarAlimento
+            {
+                RestricaoAlimentarId = lactose.RestricaoAlimentarId,
+                AlimentoId = alimento.AlimentoId
             });
         }
 
@@ -404,10 +854,10 @@ internal class SeedData
         var produtosAnimais = alimentos.Where(a => a.Name.Contains("Frango") || a.Name.Contains("Salmão") || a.Name.Contains("Queijo") || a.Name.Contains("Leite")).Take(4);
         foreach (var alimento in produtosAnimais)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = vegana.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
+            associacoes.Add(new RestricaoAlimentarAlimento
+            {
+                RestricaoAlimentarId = vegana.RestricaoAlimentarId,
+                AlimentoId = alimento.AlimentoId
             });
         }
 
@@ -416,10 +866,10 @@ internal class SeedData
         var alimentosProcessados = alimentos.Where(a => a.Name.Contains("Queijo") || a.Name.Contains("Pão")).Take(2);
         foreach (var alimento in alimentosProcessados)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = baixoSodio.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
+            associacoes.Add(new RestricaoAlimentarAlimento
+            {
+                RestricaoAlimentarId = baixoSodio.RestricaoAlimentarId,
+                AlimentoId = alimento.AlimentoId
             });
         }
 
@@ -428,10 +878,10 @@ internal class SeedData
         var comGluten = alimentos.Where(a => a.Name.Contains("Pão") || a.Name.Contains("Aveia")).Take(3);
         foreach (var alimento in comGluten)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = celiaca.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
+            associacoes.Add(new RestricaoAlimentarAlimento
+            {
+                RestricaoAlimentarId = celiaca.RestricaoAlimentarId,
+                AlimentoId = alimento.AlimentoId
             });
         }
 
@@ -440,10 +890,10 @@ internal class SeedData
         var acucarados = alimentos.Where(a => a.Name.Contains("Banana") || a.Name.Contains("Batata Doce") || a.Name.Contains("Arroz")).Take(3);
         foreach (var alimento in acucarados)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = diabetes.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
+            associacoes.Add(new RestricaoAlimentarAlimento
+            {
+                RestricaoAlimentarId = diabetes.RestricaoAlimentarId,
+                AlimentoId = alimento.AlimentoId
             });
         }
 
@@ -452,10 +902,10 @@ internal class SeedData
         var frutosMarAlimentos = alimentos.Where(a => a.Name.Contains("Salmão")).Take(1);
         foreach (var alimento in frutosMarAlimentos)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = frutosMar.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
+            associacoes.Add(new RestricaoAlimentarAlimento
+            {
+                RestricaoAlimentarId = frutosMar.RestricaoAlimentarId,
+                AlimentoId = alimento.AlimentoId
             });
         }
 
@@ -464,10 +914,10 @@ internal class SeedData
         var amendoimAlimentos = alimentos.Where(a => a.Name.Contains("Feijão") || a.Name.Contains("Aveia")).Take(2);
         foreach (var alimento in amendoimAlimentos)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = amendoim.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
+            associacoes.Add(new RestricaoAlimentarAlimento
+            {
+                RestricaoAlimentarId = amendoim.RestricaoAlimentarId,
+                AlimentoId = alimento.AlimentoId
             });
         }
 
@@ -476,10 +926,10 @@ internal class SeedData
         var ovosAlimentos = alimentos.Where(a => a.Name.Contains("Maçã") || a.Name.Contains("Banana")).Take(2);
         foreach (var alimento in ovosAlimentos)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = ovos.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
+            associacoes.Add(new RestricaoAlimentarAlimento
+            {
+                RestricaoAlimentarId = ovos.RestricaoAlimentarId,
+                AlimentoId = alimento.AlimentoId
             });
         }
 
@@ -488,10 +938,10 @@ internal class SeedData
         var frutasDoces = alimentos.Where(a => a.Name.Contains("Maçã") || a.Name.Contains("Banana") || a.Name.Contains("Batata Doce")).Take(3);
         foreach (var alimento in frutasDoces)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = frutose.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
+            associacoes.Add(new RestricaoAlimentarAlimento
+            {
+                RestricaoAlimentarId = frutose.RestricaoAlimentarId,
+                AlimentoId = alimento.AlimentoId
             });
         }
 
@@ -504,28 +954,28 @@ internal class SeedData
             var alimentosAleatorios = alimentos.OrderBy(x => random.Next()).Take(2);
             foreach (var alimento in alimentosAleatorios)
             {
-                associacoes.Add(new RestricaoAlimentarAlimento 
-                { 
-                    RestricaoAlimentarId = restricao.RestricaoAlimentarId, 
-                    AlimentoId = alimento.AlimentoId 
+                associacoes.Add(new RestricaoAlimentarAlimento
+                {
+                    RestricaoAlimentarId = restricao.RestricaoAlimentarId,
+                    AlimentoId = alimento.AlimentoId
                 });
             }
         }
 
-        context.RestricaoAlimentarAlimento.AddRange(associacoes);
-        context.SaveChanges();
+        dbContext.RestricaoAlimentarAlimento.AddRange(associacoes);
+        dbContext.SaveChanges();
     }
 
 
 
-    private static void PopulateAlimentoSubstitutos(HealthWellbeingDbContext context)
+    private static void PopulateAlimentoSubstitutos(HealthWellbeingDbContext dbContext)
     {
-        if (context.AlimentoSubstitutos.Any())
+        if (dbContext.AlimentoSubstitutos.Any())
         {
             return;
         }
 
-        context.AlimentoSubstitutos.AddRange(
+        dbContext.AlimentoSubstitutos.AddRange(
 
             new AlimentoSubstituto { AlimentoOriginalId = 1, AlimentoSubstitutoRefId = 2, Motivo = "Alternativa para alergia.", ProporcaoEquivalente = 1, Observacoes = "Substituição recomendada.", FatorSimilaridade = 0.8 },
             new AlimentoSubstituto { AlimentoOriginalId = 3, AlimentoSubstitutoRefId = 4, Motivo = "Alternativa para intolerância ao glúten.", ProporcaoEquivalente = 1, Observacoes = "Substituição recomendada.", FatorSimilaridade = 0.9 },
@@ -599,17 +1049,17 @@ internal class SeedData
             new AlimentoSubstituto { AlimentoOriginalId = 15, AlimentoSubstitutoRefId = 3, Motivo = "Arroz como acompanhamento alternativo.", ProporcaoEquivalente = 1, Observacoes = "Uso em guarnições.", FatorSimilaridade = 0.25 }
         );
 
-        context.SaveChanges();
+        dbContext.SaveChanges();
     }
 
-    private static void PopulateComponentesReceita(HealthWellbeingDbContext context)
+    private static void PopulateComponentesReceita(HealthWellbeingDbContext dbContext)
     {
-        if (context.ComponenteReceita.Any())
+        if (dbContext.ComponenteReceita.Any())
         {
             return;
         }
 
-        var receitas = context.Receita.ToList();
+        var receitas = dbContext.Receita.ToList();
         if (!receitas.Any())
         {
             return;
@@ -624,7 +1074,7 @@ internal class SeedData
             return id;
         };
 
-        context.ComponenteReceita.AddRange(
+        dbContext.ComponenteReceita.AddRange(
             new ComponenteReceita { AlimentoId = 1, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 100, IsOpcional = false, ReceitaId = nextReceitaId() },
             new ComponenteReceita { AlimentoId = 2, UnidadeMedida = UnidadeMedidaEnum.Mililitro, Quantidade = 200, IsOpcional = true, ReceitaId = nextReceitaId() },
             new ComponenteReceita { AlimentoId = 3, UnidadeMedida = UnidadeMedidaEnum.Xicara, Quantidade = 1, IsOpcional = false, ReceitaId = nextReceitaId() },
@@ -649,17 +1099,54 @@ internal class SeedData
             new ComponenteReceita { AlimentoId = 12, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 40, IsOpcional = true, ReceitaId = nextReceitaId() }
         );
 
-        context.SaveChanges();
+        dbContext.SaveChanges();
     }
 
-    private static void PopulateReceitas(HealthWellbeingDbContext context)
+    private static void PopulateFoodHabits(HealthWellbeingDbContext dbContext)
     {
-        if (context.Receita.Any())
+        if (dbContext.FoodHabitsPlan != null && !dbContext.FoodHabitsPlan.Any())
+        {
+            var plans = new List<FoodHabitsPlan>();
+            var today = DateTime.Today;
+
+            var clients = dbContext.Client.OrderBy(c => c.ClientId).ToList();
+
+            for (int i = 0; i < 30 && i < clients.Count; i++)
+            {
+                var clientId = clients[i].ClientId;
+
+                var goalId = dbContext.Goal
+                    .Where(g => g.ClientId == clientId)
+                    .OrderByDescending(g => g.GoalId)
+                    .Select(g => g.GoalId)
+                    .FirstOrDefault();
+
+                if (goalId == 0) continue;
+
+                plans.Add(new FoodHabitsPlan
+                {
+                    ClientId = clientId,
+                    GoalId = goalId,
+                    StartingDate = today.AddDays(-i * 7),
+                    EndingDate = today.AddDays(-i * 7 + 30)
+                });
+            }
+
+            dbContext.FoodHabitsPlan.AddRange(plans);
+            dbContext.SaveChanges();
+        }
+    }
+
+
+
+    private static void PopulateReceitas(HealthWellbeingDbContext dbContext)
+    {
+        if (dbContext.Receita.Any())
         {
             return;
         }
 
-        context.Receita.AddRange(
+        dbContext.Receita.AddRange(
             // Receitas Rápidas (5-15 minutos)
             new Receita
             {
@@ -897,12 +1384,12 @@ internal class SeedData
             }
         );
 
-        context.SaveChanges();
+        dbContext.SaveChanges();
     }
 
-    public static void Initialize(HealthWellbeingDbContext context)
+    public static void Initialize(HealthWellbeingDbContext dbContext)
     {
-        int existentes = 100; //context.Terapeutas.Count();
+        int existentes = 100; //dbContext.Terapeutas.Count();
         int alvo = 100;
 
         if (existentes >= alvo) return;
@@ -962,13 +1449,13 @@ internal class SeedData
             });
         }
 
-        //context.Terapeutas.AddRange(novos);
-        context.SaveChanges();
+        //dbContext.Terapeutas.AddRange(novos);
+        dbContext.SaveChanges();
     }
 
-    private static void PopulateConsultas(HealthWellbeingDbContext db)
+    private static void PopulateConsultas(HealthWellbeingDbContext dbContext)
     {
-        if (db.Consulta.Any()) return;
+        if (dbContext.Consulta.Any()) return;
 
         var hoje = DateTime.Today;
 
@@ -1102,13 +1589,13 @@ internal class SeedData
             }
         };
 
-        db.Consulta.AddRange(consulta);
-        db.SaveChanges();
+        dbContext.Consulta.AddRange(consulta);
+        dbContext.SaveChanges();
     }
 
-    private static void PopulateDoctor(HealthWellbeingDbContext db)
+    private static void PopulateDoctor(HealthWellbeingDbContext dbContext)
     {
-        if (db.Doctor.Any())
+        if (dbContext.Doctor.Any())
         {
             return;
         }
@@ -1131,13 +1618,13 @@ internal class SeedData
             new Doctor { Nome = "Patrícia Lopes",   Telemovel = "926789012", Email = "patricia.lopes@healthwellbeing.pt" },
         };
 
-        db.Doctor.AddRange(doctor);
-        db.SaveChanges();
+        dbContext.Doctor.AddRange(doctor);
+        dbContext.SaveChanges();
     }
 
-    private static void PopulateUtenteSaude(HealthWellbeingDbContext db)
+    private static void PopulateUtenteSaude(HealthWellbeingDbContext dbContext)
     {
-        if (db.UtenteSaude.Any()) return; // Evita duplicar registos
+        if (dbContext.UtenteSaude.Any()) return; // Evita duplicar registos
 
         var utentes = new[]
         {
@@ -1717,13 +2204,13 @@ internal class SeedData
             }
         };
 
-        db.UtenteSaude.AddRange(utentes);
-        db.SaveChanges();
+        dbContext.UtenteSaude.AddRange(utentes);
+        dbContext.SaveChanges();
     }
 
-    private static void PopulateSpecialities(HealthWellbeingDbContext db)
+    private static void PopulateSpecialities(HealthWellbeingDbContext dbContext)
     {
-        if (db.Specialities.Any()) return; // Evita duplicar registos
+        if (dbContext.Specialities.Any()) return; // Evita duplicar registos
 
         var especialidades = new[]
         {
@@ -1780,8 +2267,8 @@ internal class SeedData
 
 };
 
-        db.Specialities.AddRange(especialidades);
-        db.SaveChanges();
+        dbContext.Specialities.AddRange(especialidades);
+        dbContext.SaveChanges();
     }
 
     private static void PopulateEventTypes(HealthWellbeingDbContext dbContext)
@@ -1953,304 +2440,6 @@ internal class SeedData
             new Level { LevelAtual = 40, LevelCategory = "Mítico", Description = "Nível máximo - Mito vivo da aplicação" }
         });
         dbContext.SaveChanges();
-    }
-
-    private static List<Client> PopulateClients(HealthWellbeingDbContext dbContext)
-    {
-        // Verifica se já existem clientes para não duplicar
-        if (dbContext.Client.Any())
-        {
-            return dbContext.Client.ToList();
-        }
-
-        // Lista com 25 clientes
-        var clients = new List<Client>()
-        {
-            // Os seus 5 clientes originais
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Alice Wonderland",
-                Email = "alice.w@example.com",
-                Phone = "555-1234567",
-                Address = "10 Downing St, London",
-                BirthDate = new DateTime(1990, 5, 15),
-                Gender = "Female",
-                RegistrationDate = DateTime.Now.AddDays(-30)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Bob The Builder",
-                Email = "bob.builder@work.net",
-                Phone = "555-9876543",
-                Address = "Construction Site 5A",
-                BirthDate = new DateTime(1985, 10, 20),
-                Gender = "Male",
-                RegistrationDate = DateTime.Now.AddDays(-15),
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Charlie Brown",
-                Email = "charlie.b@peanuts.com",
-                Phone = "555-4567890",
-                Address = "123 Comic Strip Ave",
-                BirthDate = new DateTime(2000, 1, 1),
-                Gender = "Male",
-                RegistrationDate = DateTime.Now.AddDays(-5)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "David Copperfield",
-                Email = "david.c@magic.com",
-                Phone = "555-9001002",
-                Address = "Las Vegas Strip",
-                BirthDate = new DateTime(1960, 9, 16),
-                Gender = "Male",
-                RegistrationDate = DateTime.Now.AddDays(-25)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Eve Harrington",
-                Email = "eve.h@stage.net",
-                Phone = "555-3330009",
-                Address = "Broadway St",
-                BirthDate = new DateTime(1995, 2, 28),
-                Gender = "Female",
-                RegistrationDate = DateTime.Now.AddDays(-10)
-            },
-    
-            // Mais 20 clientes para teste
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Frank Castle",
-                Email = "frank.c@punisher.com",
-                Phone = "555-1110001",
-                Address = "Hells Kitchen, NY",
-                BirthDate = new DateTime(1978, 3, 16),
-                Gender = "Male",
-                RegistrationDate = DateTime.Now.AddDays(-40)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Grace Hopper",
-                Email = "grace.h@navy.mil",
-                Phone = "555-2220002",
-                Address = "Arlington, VA",
-                BirthDate = new DateTime(1906, 12, 9),
-                Gender = "Female",
-                RegistrationDate = DateTime.Now.AddDays(-100)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Harry Potter",
-                Email = "harry.p@hogwarts.wiz",
-                Phone = "555-3330003",
-                Address = "4 Privet Drive, Surrey",
-                BirthDate = new DateTime(1980, 7, 31),
-                Gender = "Male",
-                RegistrationDate = DateTime.Now.AddDays(-12)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Ivy Poison",
-                Email = "ivy.p@gotham.bio",
-                Phone = "555-4440004",
-                Address = "Gotham Gardens",
-                BirthDate = new DateTime(1988, 11, 2),
-                Gender = "Female",
-                RegistrationDate = DateTime.Now.AddDays(-3)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Jack Sparrow",
-                Email = "jack.s@pirate.sea",
-                Phone = "555-5550005",
-                Address = "Tortuga",
-                BirthDate = new DateTime(1700, 4, 1),
-                Gender = "Male",
-                RegistrationDate = DateTime.Now.AddDays(-8)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Kara Danvers",
-                Email = "kara.d@catco.com",
-                Phone = "555-6660006",
-                Address = "National City",
-                BirthDate = new DateTime(1993, 9, 22),
-                Gender = "Female",
-                RegistrationDate = DateTime.Now.AddDays(-22)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Luke Skywalker",
-                Email = "luke.s@jedi.org",
-                Phone = "555-7770007",
-                Address = "Tatooine",
-                BirthDate = new DateTime(1977, 5, 25),
-                Gender = "Male",
-                RegistrationDate = DateTime.Now.AddDays(-18)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Mona Lisa",
-                Email = "mona.l@art.com",
-                Phone = "555-8880008",
-                Address = "The Louvre, Paris",
-                BirthDate = new DateTime(1503, 6, 15),
-                Gender = "Female",
-                RegistrationDate = DateTime.Now.AddDays(-50)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Neo Anderson",
-                Email = "neo.a@matrix.com",
-                Phone = "555-9990009",
-                Address = "Zion",
-                BirthDate = new DateTime(1971, 9, 13),
-                Gender = "Male",
-                RegistrationDate = DateTime.Now.AddDays(-2)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Olivia Pope",
-                Email = "olivia.p@gladiator.com",
-                Phone = "555-1010010",
-                Address = "Washington D.C.",
-                BirthDate = new DateTime(1977, 4, 2),
-                Gender = "Female",
-                RegistrationDate = DateTime.Now.AddDays(-60)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Peter Parker",
-                Email = "peter.p@bugle.com",
-                Phone = "555-2020011",
-                Address = "Queens, NY",
-                BirthDate = new DateTime(2001, 8, 10),
-                Gender = "Male",
-                RegistrationDate = DateTime.Now.AddDays(-7)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Quinn Fabray",
-                Email = "quinn.f@glee.com",
-                Phone = "555-3030012",
-                Address = "Lima, Ohio",
-                BirthDate = new DateTime(1994, 7, 19),
-                Gender = "Female",
-                RegistrationDate = DateTime.Now.AddDays(-33)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Rachel Green",
-                Email = "rachel.g@friends.com",
-                Phone = "555-4040013",
-                Address = "Central Perk, NY",
-                BirthDate = new DateTime(1970, 5, 5),
-                Gender = "Female",
-                RegistrationDate = DateTime.Now.AddDays(-45)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Steve Rogers",
-                Email = "steve.r@avengers.com",
-                Phone = "555-5050014",
-                Address = "Brooklyn, NY",
-                BirthDate = new DateTime(1918, 7, 4),
-                Gender = "Male",
-                RegistrationDate = DateTime.Now.AddDays(-11)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Tony Stark",
-                Email = "tony.s@stark.com",
-                Phone = "555-6060015",
-                Address = "Malibu Point, CA",
-                BirthDate = new DateTime(1970, 5, 29),
-                Gender = "Male",
-                RegistrationDate = DateTime.Now.AddDays(-90)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Ursula Buffay",
-                Email = "ursula.b@friends.tv",
-                Phone = "555-7070016",
-                Address = "Riff's Bar, NY",
-                BirthDate = new DateTime(1968, 2, 22),
-                Gender = "Female",
-                RegistrationDate = DateTime.Now.AddDays(-14)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Victor Frankenstein",
-                Email = "victor.f@science.ch",
-                Phone = "555-8080017",
-                Address = "Geneva, Switzerland",
-                BirthDate = new DateTime(1790, 10, 10),
-                Gender = "Male",
-                RegistrationDate = DateTime.Now.AddDays(-200)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Walter White",
-                Email = "walter.w@heisenberg.com",
-                Phone = "555-9090018",
-                Address = "Albuquerque, NM",
-                BirthDate = new DateTime(1958, 9, 7),
-                Gender = "Male",
-                RegistrationDate = DateTime.Now.AddDays(-28)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Xena Warrior",
-                Email = "xena.w@myth.gr",
-                Phone = "555-0100019",
-                Address = "Amphipolis, Greece",
-                BirthDate = new DateTime(1968, 3, 29),
-                Gender = "Female",
-                RegistrationDate = DateTime.Now.AddDays(-1)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Yoda Master",
-                Email = "yoda.m@jedi.org",
-                Phone = "555-1210020",
-                Address = "Dagobah System",
-                BirthDate = new DateTime(1000, 1, 1),
-                Gender = "Male",
-                RegistrationDate = DateTime.Now.AddDays(-500)
-            }
-        };
-
-        // Adiciona todos os clientes à base de dados
-        dbContext.Client.AddRange(clients);
-        dbContext.SaveChanges();
-
-        return clients;
     }
 
     private static void PopulateMember(HealthWellbeingDbContext dbContext, List<Client> clients)
@@ -2459,7 +2648,7 @@ internal class SeedData
                     Name = "Intense Cardio HIT",
                     Duration = 45,
                     DayOfWeek = "Wednesday",
-                    StartTime = new TimeSpan(18, 30, 0),
+                    StartTime = new TimeSpan(18, 30, 0),  
                     MaxParticipants = 20
                 },
                     new Training

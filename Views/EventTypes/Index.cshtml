@@ -1,4 +1,4 @@
-﻿@model HealthWellbeing.Models.PaginationInfoGroup8<HealthWellbeing.Models.EventType>
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.EventType>
 
 @{
     ViewData["Title"] = "Event Types";
@@ -134,7 +134,7 @@ else {
                         <li class="page-item active"><a class="page-link" href="#">@p</a></li>
                     }
                     else {
-                        <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p" asp-route-searchName="@ViewBag.SearchName" asp-route-searchScoringMode="@ViewBag.SearchScoringMode">@p</a></li>
+                        <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p" asp-route-searchName="@ViewBag.SearchName" asp-route-searchScoringMode="@ViewBag.SearchName">@p</a></li>
                     }
                 }
 

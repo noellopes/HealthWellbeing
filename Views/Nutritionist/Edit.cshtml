@@ -1,0 +1,115 @@
+﻿@using System
+@using System.Collections.Generic
+@model HealthWellbeing.Models.Nutritionist
+
+@{
+    ViewData["Title"] = "Edit Nutritionist";
+    var clients = ViewBag.Clients as List<Tuple<int, string, string>> ?? new();
+    int selectedClientId = (int)(ViewBag.SelectedClientId ?? 0);
+}
+
+<div class="container my-4">
+    <div class="fh-wrapper">
+
+        <div class="fh-header">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-pencil-square" style="color: var(--fi-cyan); font-size:1.15rem;"></i>
+                        <h1 class="h5 fh-title mb-0">Edit Nutritionist</h1>
+                    </div>
+                    <div class="mt-2 fh-badge">
+                        <i class="bi bi-gear" style="color: var(--fi-cyan);"></i>
+                        <span>Edit</span>
+                    </div>
+                </div>
+
+                <a asp-action="Index" class="btn btn-secondary" style="border-radius:12px;">
+                    <i class="bi bi-arrow-left-circle me-1"></i>Back
+                </a>
+            </div>
+        </div>
+
+        <div class="fh-panel">
+            <div class="fh-card p-3">
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.NutritionistId" />
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Name</label>
+                            <select name="clientId" id="clientPick" class="form-select fh-input">
+                                <option value="0">— Select —</option>
+                                @foreach (var c in clients)
+                                {
+                                    <option value="@c.Item1" data-email="@c.Item3" selected="@(c.Item1 == selectedClientId ? "selected" : null)">
+                                        @c.Item2
+                                    </option>
+                                }
+                            </select>
+                            <span class="text-warning small">@Html.ValidationMessage("ClientId")</span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input id="emailBox" class="form-control fh-input" readonly value="@(Model.Email ?? "")" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Gender</label>
+                            <select name="gender" class="form-select fh-input">
+                                <option value="">— Select —</option>
+                                <option value="Male" selected="@(Model.Gender == "Male" ? "selected" : null)">Male</option>
+                                <option value="Female" selected="@(Model.Gender == "Female" ? "selected" : null)">Female</option>
+                                <option value="Other" selected="@(Model.Gender == "Other" ? "selected" : null)">Other</option>
+                            </select>
+                            <span class="text-warning small">@Html.ValidationMessage("Gender")</span>
+                        </div>
+
+                        <div class="col-12 d-flex gap-2 mt-2">
+                            <button type="submit" class="btn btn-warning text-white" style="border-radius:12px; font-weight:900;">
+                                <i class="bi bi-check2-circle me-1"></i>Save
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-light" style="border-radius:12px;">Cancel</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .fh-input {
+        background: rgba(17,24,39,.92);
+        border: 1px solid rgba(255,255,255,.14);
+        color: rgba(255,255,255,.9);
+        border-radius: 12px;
+    }
+
+        .fh-input:focus {
+            border-color: rgba(34,211,238,.55);
+            box-shadow: 0 0 0 .2rem rgba(34,211,238,.12);
+            color: rgba(255,255,255,.95);
+        }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function(){
+            const sel = document.getElementById("clientPick");
+            const email = document.getElementById("emailBox");
+
+            function sync(){
+                const opt = sel.options[sel.selectedIndex];
+                email.value = opt?.dataset?.email || "";
+            }
+
+            sel.addEventListener("change", sync);
+            sync();
+        })();
+    </script>
+}

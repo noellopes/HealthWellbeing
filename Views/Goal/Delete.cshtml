@@ -1,0 +1,59 @@
+@model HealthWellbeing.Models.Goal
+
+@{
+    ViewData["Title"] = "Delete Goal";
+}
+
+<div class="container my-4">
+    <div class="fh-wrapper">
+        <!-- Header -->
+        <div class="fh-header">
+            <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-trash3" style="color:#ef4444; font-size:1.15rem;"></i>
+                    <h1 class="h5 fh-title mb-0">Delete Goal</h1>
+                </div>
+                <a asp-action="Index" class="btn btn-outline-light" style="border-radius:12px;">
+                    <i class="bi bi-arrow-left me-1"></i>Back
+                </a>
+            </div>
+        </div>
+
+        <!-- Alert -->
+        <div class="fh-panel">
+            <div class="alert alert-danger fh-alert">
+                <i class="bi bi-exclamation-triangle me-1"></i>This action cannot be undone.
+            </div>
+
+            <!-- Details -->
+            <div class="fh-card p-3">
+                <dl class="row mb-3">
+                    <dt class="col-sm-3" style="color: var(--fi-muted);">Client</dt>
+                    <dd class="col-sm-9 fw-bold">@((Model.Client?.Name) ?? $"Client #{Model.ClientId}")</dd>
+
+                    <dt class="col-sm-3" style="color: var(--fi-muted);">Goal</dt>
+                    <dd class="col-sm-9 fw-bold">
+                        @(Model.GoalName switch
+                        {
+                            "lose" => "Weight Loss",
+                            "maintain" => "Maintenance",
+                            "gain" => "Muscle Gain",
+                            _ => Model.GoalName
+                        })
+                    </dd>
+                </dl>
+
+                <!-- Delete Form -->
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="GoalId" />
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-outline-secondary" style="border-radius:12px;">Cancel</a>
+                        <button type="submit" class="btn btn-danger" style="border-radius:12px; font-weight:800;">
+                            <i class="bi bi-trash me-1"></i>Delete
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
