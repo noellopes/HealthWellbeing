@@ -5,32 +5,65 @@
     var alternatives = ViewBag.Alternatives as List<HealthWellbeing.Models.Training>;
 }
 
-<div class="container mt-5 text-center">
-    <div class="alert alert-danger shadow-sm p-5">
-        <h1 class="display-4"><i class="bi bi-x-circle-fill text-danger"></i></h1>
-        <h2 class="fw-bold mt-3">Class Full!</h2>
-        <p class="lead">We are sorry, but the session <strong>@Model.Name</strong> on the selected date has reached its maximum capacity (@Model.TrainingType.MaxParticipants participants).</p>
+<div class="container-fluid px-4">
+    <h1 class="mt-4 text-danger fw-bold">
+        <i class="bi bi-x-octagon-fill me-2"></i>Class Full
+    </h1>
+
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-header bg-danger text-white py-3">
+            <h5 class="card-title mb-0 fw-bold">Maximum Capacity Reached</h5>
+        </div>
+        <div class="card-body p-5 text-center">
+            <i class="bi bi-people-fill display-1 text-danger opacity-25 mb-3"></i>
+            <h2 class="fw-bold text-secondary">We are sorry!</h2>
+            <p class="fs-5 text-muted">
+                The session <strong class="text-dark">@Model.Name</strong> on 
+                <span class="text-nowrap">@Model.DayOfWeek</span> has reached its limit of 
+                <span class="badge bg-danger rounded-pill">@Model.TrainingType.MaxParticipants participants</span>.
+            </p>
+            
+            <div class="mt-4">
+                <a asp-controller="Training" asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm rounded-pill">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Schedule
+                </a>
+            </div>
+        </div>
     </div>
 
     @if (alternatives != null && alternatives.Any())
     {
         <div class="mt-5">
-            <h4 class="text-muted mb-4">Suggested Alternatives for <strong>@Model.TrainingType.Name</strong>:</h4>
+            <h4 class="text-primary fw-bold mb-3">
+                <i class="bi bi-lightbulb-fill me-2"></i>Suggested Alternatives
+            </h4>
+            <p class="text-muted mb-4">You might be interested in these similar classes available this week:</p>
 
-            <div class="row justify-content-center">
+            <div class="row g-4">
                 @foreach (var alt in alternatives)
                 {
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100 border-primary">
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm border-0 hover-effect">
+                            <div class="card-header bg-light border-bottom-0 fw-bold text-primary">
+                                @alt.Name
+                            </div>
                             <div class="card-body">
-                                <h5 class="card-title text-primary">@alt.Name</h5>
-                                <p class="card-text">
-                                    <i class="bi bi-calendar-event"></i> @alt.DayOfWeek<br />
-                                    <i class="bi bi-clock"></i> @alt.StartTime
-                                </p>
-                                <a asp-action="Create" asp-route-trainingId="@alt.TrainingId" class="btn btn-outline-primary btn-sm">
-                                    Book This Instead
-                                </a>
+                                <ul class="list-unstyled mb-4">
+                                    <li class="mb-2 text-muted">
+                                        <i class="bi bi-calendar-event me-2 text-info"></i> @alt.DayOfWeek
+                                    </li>
+                                    <li class="mb-2 text-muted">
+                                        <i class="bi bi-clock me-2 text-info"></i> @alt.StartTime.ToString(@"hh\:mm")
+                                    </li>
+                                    <li class="text-muted">
+                                        <i class="bi bi-person-badge me-2 text-info"></i> @(alt.Trainer?.Name ?? "TBA")
+                                    </li>
+                                </ul>
+                                <div class="d-grid">
+                                    <a asp-action="Create" asp-route-trainingId="@alt.TrainingId" class="btn btn-primary shadow-sm">
+                                        <i class="bi bi-calendar-plus me-1"></i> Book This Slot
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -40,12 +73,8 @@
     }
     else
     {
-        <div class="mt-4">
-            <p>No other classes of this type are available at the moment.</p>
+        <div class="alert alert-warning mt-4 shadow-sm border-start border-4 border-warning" role="alert">
+            <i class="bi bi-exclamation-circle-fill me-2"></i> No other classes of this type are available at the moment. Please check back later.
         </div>
     }
-
-    <div class="mt-5">
-        <a asp-controller="Training" asp-action="Index" class="btn btn-secondary">Back to Training List</a>
-    </div>
 </div>

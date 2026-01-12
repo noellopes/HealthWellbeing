@@ -1,48 +1,119 @@
 ﻿@model HealthWellbeing.Models.Session
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Session Details";
+    bool isStaff = User.IsInRole("Administrator") || User.IsInRole("Trainer");
 }
 
-<h1>Details</h1>
+<div class="container py-5">
+    <div class="d-flex align-items-center mb-4">
+        <h1 class="text-primary me-3"><i class="bi bi-calendar2-week-fill me-2"></i>Session Details</h1>
+    </div>
 
-<div>
-    <h4>Session</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Member)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Member.MemberId)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Training)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Training.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SessionDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SessionDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MemberFeedback)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MemberFeedback)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Rating)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Rating)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.SessionId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-header bg-primary text-white fw-bold py-3">
+                    <i class="bi bi-info-circle-fill me-2"></i>Class Information
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">Class Name</dt>
+                        <dd class="col-sm-8 fw-bold fs-5">@Model.Training.Name</dd>
+
+                        <dt class="col-sm-4 text-muted">Type</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-info text-dark">@Model.Training.TrainingType?.Name</span>
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted">Date</dt>
+                        <dd class="col-sm-8">@Model.SessionDate.ToString("dddd, dd MMMM yyyy")</dd>
+
+                        <dt class="col-sm-4 text-muted">Time</dt>
+                        <dd class="col-sm-8 text-primary fw-bold">@Model.SessionDate.ToString("HH:mm")</dd>
+
+                        <dt class="col-sm-4 text-muted">Trainer</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.Training.Trainer != null)
+                            {
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-person-badge me-2 text-secondary"></i> @Model.Training.Trainer.Name
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="text-muted">TBA</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-header bg-dark text-white fw-bold py-3">
+                    <i class="bi bi-person-check-fill me-2"></i>Participant & Feedback
+                </div>
+                <div class="card-body">
+                    @if (isStaff)
+                    {
+                        <div class="mb-4 pb-3 border-bottom">
+                            <label class="small text-muted fw-bold text-uppercase">Client</label>
+                            <div class="fs-5 fw-bold text-dark">
+                                @(Model.Member?.Client?.Name ?? "Unknown Client")
+                            </div>
+                            <div class="small text-muted">
+                                <i class="bi bi-envelope me-1"></i> @(Model.Member?.Client?.Email ?? "-")
+                            </div>
+                        </div>
+                    }
+
+                    <div class="text-center">
+                        <label class="small text-muted fw-bold text-uppercase mb-2">Rating</label>
+                        @if (Model.Rating.HasValue)
+                        {
+                            <div class="text-warning fs-3 mb-3">
+                                @for (int i = 0; i < Model.Rating; i++)
+                                {
+                                    <i class="bi bi-star-fill"></i>
+                                }
+                                @for (int i = 0; i < (5 - Model.Rating); i++)
+                                {
+                                    <i class="bi bi-star"></i>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-light border mb-3">
+                                <small class="text-muted">No rating provided yet.</small>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="small text-muted fw-bold text-uppercase mb-1">Feedback Notes</label>
+                        @if (!string.IsNullOrEmpty(Model.MemberFeedback))
+                        {
+                            <div class="bg-light p-3 rounded border text-start">
+                                <em class="text-dark">"@Model.MemberFeedback"</em>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted small fst-italic">No additional feedback provided.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-3">
+        <a asp-action="Edit" asp-route-id="@Model.SessionId" class="btn btn-warning shadow-sm px-4">
+            <i class="bi bi-pencil-square me-1"></i> Edit
+        </a>
+        <a asp-action="Index" class="btn btn-secondary shadow-sm px-4">Back to List</a>
+    </div>
 </div>
