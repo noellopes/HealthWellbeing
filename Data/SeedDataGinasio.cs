@@ -11,7 +11,7 @@ internal class SeedDataGinasio
     {
         if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
 
-        dbContext.Database.EnsureCreated();
+        dbContext.Database.Migrate();
 
         var clients = PopulateClients(dbContext);
         var members = PopulateMember(dbContext, clients);
@@ -164,14 +164,14 @@ internal class SeedDataGinasio
 
         var trainers = new List<Trainer>
     {
-            new Trainer { Name = "John Smith", Address = "123 HIIT St, New York", Email = "john@gym.com", Phone = "555-111", BirthDate = new DateTime(1988, 7, 10), Gender = "Male" },
-            new Trainer { Name = "Emma Johnson", Address = "45 Strength Blvd, London", Email = "emma@gym.com", Phone = "555-222", BirthDate = new DateTime(1992, 11, 25), Gender = "Female" },
-            new Trainer { Name = "Carlos Mendes", Address = "8 Yoga Lane, Lisbon", Email = "carlos@gym.com", Phone = "555-333", BirthDate = new DateTime(1975, 4, 1), Gender = "Male" },
-            new Trainer { Name = "Sophie Lee", Address = "14 Pilates Rd, Seoul", Email = "sophie@gym.com", Phone = "555-444", BirthDate = new DateTime(1996, 2, 14), Gender = "Female" },
-            new Trainer { Name = "Maria Rodriguez", Address = "90 Zumba St, Madrid", Email = "maria@gym.com", Phone = "555-555", BirthDate = new DateTime(1985, 9, 30), Gender = "Female" },
-            new Trainer { Name = "David Costa", Address = "22 Cycling Way, Porto", Email = "david@gym.com", Phone = "555-666", BirthDate = new DateTime(1990, 6, 5), Gender = "Male" },
-            new Trainer { Name = "Laura Silva", Address = "101 Barre Ave, Coimbra", Email = "laura@gym.com", Phone = "555-777", BirthDate = new DateTime(1994, 3, 18), Gender = "Female" },
-            new Trainer { Name = "André Santos", Address = "3 Functional Cir, Braga", Email = "andre@gym.com", Phone = "555-888", BirthDate = new DateTime(1983, 1, 22), Gender = "Male" }
+            new Trainer { Name = "John Smith", Address = "123 HIIT St, New York", Email = "john@gym.com", Phone = "555-111", BirthDate = new DateTime(1988, 7, 10), Gender = "Male", IsActive = false },
+            new Trainer { Name = "Emma Johnson", Address = "45 Strength Blvd, London", Email = "emma@gym.com", Phone = "555-222", BirthDate = new DateTime(1992, 11, 25), Gender = "Female", IsActive = true },
+            new Trainer { Name = "Carlos Mendes", Address = "8 Yoga Lane, Lisbon", Email = "carlos@gym.com", Phone = "555-333", BirthDate = new DateTime(1975, 4, 1), Gender = "Male", IsActive = true },
+            new Trainer { Name = "Sophie Lee", Address = "14 Pilates Rd, Seoul", Email = "sophie@gym.com", Phone = "555-444", BirthDate = new DateTime(1996, 2, 14), Gender = "Female", IsActive = true },
+            new Trainer { Name = "Maria Rodriguez", Address = "90 Zumba St, Madrid", Email = "maria@gym.com", Phone = "555-555", BirthDate = new DateTime(1985, 9, 30), Gender = "Female", IsActive = true },
+            new Trainer { Name = "David Costa", Address = "22 Cycling Way, Porto", Email = "david@gym.com", Phone = "555-666", BirthDate = new DateTime(1990, 6, 5), Gender = "Male", IsActive = true },
+            new Trainer { Name = "Laura Silva", Address = "101 Barre Ave, Coimbra", Email = "laura@gym.com", Phone = "555-777", BirthDate = new DateTime(1994, 3, 18), Gender = "Female", IsActive = true },
+            new Trainer { Name = "André Santos", Address = "3 Functional Cir, Braga", Email = "andre@gym.com", Phone = "555-888", BirthDate = new DateTime(1983, 1, 22), Gender = "Male", IsActive = true }
         };
 
         dbContext.Trainer.AddRange(trainers);
