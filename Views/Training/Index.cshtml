@@ -2,19 +2,44 @@
 
 @{
     ViewData["Title"] = "Training Sessions";
+    var searchName = ViewBag.SearchName as string ?? "";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary fw-bold">Training Sessions</h2>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-lg"></i> New Training
-        </a>
+
+
+<div class="container-fluid px-4">
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-body bg-light">
+            <h2 class="text-primary fw-bold">Training Sessions</h2>
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0">
+                <i class="bi bi-calendar-event-fill me-2"></i>Training Sessions
+            </h5>
+            <a asp-action="Create" class="btn btn-success px-3 shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> Add Training
+            </a>
+        </div>
     </div>
 
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
-            <table class="table table-hover align-middle mb-0">
+            <form asp-action="Index" method="get" class="row g-2 mb-4">
+                <div class="col-md-9">
+                    <input name="searchName"
+                           value="@searchName"
+                           class="form-control shadow-sm"
+                           placeholder="Search by training name..." />
+                </div>
+
+                <div class="col-md-3">
+                    <button type="submit"
+                            class="btn btn-primary w-100 shadow-sm fw-bold">
+                        <i class="bi bi-search me-1"></i> Search
+                    </button>
+                </div>
+            </form>
+                <div class="table-responsive bg-white rounded shadow-sm">
+                    <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light">
                     <tr>
                         <th class="ps-4">Name</th>

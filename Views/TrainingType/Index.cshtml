@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Training Types";
+
+    var searchName = ViewBag.SearchName ?? "";
     var searchActive = ViewBag.SearchActive ?? "";
 }
 
@@ -24,7 +26,17 @@
 
             <!-- SEARCH -->
             <form asp-action="Index" method="get" class="row g-2 mb-4">
+
+                <!-- 🔍 Search by name -->
                 <div class="col-md-6">
+                    <input name="searchName"
+                           value="@searchName"
+                           class="form-control shadow-sm"
+                           placeholder="Search by name..." />
+                </div>
+
+                <!-- 🔍 Search by status -->
+                <div class="col-md-4">
                     <select name="searchActive" class="form-select shadow-sm">
                         <option value="">All Status</option>
                         <option value="Yes" selected="@(searchActive == "Yes")">Active</option>
@@ -32,7 +44,7 @@
                     </select>
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-2">
                     <button type="submit"
                             class="btn btn-primary w-100 shadow-sm fw-bold">
                         <i class="bi bi-search me-1"></i>Search
@@ -110,10 +122,14 @@
                 <!-- PAGINATION -->
                 <nav aria-label="Training type navigation" class="mt-4">
                     <ul class="pagination justify-content-center">
+
                         <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
                             <a class="page-link shadow-sm"
                                asp-route-page="1"
-                               asp-route-searchActive="@searchActive">First</a>
+                               asp-route-searchName="@searchName"
+                               asp-route-searchActive="@searchActive">
+                                First
+                            </a>
                         </li>
 
                         @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
@@ -121,14 +137,20 @@
                             <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
                                 <a class="page-link shadow-sm"
                                    asp-route-page="@p"
-                                   asp-route-searchActive="@searchActive">@p</a>
+                                   asp-route-searchName="@searchName"
+                                   asp-route-searchActive="@searchActive">
+                                    @p
+                                </a>
                             </li>
                         }
 
                         <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
                             <a class="page-link shadow-sm"
                                asp-route-page="@Model.TotalPages"
-                               asp-route-searchActive="@searchActive">Last</a>
+                               asp-route-searchName="@searchName"
+                               asp-route-searchActive="@searchActive">
+                                Last
+                            </a>
                         </li>
                     </ul>
                 </nav>
@@ -136,3 +158,4 @@
         </div>
     </div>
 </div>
+
