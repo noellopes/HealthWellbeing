@@ -6,7 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
+<<<<<<<< HEAD:Migrations/20260112162432_aer.cs
     public partial class aer : Migration
+========
+    public partial class bea : Migration
+>>>>>>>> a71b8694fd5fcf816569bbb010739645a5e51ab5:Migrations/20260112155917_bea.cs
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
