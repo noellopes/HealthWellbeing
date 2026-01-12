@@ -1,0 +1,31 @@
+﻿@model HealthWellbeing.Models.TrainingExercise
+
+@{
+    ViewData["Title"] = "Remove Exercise";
+}
+
+<div class="container mt-5">
+    <div class="card shadow border-0 mx-auto" style="max-width: 600px;">
+        <div class="card-header bg-danger text-white py-3">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-exclamation-triangle me-2"></i>Confirm Removal</h5>
+        </div>
+        <div class="card-body p-4 text-center">
+
+            <h4 class="mb-3">Are you sure?</h4>
+            <p class="text-muted">Do you really want to remove this exercise from the training plan?</p>
+
+            <div class="alert alert-light border">
+                <h5 class="text-danger fw-bold mb-0">@Model.Exercise.Name</h5>
+                <small>@Model.Sets Sets x @Model.Reps Reps</small>
+            </div>
+
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="TrainingExerciseId" />
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-danger btn-lg">Yes, Remove Exercise</button>
+                    <a asp-action="Index" asp-route-trainingId="@Model.TrainingId" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

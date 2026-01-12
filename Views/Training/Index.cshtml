@@ -1,196 +1,58 @@
-﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.Training>
+﻿@model IEnumerable<HealthWellbeing.Models.Training>
 
 @{
     ViewData["Title"] = "Training Sessions";
-
-    var searchName = ViewBag.SearchName;
-    var searchTrainerId = ViewBag.SearchTrainerId;
-    var searchTrainingTypeId = ViewBag.SearchTrainingTypeId;
-    var searchDuration = ViewBag.SearchDuration;
-
-    var trainerList = ViewData["TrainerId"] as SelectList;
-    var trainingTypeList = ViewData["TrainingTypeId"] as SelectList;
 }
 
-<div class="container-fluid px-4">
-    <h1 class="mt-4 text-primary fw-bold">
-        <i class="bi bi-calendar-event-fill me-2"></i>@ViewData["Title"]
-    </h1>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold">Training Sessions</h2>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-lg"></i> New Training
+        </a>
+    </div>
 
-    <div class="card mb-4 shadow-sm border-0">
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
-            <h5 class="mb-0">
-                <i class="bi bi-clipboard-data me-2"></i>Training Schedule
-            </h5>
-            <a asp-action="Create" class="btn btn-success px-3 shadow-sm">
-                <i class="bi bi-plus-circle me-1"></i> Add Training
-            </a>
-        </div>
-
-        <div class="card-body bg-light">
-
-            <!-- Filters -->
-            <form asp-action="Index" method="get" class="row g-2 mb-4">
-                <div class="col-md-3">
-                    <input name="searchName"
-                           value="@searchName"
-                           class="form-control shadow-sm"
-                           placeholder="Search by name..." />
-                </div>
-
-                <div class="col-md-3">
-                    <select name="searchTrainerId"
-                            class="form-select shadow-sm"
-                            asp-items="trainerList">
-                        <option value="">All trainers</option>
-                    </select>
-                </div>
-
-                <div class="col-md-3">
-                    <select name="searchTrainingTypeId"
-                            class="form-select shadow-sm"
-                            asp-items="trainingTypeList">
-                        <option value="">All training types</option>
-                    </select>
-                </div>
-
-                <div class="col-md-2">
-                    <input name="searchDuration"
-                           value="@searchDuration"
-                           type="number"
-                           class="form-control shadow-sm"
-                           placeholder="Duration (min)" />
-                </div>
-
-                <div class="col-md-1">
-                    <button type="submit"
-                            class="btn btn-primary w-100 shadow-sm fw-bold">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </div>
-            </form>
-
-            <!-- Table -->
-            <div class="table-responsive bg-white rounded shadow-sm">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light border-bottom">
-                        <tr>
-                            <th class="ps-3">Session</th>
-                            <th>Trainer</th>
-                            <th>Type</th>
-                            <th>Schedule</th>
-                            <th class="text-end pe-3">Actions</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        @if (!Model.Items.Any())
-                        {
-                            <tr>
-                                <td colspan="5" class="text-center text-muted py-4">
-                                    No training sessions found.
-                                </td>
-                            </tr>
-                        }
-                        else
-                        {
-                            foreach (var item in Model.Items)
-                            {
-                                <tr>
-                                    <td class="fw-bold ps-3">
-                                        @item.Name
-                                        <div class="small text-muted">
-                                            @item.Duration min ·
-                                            Max @item.TrainingType?.MaxParticipants
-                                        </div>
-                                    </td>
-
-                                    <td>
-                                        @item.Trainer?.Name
-                                        <div class="small text-muted">
-                                            @item.Trainer?.Email
-                                        </div>
-                                    </td>
-
-                                    <td>
-                                        <span class="badge bg-info text-dark shadow-sm">
-                                            @item.TrainingType?.Name
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <span class="badge bg-light text-dark border shadow-sm">
-                                            @item.DayOfWeek · @item.StartTime
-                                        </span>
-                                    </td>
-
-                                    <td class="text-end pe-3">
-                                        <div class="btn-group shadow-sm" role="group">
-                                            <a asp-action="Edit"
-                                               asp-route-id="@item.TrainingId"
-                                               class="btn btn-sm btn-warning">
-                                                <i class="bi bi-pencil-square"></i> Edit
-                                            </a>
-                                            <a asp-action="Details"
-                                               asp-route-id="@item.TrainingId"
-                                               class="btn btn-sm btn-info">
-                                                <i class="bi bi-info-circle"></i> Details
-                                            </a>
-                                            <a asp-action="Delete"
-                                               asp-route-id="@item.TrainingId"
-                                               class="btn btn-sm btn-danger">
-                                                <i class="bi bi-trash"></i> Delete
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination -->
-            <nav aria-label="Training navigation" class="mt-4">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-                        <a class="page-link shadow-sm"
-                           asp-route-page="1"
-                           asp-route-searchName="@searchName"
-                           asp-route-searchTrainerId="@searchTrainerId"
-                           asp-route-searchTrainingTypeId="@searchTrainingTypeId"
-                           asp-route-searchDuration="@searchDuration">
-                            First
-                        </a>
-                    </li>
-
-                    @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Name</th>
+                        <th>Type</th>
+                        <th>Trainer</th>
+                        <th>Schedule</th>
+                        <th class="text-center">Manage</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
                     {
-                        <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
-                            <a class="page-link shadow-sm"
-                               asp-route-page="@p"
-                               asp-route-searchName="@searchName"
-                               asp-route-searchTrainerId="@searchTrainerId"
-                               asp-route-searchTrainingTypeId="@searchTrainingTypeId"
-                               asp-route-searchDuration="@searchDuration">
-                                @p
-                            </a>
-                        </li>
+                        <tr>
+                            <td class="ps-4 fw-bold">@item.Name</td>
+                            <td><span class="badge bg-info text-dark">@item.TrainingType.Name</span></td>
+                            <td>@item.Trainer.Name</td>
+                            <td>
+                                <div>@item.DayOfWeek</div>
+                                <small class="text-muted">@item.StartTime.ToString(@"hh\:mm") (@item.Duration min)</small>
+                            </td>
+
+                            <td class="text-center">
+                                <a asp-controller="TrainingExercise" asp-action="Index" asp-route-trainingId="@item.TrainingId"
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-list-check me-1"></i> Exercises
+                                </a>
+                            </td>
+
+                            <td class="text-end pe-4">
+                                <a asp-action="Edit" asp-route-id="@item.TrainingId" class="btn btn-sm btn-link text-secondary"><i class="bi bi-pencil"></i></a>
+                                <a asp-action="Details" asp-route-id="@item.TrainingId" class="btn btn-sm btn-link text-info"><i class="bi bi-info-circle"></i></a>
+                                <a asp-action="Delete" asp-route-id="@item.TrainingId" class="btn btn-sm btn-link text-danger"><i class="bi bi-trash"></i></a>
+                            </td>
+                        </tr>
                     }
-
-                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-                        <a class="page-link shadow-sm"
-                           asp-route-page="@Model.TotalPages"
-                           asp-route-searchName="@searchName"
-                           asp-route-searchTrainerId="@searchTrainerId"
-                           asp-route-searchTrainingTypeId="@searchTrainingTypeId"
-                           asp-route-searchDuration="@searchDuration">
-                            Last
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
