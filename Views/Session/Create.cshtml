@@ -4,34 +4,73 @@
     ViewData["Title"] = "Confirm Booking";
 }
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow border-0">
-                <div class="card-header bg-primary text-white text-center py-3">
-                    <h4 class="mb-0">Confirm Your Session</h4>
+<div class="container-fluid px-4">
+    <h1 class="mt-4 text-primary"><i class="bi bi-calendar-plus-fill me-2"></i>Book a Session</h1>
+
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-header bg-success text-white py-3">
+            <h5 class="card-title mb-0 fw-bold">Confirm Class Booking</h5>
+        </div>
+        <div class="card-body p-4">
+            <p class="text-muted small mb-4">Please review the class details below before confirming your attendance.</p>
+
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="TrainingId" value="@Model.TrainingId" />
+                @* A data sugerida vem do Controller (ViewBag) ou calculada *@
+                <input type="hidden" name="SessionDate" value="@ViewBag.SuggestedDate" />
+
+                <div class="alert alert-info border-0 shadow-sm d-flex align-items-center mb-4 p-3 bg-opacity-10">
+                    <i class="bi bi-info-circle-fill fs-2 me-3 text-info"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-uppercase small text-muted">Scheduled Date</h6>
+                        <span class="fs-4 text-dark fw-bold">
+                            @if (ViewBag.SuggestedDate != null)
+                            {
+                                @Convert.ToDateTime(ViewBag.SuggestedDate).ToString("dddd, dd MMMM yyyy")
+                            }
+                        </span>
+                    </div>
                 </div>
-                <div class="card-body p-4">
-                    <h5 class="text-secondary">Class Details:</h5>
-                    <hr />
-                    <p><strong>Class:</strong> @Model.Name</p>
-                    <p><strong>Type:</strong> @Model.TrainingType?.Name</p>
-                    <p><strong>Trainer:</strong> @Model.Trainer?.Name</p>
-                    <p><strong>Schedule:</strong> @Model.DayOfWeek at @Model.StartTime.ToString(@"hh\:mm")</p>
 
-                    <form asp-action="CreateConfirmed" method="post" class="mt-4">
-                        <input type="hidden" name="TrainingId" value="@Model.TrainingId" />
-                        <input type="hidden" name="SessionDate" value="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+                <div class="row g-3">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold text-muted">Class Name</label>
+                        <input value="@Model.Name" class="form-control shadow-sm bg-light fw-bold" disabled readonly />
+                    </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success btn-lg">
-                                <i class="bi bi-check-circle me-2"></i>Confirm Booking
-                            </button>
-                            <a asp-controller="Training" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold text-muted">Training Type</label>
+                        <input value="@Model.TrainingType?.Name" class="form-control shadow-sm bg-light" disabled readonly />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold text-muted">Trainer</label>
+                        <div class="input-group shadow-sm">
+                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-person-badge"></i></span>
+                            <input value="@Model.Trainer?.Name" class="form-control bg-light border-start-0" disabled readonly />
                         </div>
-                    </form>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold text-muted">Start Time</label>
+                        <div class="input-group shadow-sm">
+                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-clock"></i></span>
+                            <input value="@Model.StartTime.ToString(@"hh\:mm")" class="form-control bg-light border-start-0" disabled readonly />
+                        </div>
+                    </div>
                 </div>
-            </div>
+
+                <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn btn-success px-5 shadow-sm fw-bold">
+                        <i class="bi bi-check-lg me-1"></i> Confirm Booking
+                    </button>
+                    <a asp-controller="Training" asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
+                        Cancel
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 </div>

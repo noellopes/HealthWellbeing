@@ -1,54 +1,90 @@
 ﻿@model HealthWellbeing.Models.Session
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Session";
+    bool isStaff = User.IsInRole("Administrator") || User.IsInRole("Trainer");
 }
 
-<h1>Edit</h1>
+<div class="container-fluid px-4">
+    <h1 class="mt-4 text-primary"><i class="bi bi-pencil-square me-2"></i>Manage Session</h1>
 
-<h4>Session</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="SessionId" />
-            <div class="form-group">
-                <label asp-for="MemberId" class="control-label"></label>
-                <select asp-for="MemberId" class="form-control" asp-items="ViewBag.MemberId"></select>
-                <span asp-validation-for="MemberId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TrainingId" class="control-label"></label>
-                <select asp-for="TrainingId" class="form-control" asp-items="ViewBag.TrainingId"></select>
-                <span asp-validation-for="TrainingId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="SessionDate" class="control-label"></label>
-                <input asp-for="SessionDate" class="form-control" />
-                <span asp-validation-for="SessionDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MemberFeedback" class="control-label"></label>
-                <input asp-for="MemberFeedback" class="form-control" />
-                <span asp-validation-for="MemberFeedback" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Rating" class="control-label"></label>
-                <input asp-for="Rating" class="form-control" />
-                <span asp-validation-for="Rating" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-header bg-warning text-dark py-3">
+            <h5 class="card-title mb-0 fw-bold">Update Session Details</h5>
+        </div>
+        <div class="card-body p-4">
+
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4 shadow-sm"></div>
+
+                <input type="hidden" asp-for="SessionId" />
+                <input type="hidden" asp-for="MemberId" />
+                <input type="hidden" asp-for="TrainingId" />
+
+                <div class="alert alert-light border mb-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Class:</strong> @Model.Training.Name <span class="badge bg-secondary ms-2">@Model.Training.TrainingType?.Name</span>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <strong>Original Schedule:</strong> @Model.SessionDate.ToString("g")
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-12 mb-3">
+                        <label asp-for="SessionDate" class="form-label fw-bold">Session Date & Time</label>
+                        <div class="input-group shadow-sm">
+                            <span class="input-group-text @(!isStaff ? "bg-light" : "bg-white")"><i class="bi bi-calendar-event"></i></span>
+                            <input asp-for="SessionDate" class="form-control" type="datetime-local"
+                                   readonly="@(!isStaff)" style="@(!isStaff ? "background-color: #e9ecef; cursor: not-allowed;" : "")" />
+                        </div>
+                        <span asp-validation-for="SessionDate" class="invalid-feedback d-block"></span>
+                        @if (!isStaff)
+                        {
+                            <small class="text-muted fst-italic"><i class="bi bi-lock-fill me-1"></i>Contact staff to reschedule.</small>
+                        }
+                    </div>
+
+                    <div class="col-12"><hr class="my-2" /></div>
+
+                    <div class="col-md-12 mb-3">
+                        <label asp-for="MemberFeedback" class="form-label fw-bold">Your Feedback / Notes</label>
+                        <textarea asp-for="MemberFeedback" class="form-control shadow-sm" rows="3" placeholder="How was the session? Share your thoughts..."></textarea>
+                        <span asp-validation-for="MemberFeedback" class="invalid-feedback"></span>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Rating" class="form-label fw-bold">Rate this Class (1-5)</label>
+                        <select asp-for="Rating" class="form-select shadow-sm">
+                            <option value="">Select Rating...</option>
+                            <option value="5">⭐⭐⭐⭐⭐ (Excellent)</option>
+                            <option value="4">⭐⭐⭐⭐ (Good)</option>
+                            <option value="3">⭐⭐⭐ (Average)</option>
+                            <option value="2">⭐⭐ (Poor)</option>
+                            <option value="1">⭐ (Terrible)</option>
+                        </select>
+                        <span asp-validation-for="Rating" class="invalid-feedback"></span>
+                    </div>
+
+                </div>
+
+                <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                        <i class="bi bi-save me-1"></i> Save Changes
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">Cancel</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
