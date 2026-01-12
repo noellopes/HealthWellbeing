@@ -12,8 +12,13 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
+<<<<<<<< HEAD:Migrations/20260111214922_b11.Designer.cs
     [Migration("20260111214922_b11")]
     partial class b11
+========
+    [Migration("20260112002758_addTrainerActive")]
+    partial class addTrainerActive
+>>>>>>>> FinalTrainer:Migrations/20260112002758_addTrainerActive.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -180,6 +185,9 @@ namespace HealthWellbeing.Migrations
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
