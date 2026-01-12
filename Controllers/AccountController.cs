@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using HealthWellbeing.Data;
+﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeing.Controllers
 {
@@ -114,6 +116,28 @@ namespace HealthWellbeing.Controllers
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
+        }
+
+        [Authorize]
+        public async Task<IActionResult> MyProfile()
+        {
+            // 1. Obter o utilizador logado no Identity
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            // 2. Procurar o Cliente associado (usando o IdentityUserId que gravamos no Register)
+            var client = await _context.Client
+                .Include(c => c.Member) // Inclui dados de membro se existirem
+                .FirstOrDefaultAsync(c => c.IdentityUserId == user.Id);
+
+            if (client == null)
+            {
+                // Caso o admin não tenha um perfil de cliente criado
+                TempData["Error"] = "Perfil de cliente não encontrado.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            return View(client);
         }
     }
 }

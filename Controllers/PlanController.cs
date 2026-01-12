@@ -209,7 +209,7 @@ namespace HealthWellbeing.Controllers
 
             // Buscar o cliente e os seus planos atuais
             var client = await _context.Client
-                .Include(c => c.Membership)
+                .Include(c => c.Member)
                 .ThenInclude(m => m.MemberPlans)
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
 
@@ -220,9 +220,9 @@ namespace HealthWellbeing.Controllers
             }
 
             // REGRA DE NEGÓCIO: Impedir subscrição se já tiver plano Ativo
-            if (client.Membership != null && client.Membership.MemberPlans.Any(mp => mp.Status == "Active"))
+            if (client.Member != null && client.Member.MemberPlans.Any(mp => mp.Status == "Active"))
             {
-                var activePlan = client.Membership.MemberPlans.First(mp => mp.Status == "Active");
+                var activePlan = client.Member.MemberPlans.First(mp => mp.Status == "Active");
 
                 TempData["Message"] = $"You already have an active subscription ({activePlan.Plan?.Name ?? "Plan"}). You cannot subscribe to a new plan until the current one expires.";
                 TempData["MessageType"] = "warning";
@@ -242,23 +242,23 @@ namespace HealthWellbeing.Controllers
         {
             var plan = await _context.Plan.FindAsync(planId);
             var client = await _context.Client
-                .Include(c => c.Membership)
+                .Include(c => c.Member)
                 .FirstOrDefaultAsync(c => c.ClientId == clientId);
 
             if (plan == null || client == null) return NotFound();
 
             // 1. Garantir que existe registo na tabela Member
-            if (client.Membership == null)
+            if (client.Member == null)
             {
-                client.Membership = new Member { ClientId = client.ClientId };
-                _context.Member.Add(client.Membership);
+                client.Member = new Member { ClientId = client.ClientId };
+                _context.Member.Add(client.Member);
                 await _context.SaveChangesAsync();
             }
 
             // 2. Criar a Inscrição (MemberPlan)
             var memberPlan = new MemberPlan
             {
-                MemberId = client.Membership.MemberId,
+                MemberId = client.Member.MemberId,
                 PlanId = plan.PlanId,
                 StartDate = DateTime.Now,
                 EndDate = DateTime.Now.AddDays(plan.DurationDays),
@@ -272,7 +272,7 @@ namespace HealthWellbeing.Controllers
             TempData["Message"] = $"Success! You subscribed to <strong>{plan.Name}</strong>.";
             TempData["MessageType"] = "success";
 
-            return RedirectToAction("Details", "Member", new { id = client.Membership.MemberId });
+            return RedirectToAction("Details", "Member", new { id = client.Member.MemberId });
         }
 
         private bool PlanExists(int id)

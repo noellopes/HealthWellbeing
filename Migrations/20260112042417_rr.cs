@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class Mig12Jan : Migration
+    public partial class rr : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -74,7 +74,8 @@ namespace HealthWellbeing.Migrations
                     Phone = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Gender = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false)
+                    Gender = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -88,8 +89,8 @@ namespace HealthWellbeing.Migrations
                     TrainingTypeId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DurationMinutes = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
+                    MaxParticipants = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -128,8 +129,7 @@ namespace HealthWellbeing.Migrations
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     Duration = table.Column<int>(type: "int", nullable: false),
                     DayOfWeek = table.Column<int>(type: "int", nullable: false),
-                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    MaxParticipants = table.Column<int>(type: "int", nullable: false)
+                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -184,10 +184,10 @@ namespace HealthWellbeing.Migrations
                     PhysicalAssessmentId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AssessmentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Weight = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
-                    Height = table.Column<decimal>(type: "decimal(3,2)", nullable: false),
-                    BodyFatPercentage = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
-                    MuscleMass = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
+                    Weight = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Height = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    BodyFatPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    MuscleMass = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     MemberId = table.Column<int>(type: "int", nullable: false),
                     TrainerId = table.Column<int>(type: "int", nullable: false)
@@ -206,6 +206,64 @@ namespace HealthWellbeing.Migrations
                         column: x => x.TrainerId,
                         principalTable: "Trainer",
                         principalColumn: "TrainerId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Session",
+                columns: table => new
+                {
+                    SessionId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MemberId = table.Column<int>(type: "int", nullable: false),
+                    TrainingId = table.Column<int>(type: "int", nullable: false),
+                    SessionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    MemberFeedback = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Rating = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Session", x => x.SessionId);
+                    table.ForeignKey(
+                        name: "FK_Session_Member_MemberId",
+                        column: x => x.MemberId,
+                        principalTable: "Member",
+                        principalColumn: "MemberId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Session_Training_TrainingId",
+                        column: x => x.TrainingId,
+                        principalTable: "Training",
+                        principalColumn: "TrainingId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TrainingExercise",
+                columns: table => new
+                {
+                    TrainingExerciseId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TrainingId = table.Column<int>(type: "int", nullable: false),
+                    ExerciseId = table.Column<int>(type: "int", nullable: false),
+                    Sets = table.Column<int>(type: "int", nullable: false),
+                    Reps = table.Column<int>(type: "int", nullable: false),
+                    RestTime = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrainingExercise", x => x.TrainingExerciseId);
+                    table.ForeignKey(
+                        name: "FK_TrainingExercise_Exercise_ExerciseId",
+                        column: x => x.ExerciseId,
+                        principalTable: "Exercise",
+                        principalColumn: "ExerciseId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TrainingExercise_Training_TrainingId",
+                        column: x => x.TrainingId,
+                        principalTable: "Training",
+                        principalColumn: "TrainingId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -269,6 +327,16 @@ namespace HealthWellbeing.Migrations
                 column: "TrainerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Session_MemberId",
+                table: "Session",
+                column: "MemberId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Session_TrainingId",
+                table: "Session",
+                column: "TrainingId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Training_TrainerId",
                 table: "Training",
                 column: "TrainerId");
@@ -277,6 +345,16 @@ namespace HealthWellbeing.Migrations
                 name: "IX_Training_TrainingTypeId",
                 table: "Training",
                 column: "TrainingTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrainingExercise_ExerciseId",
+                table: "TrainingExercise",
+                column: "ExerciseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrainingExercise_TrainingId",
+                table: "TrainingExercise",
+                column: "TrainingId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TrainingPlan_PlanId",
@@ -293,19 +371,25 @@ namespace HealthWellbeing.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Exercise");
-
-            migrationBuilder.DropTable(
                 name: "MemberPlan");
 
             migrationBuilder.DropTable(
                 name: "PhysicalAssessment");
 
             migrationBuilder.DropTable(
+                name: "Session");
+
+            migrationBuilder.DropTable(
+                name: "TrainingExercise");
+
+            migrationBuilder.DropTable(
                 name: "TrainingPlan");
 
             migrationBuilder.DropTable(
                 name: "Member");
+
+            migrationBuilder.DropTable(
+                name: "Exercise");
 
             migrationBuilder.DropTable(
                 name: "Plan");

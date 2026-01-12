@@ -62,9 +62,9 @@
                                     <div class="small text-muted">@item.Phone</div>
                                 </td>
                                 <td>
-                                    @if (item.Membership != null)
+                                    @if (item.Member != null)
                                     {
-                                        <span class="badge rounded-pill bg-info text-dark shadow-sm">Member #@item.Membership.MemberId</span>
+                                        <span class="badge rounded-pill bg-info text-dark shadow-sm">Member #@item.Member.MemberId</span>
                                     }
                                     else
                                     {
@@ -72,9 +72,9 @@
                                     }
                                 </td>
                                 <td>
-                                    @if (item.Membership?.MemberPlans != null && item.Membership.MemberPlans.Any())
+                                    @if (item.Member?.MemberPlans != null && item.Member.MemberPlans.Any())
                                     {
-                                        foreach (var mp in item.Membership.MemberPlans)
+                                        foreach (var mp in item.Member.MemberPlans)
                                         {
                                             <span class="badge bg-success shadow-sm"><i class="bi bi-journal-check me-1"></i>@mp.Plan.Name</span>
                                         }

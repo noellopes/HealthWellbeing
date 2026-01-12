@@ -26,25 +26,21 @@ namespace HealthWellbeing.Data
         public DbSet<Exercise> Exercise { get; set; } = default!;
         public DbSet<TrainingExercise> TrainingExercise { get; set; } = default!;
         public DbSet<PhysicalAssessment> PhysicalAssessment { get; set; } = default!;
+        public DbSet<Session> Session { get; set; } = default!;
 
         // Tabelas Intermédias e Auxiliares
         public DbSet<MemberPlan> MemberPlan { get; set; } = default!;
         public DbSet<TrainingPlan> TrainingPlan { get; set; } = default!;
-        public DbSet<Session> Session { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configuração para Peso, Altura, percentagem de gordura e massa muscular
-            modelBuilder.Entity<PhysicalAssessment>()
-                .Property(p => p.Weight).HasColumnType("decimal(5,2)");
-            modelBuilder.Entity<PhysicalAssessment>()
-                .Property(p => p.Height).HasColumnType("decimal(3,2)");
-            modelBuilder.Entity<PhysicalAssessment>()
-                .Property(p => p.BodyFatPercentage).HasColumnType("decimal(5,2)");
-            modelBuilder.Entity<PhysicalAssessment>()
-                .Property(p => p.MuscleMass).HasColumnType("decimal(5,2)");
+            // Forçar a relação 1:1 entre Client e Member
+            modelBuilder.Entity<Client>()
+                .HasOne(c => c.Member)
+                .WithOne(m => m.Client)
+                .HasForeignKey<Member>(m => m.ClientId);
         }
     }
 }

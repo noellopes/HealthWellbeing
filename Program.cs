@@ -19,7 +19,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-// 3. Configuração do Identity (Roles são obrigatórios)
+// 3. Configuração do Identity
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -40,7 +40,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication(); // Obrigatório antes do Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
@@ -54,28 +54,32 @@ app.MapRazorPages();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+
     // --- BLOCO 1: IDENTITY (LOGINS) ---
     try
     {
         var identityContext = services.GetRequiredService<ApplicationDbContext>();
         identityContext.Database.Migrate();
+        // Verifica se a classe SeedData existe no teu projeto, caso contrário comenta a linha abaixo
         HealthWellbeing.Data.SeedData.SeedRolesAndAdminAsync(services).Wait();
     }
     catch (Exception ex)
     {
         Console.WriteLine("AVISO: Falha no Seed do Identity: " + ex.Message);
-        // Não fazemos throw aqui para ele tentar o próximo bloco
     }
+
+    // --- BLOCO 2: GINÁSIO (DADOS DE NEGÓCIO) ---
     try
     {
         var context = services.GetRequiredService<HealthWellbeingDbContext>();
-        context.Database.Migrate(); // Garante que as tuas tabelas existem
+        context.Database.Migrate(); // Garante que as tabelas existem via Migrations
         SeedDataGinasio.Populate(context);
     }
     catch (Exception ex)
     {
-        // Se este falhar, queremos saber porquê!
-        throw new Exception("ERRO NO SEED DO GINÁSIO: " + ex.Message);
+        // CORREÇÃO 3: Captura a InnerException para mostrar o erro REAL do SQL (ex: FK constraint)
+        var msg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+        throw new Exception("ERRO NO SEED DO GINÁSIO: " + msg);
     }
 }
 // =========================================================
