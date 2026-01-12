@@ -50,7 +50,7 @@ namespace HealthWellbeing.Controllers
             ViewBag.SearchStatus = searchStatus;
 
             int totalItems = await memberPlansQuery.CountAsync();
-            var paginationInfo = new PaginationInfo<MemberPlan>(page, totalItems, 5);
+            var paginationInfo = new PaginationInfo<MemberPlan>(page, totalItems, 3);
 
             paginationInfo.Items = await memberPlansQuery
                 .OrderByDescending(mp => mp.StartDate) // Ordenar por data mais recente

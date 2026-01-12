@@ -18,5 +18,8 @@ namespace HealthWellbeing.Models
 
         [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
+
+        [Display(Name = "Max Participants")]
+        public int MaxParticipants { get; set; }
     }
 }

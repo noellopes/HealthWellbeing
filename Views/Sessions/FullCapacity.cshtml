@@ -1,0 +1,51 @@
+﻿@model HealthWellbeing.Models.Training
+
+@{
+    ViewData["Title"] = "Class Full";
+    var alternatives = ViewBag.Alternatives as List<HealthWellbeing.Models.Training>;
+}
+
+<div class="container mt-5 text-center">
+    <div class="alert alert-danger shadow-sm p-5">
+        <h1 class="display-4"><i class="bi bi-x-circle-fill text-danger"></i></h1>
+        <h2 class="fw-bold mt-3">Class Full!</h2>
+        <p class="lead">We are sorry, but the session <strong>@Model.Name</strong> on the selected date has reached its maximum capacity (@Model.TrainingType.MaxParticipants participants).</p>
+    </div>
+
+    @if (alternatives != null && alternatives.Any())
+    {
+        <div class="mt-5">
+            <h4 class="text-muted mb-4">Suggested Alternatives for <strong>@Model.TrainingType.Name</strong>:</h4>
+
+            <div class="row justify-content-center">
+                @foreach (var alt in alternatives)
+                {
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-primary">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">@alt.Name</h5>
+                                <p class="card-text">
+                                    <i class="bi bi-calendar-event"></i> @alt.DayOfWeek<br />
+                                    <i class="bi bi-clock"></i> @alt.StartTime
+                                </p>
+                                <a asp-action="Create" asp-route-trainingId="@alt.TrainingId" class="btn btn-outline-primary btn-sm">
+                                    Book This Instead
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="mt-4">
+            <p>No other classes of this type are available at the moment.</p>
+        </div>
+    }
+
+    <div class="mt-5">
+        <a asp-controller="Training" asp-action="Index" class="btn btn-secondary">Back to Training List</a>
+    </div>
+</div>

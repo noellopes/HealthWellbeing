@@ -29,6 +29,7 @@ namespace HealthWellbeing.Data
         // Tabelas Intermédias e Auxiliares
         public DbSet<MemberPlan> MemberPlan { get; set; } = default!;
         public DbSet<TrainingPlan> TrainingPlan { get; set; } = default!;
+        public DbSet<Session> Session { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
