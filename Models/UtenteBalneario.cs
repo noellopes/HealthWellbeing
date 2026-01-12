@@ -32,7 +32,7 @@ namespace HealthWellbeing.Models
 
 
         //DadosMedicos
-        public DadosMedicos DadosMedicos { get; set; } = new DadosMedicos();
+        public DadosMedicos? DadosMedicos { get; set; } = new DadosMedicos();
 
 
         //Dados administrativos
@@ -40,7 +40,7 @@ namespace HealthWellbeing.Models
         [DataType(DataType.Date)]
         public DateTime DataInscricao { get; set; }
 
-        public  SeguroSaude SeguroSaude { get; set; } = new SeguroSaude();
+        public  SeguroSaude? SeguroSaude { get; set; } = new SeguroSaude();
 
         public bool Ativo { get; set; }
 

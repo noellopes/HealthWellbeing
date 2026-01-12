@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260107061017_AlignServicoForeignKey")]
-    partial class AlignServicoForeignKey
+    [Migration("20260111151829_MakeUtenteBalnearioIdNullable_FIX")]
+    partial class MakeUtenteBalnearioIdNullable_FIX
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -113,7 +113,6 @@ namespace HealthWellbeing.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AgendamentoId"));
 
                     b.Property<string>("Descricao")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -132,10 +131,10 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("ServicoId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TerapeutaId")
+                    b.Property<int>("TerapeutaId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TipoServicoId")
+                    b.Property<int>("TipoServicosId")
                         .HasColumnType("int");
 
                     b.Property<int?>("UtenteBalnearioId")
@@ -147,11 +146,11 @@ namespace HealthWellbeing.Migrations
 
                     b.HasIndex("TerapeutaId");
 
-                    b.HasIndex("TipoServicoId");
+                    b.HasIndex("TipoServicosId");
 
                     b.HasIndex("UtenteBalnearioId");
 
-                    b.ToTable("Agendamento");
+                    b.ToTable("Agendamentos");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
@@ -1140,7 +1139,7 @@ namespace HealthWellbeing.Migrations
 
                     b.HasIndex("SeguroSaudeId");
 
-                    b.ToTable("UtenteBalneario");
+                    b.ToTable("Utentes");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.UtenteSaude", b =>
@@ -1270,15 +1269,17 @@ namespace HealthWellbeing.Migrations
 
                     b.HasOne("HealthWellbeing.Models.Terapeuta", "Terapeuta")
                         .WithMany("Agendamentos")
-                        .HasForeignKey("TerapeutaId");
+                        .HasForeignKey("TerapeutaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("HealthWellbeing.Models.TipoServicos", "TipoServico")
                         .WithMany()
-                        .HasForeignKey("TipoServicoId")
+                        .HasForeignKey("TipoServicosId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("HealthWellbeing.Models.UtenteBalneario", "UtenteBalneario")
+                    b.HasOne("HealthWellbeing.Models.UtenteBalneario", "Utentes")
                         .WithMany()
                         .HasForeignKey("UtenteBalnearioId");
 
@@ -1288,7 +1289,7 @@ namespace HealthWellbeing.Migrations
 
                     b.Navigation("TipoServico");
 
-                    b.Navigation("UtenteBalneario");
+                    b.Navigation("Utentes");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
