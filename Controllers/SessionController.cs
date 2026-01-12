@@ -117,6 +117,24 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction("Index", "Training");
             }
 
+            var member = await GetCurrentMemberAsync();
+
+            // Verifica se o plano do membro cobre este treino
+            bool isAllowed = await _context.MemberPlan
+                .Join(_context.TrainingPlan,
+                      mp => mp.PlanId,
+                      tp => tp.PlanId,
+                      (mp, tp) => new { mp, tp })
+                .AnyAsync(x => x.mp.MemberId == member.MemberId
+                            && x.mp.Status == "Active"
+                            && x.tp.TrainingId == trainingId);
+
+            if (!isAllowed)
+            {
+                TempData["Error"] = "Your current plan does not include this training.";
+                return RedirectToAction(nameof(AvailableTrainings));
+            }
+
             var training = await _context.Training
                 .Include(t => t.Trainer)
                 .Include(t => t.TrainingType)
@@ -303,6 +321,51 @@ namespace HealthWellbeing.Controllers
         {
             int d = ((int)day - (int)start.DayOfWeek + 7) % 7;
             return start.AddDays(d == 0 ? 7 : d);
+        }
+
+        public async Task<IActionResult> AvailableTrainings()
+        {
+            // 1. Obter o Membro Logado
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "Account");
+
+            var member = await _context.Member
+                .Include(m => m.Client)
+                .FirstOrDefaultAsync(m => m.Client.Email == user.Email);
+
+            if (member == null) return RedirectToAction("Register", "Account");
+
+            // 2. Descobrir o Plano ATIVO do Membro
+            // Vamos à tabela MemberPlan ver o que está "Active" hoje
+            var activeMemberPlan = await _context.MemberPlan
+                .Include(mp => mp.Plan)
+                .FirstOrDefaultAsync(mp =>
+                    mp.MemberId == member.MemberId &&
+                    mp.Status == "Active" &&
+                    mp.EndDate >= DateTime.Now); // Garante que o plano não expirou
+
+            if (activeMemberPlan == null)
+            {
+                TempData["Error"] = "You don't have an active plan. Please subscribe first.";
+                return RedirectToAction("Index", "Home"); // Ou redirecionar para página de Planos
+            }
+
+            // 3. Descobrir quais os Treinos permitidos para este Plano
+            // Usamos a tabela de ligação TrainingPlan
+            var allowedTrainingIds = await _context.TrainingPlan
+                .Where(tp => tp.PlanId == activeMemberPlan.PlanId)
+                .Select(tp => tp.TrainingId)
+                .ToListAsync();
+
+            // 4. Carregar apenas os Treinos que estão na lista de permitidos
+            var availableTrainings = await _context.Training
+                .Include(t => t.TrainingType)
+                .Include(t => t.Trainer)
+                .Where(t => allowedTrainingIds.Contains(t.TrainingId)) // <--- O FILTRO MÁGICO É AQUI
+                .ToListAsync();
+
+            ViewBag.PlanName = activeMemberPlan.Plan.Name;
+            return View(availableTrainings);
         }
     }
 }

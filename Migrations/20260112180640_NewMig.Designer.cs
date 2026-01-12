@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260112163726_reb")]
-    partial class reb
+    [Migration("20260112180640_NewMig")]
+    partial class NewMig
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
