@@ -264,5 +264,39 @@ namespace HealthWellbeing.Controllers
         {
             return User.IsInRole("Administrator") || User.IsInRole("Trainer");
         }
+
+        // GET: Member/ProgressReport/5
+        public async Task<IActionResult> ProgressReport(int id, DateTime? from, DateTime? to)
+        {
+            var member = await _context.Member
+                .Include(m => m.Client)
+                .FirstOrDefaultAsync(m => m.MemberId == id);
+
+            if (member == null) return NotFound();
+
+            // Definir datas por defeito (ex: últimos 6 meses) caso não venham no filtro
+            var dateFrom = from ?? DateTime.Now.AddMonths(-6);
+            var dateTo = to ?? DateTime.Now;
+
+            var viewModel = new ProgressReportViewModel
+            {
+                MemberId = id,
+                From = dateFrom,
+                To = dateTo,
+                // Busca as avaliações no intervalo de tempo
+                Assessments = await _context.PhysicalAssessment
+                    .Where(a => a.MemberId == id && a.AssessmentDate >= dateFrom && a.AssessmentDate <= dateTo)
+                    .OrderBy(a => a.AssessmentDate)
+                    .ToListAsync(),
+
+                TotalTrainingsAttended = await _context.Session
+                    .Where(s => s.MemberId == id && s.SessionDate >= dateFrom && s.SessionDate <= dateTo)
+                    .CountAsync()
+            };
+
+            ViewBag.MemberName = member.Client.Name;
+            return View(viewModel);
+        }
+
     }
 }

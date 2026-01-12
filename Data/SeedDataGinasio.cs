@@ -13,8 +13,9 @@ namespace HealthWellbeing.Data
         {
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
 
-            //dbContext.Database.EnsureCreated();
+            // dbContext.Database.EnsureCreated();
             dbContext.Database.Migrate();
+
             // 1. DADOS BASE
             var clients = PopulateClients(dbContext);
             var plans = PopulatePlan(dbContext);

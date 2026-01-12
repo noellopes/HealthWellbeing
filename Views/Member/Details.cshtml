@@ -116,7 +116,12 @@
                                                     <span class="badge bg-primary">@eval.BMI.ToString("F1")</span>
                                                 </td>
                                                 <td>
-                                                    <a asp-controller="PhysicalAssessments" asp-action="Details" asp-route-id="@eval.PhysicalAssessmentId" class="btn btn-sm btn-outline-info">Ver Relatório</a>
+                                                    <a asp-controller="Member"
+                                                       asp-action="ProgressReport"
+                                                       asp-route-id="@Model.MemberId"
+                                                       class="btn btn-sm btn-outline-info">
+                                                        <i class="bi bi-graph-up me-1"></i>Ver Relatório
+                                                    </a>
                                                 </td>
                                             </tr>
                                         }
