@@ -12,7 +12,8 @@ namespace HealthWellbeing.Models
 
         // Relacionado com a tabela Stock
         [Required(ErrorMessage = "Selecione um consumível.")]
-        public int StockId { get; set; }
+        public int? StockId { get; set; } 
+
 
         [ForeignKey("StockId")]
         [ValidateNever]

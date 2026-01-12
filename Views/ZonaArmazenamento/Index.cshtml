@@ -30,6 +30,7 @@
             <a asp-action="Historico" class="btn btn-info text-white shadow-sm btn-acao me-2">
                 <i class="bi bi-clock-history me-1"></i> Histórico
             </a>
+
             <a asp-action="Create" class="btn btn-success shadow-sm btn-acao">
                 <i class="bi bi-plus-lg me-1"></i> Nova Zona
             </a>
@@ -94,6 +95,18 @@
         <div class="alert alert-danger alert-dismissible fade show shadow-sm">
             @TempData["ErrorMessage"]
             <button class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (ViewBag.PossuiEncomendaParaAceitar != null && (bool)ViewBag.PossuiEncomendaParaAceitar)
+    {
+        <div class="alert alert-warning shadow-sm">
+            <strong>Encomenda pendente: @ViewBag.ConsumivelEncomendado</strong>
+            <form asp-action="ReceberEncomenda" method="post" class="d-flex align-items-center mt-2">
+                <input type="hidden" name="consumivelId" value="@ViewBag.ConsumivelEncomendado" />
+                <input type="number" name="quantidadeTotal" value="@ViewBag.QuantidadeEncomendada" min="@ViewBag.QuantidadeEncomendada"
+                       class="form-control me-2" style="width:120px;" />
+                <button type="submit" class="btn btn-success">Aceitar Encomenda</button>
+            </form>
         </div>
     }
 

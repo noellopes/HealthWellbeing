@@ -84,7 +84,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // CONFIRMAR COMPRA
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult ConfirmarRegisto(RegistoCompra model)
@@ -108,8 +108,7 @@ namespace HealthWellbeing.Controllers
             if (consumivel == null)
                 return NotFound();
 
-            int limitePermitido =
-                consumivel.QuantidadeMaxima - consumivel.QuantidadeAtual;
+            int limitePermitido = consumivel.QuantidadeMaxima - consumivel.QuantidadeAtual;
 
             if (model.Quantidade > limitePermitido)
             {
@@ -136,7 +135,7 @@ namespace HealthWellbeing.Controllers
                     fc.ConsumivelId == model.ConsumivelId
                 );
 
-            //  Registar COMPRA
+            // 🔹 Registar COMPRA
             var compra = new Compra
             {
                 ConsumivelId = model.ConsumivelId,
@@ -144,53 +143,40 @@ namespace HealthWellbeing.Controllers
                 Quantidade = model.Quantidade,
                 PrecoUnitario = fornecedor.Preco,
                 TempoEntrega = fornecedor.TempoEntrega ?? 0,
-                DataCompra = DateTime.Now
+                DataCompra = DateTime.Now,
+                //Recebida = false // só será marcada quando o stock for recebido
             };
-
             _context.Compra.Add(compra);
 
-            // 🔹 Zona 
-            var zona = _context.ZonaArmazenamento
-                .Where(z => z.ConsumivelId == model.ConsumivelId && z.Ativa)
-                .OrderBy(z => z.QuantidadeAtual)
-                .FirstOrDefault();
+            var stock = _context.Stock
+    .Where(s => s.ConsumivelID == model.ConsumivelId)
+    .FirstOrDefault();
 
-            if (zona == null)
-                return BadRequest("Não existe zona ativa para este consumível.");
+            if (stock == null)
+                return BadRequest("Não existe stock para este consumível.");
 
-            zona.QuantidadeAtual += model.Quantidade;
-            
-            _context.SaveChanges();
-
-            // 🔹 Recalcular TOTAL do Consumível 
-            consumivel.QuantidadeAtual = _context.ZonaArmazenamento
-                .Where(z => z.ConsumivelId == consumivel.ConsumivelId)
-                .Sum(z => z.QuantidadeAtual);
-
-            // Sincronizar stock automaticamente
-            SincronizaCompra.AtualizarStockAposCompra(
-                _context,
-                consumivel.ConsumivelId
-            );
-
-            // 🔹 Histórico
-            _context.HistoricoCompras.Add(new HistoricoCompras
+            // Criar o histórico de compras associado ao stock
+            var historico = new HistoricoCompras
             {
-                StockId = _context.Stock
-                    .Where(s => s.ConsumivelID == consumivel.ConsumivelId)
-                    .Select(s => s.StockId)
-                    .First(),
-
                 Quantidade = model.Quantidade,
                 FornecedorId = fornecedor.FornecedorId,
                 Tipo = "Entrada",
-                Data = DateTime.Now
-            });
+                Data = DateTime.Now,
+                StockId = stock.StockId // agora não é null
+            };
 
-            
+            _context.HistoricoCompras.Add(historico);
+            _context.SaveChanges();
+
+            TempData["EncomendaRealizada"] = true;
+            TempData["ConsumivelIdEncomendado"] = model.ConsumivelId;
+            TempData["QuantidadeEncomendada"] = model.Quantidade;
+            TempData["SuccessMessage"] = "✅ Encomenda registada com sucesso!";
 
             return RedirectToAction("Index", "HistoricoCompras");
         }
+
+
 
         // HISTÓRICO SIMPLES
         public IActionResult Historico()
