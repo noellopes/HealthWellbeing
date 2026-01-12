@@ -543,7 +543,7 @@ namespace HealthWellbeing.Controllers
             if (User.IsInRole("Administrador"))
                 return RedirectToAction("Index", "Admin");
 
-            if (User.IsInRole("DiretorClinico,Medico"))
+            if (User.IsInRole("DiretorClinico"))
                 return RedirectToAction(nameof(Index), "UtenteSaude");
 
             if (User.IsInRole("Rececionista"))
