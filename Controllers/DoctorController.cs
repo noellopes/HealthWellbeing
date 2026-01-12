@@ -205,14 +205,37 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var doctor = await _context.Doctor.FindAsync(id);
-            if (doctor != null)
+            // Carrega o médico (e o que precisares para a view)
+            var doctor = await _context.Doctor
+                .Include(d => d.Especialidade)
+                .FirstOrDefaultAsync(d => d.IdMedico == id);
+
+            if (doctor == null) return NotFound();
+
+            // 1) Bloquear se houver consultas associadas (AJUSTA o DbSet/nome das FKs se necessário)
+            int numberConsultas = await _context.DoctorConsulta
+                .Where(dc => dc.IdMedico == id)
+                .CountAsync();
+
+            if (numberConsultas > 0)
             {
-                _context.Doctor.Remove(doctor);
+                ViewBag.Error = $"Não é possível apagar o médico porque tem {numberConsultas} consulta(s) marcada(s). " +
+                                "Remove/desassocia primeiro essas consultas.";
+                return View("Delete", doctor);
             }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            // 2) Apagar normalmente
+            try
+            {
+                _context.Doctor.Remove(doctor);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException)
+            {
+                ViewBag.Error = "Não foi possível apagar o médico. Existe informação associada que impede o apagamento.";
+                return View("Delete", doctor);
+            }
         }
 
         private bool DoctorExists(int id)
