@@ -61,6 +61,7 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
+        // POST: Usuarios/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CriarUsuario model)
@@ -72,16 +73,23 @@ namespace HealthWellbeing.Controllers
 
                 if (result.Succeeded)
                 {
+                    // --- CORREÇÃO PARA LOGIN: Confirmar Email Automaticamente ---
+                    var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    await _userManager.ConfirmEmailAsync(user, token);
+
+                    // Atribuir o Papel (Role)
                     if (!string.IsNullOrEmpty(model.Role))
                     {
                         await _userManager.AddToRoleAsync(user, model.Role);
                     }
+
                     return RedirectToAction(nameof(Index));
                 }
 
                 foreach (var error in result.Errors)
                     ModelState.AddModelError(string.Empty, error.Description);
             }
+
             ViewBag.Roles = new SelectList(await _roleManager.Roles.ToListAsync(), "Name", "Name");
             return View(model);
         }
@@ -107,6 +115,7 @@ namespace HealthWellbeing.Controllers
             return View(model);
         }
 
+        // POST: Usuarios/Edit/id
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, CriarUsuario model)
@@ -124,6 +133,7 @@ namespace HealthWellbeing.Controllers
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
+                    // Atualizar Papéis (Remove os antigos e adiciona o novo)
                     var rolesAtuais = await _userManager.GetRolesAsync(user);
                     await _userManager.RemoveFromRolesAsync(user, rolesAtuais);
 
