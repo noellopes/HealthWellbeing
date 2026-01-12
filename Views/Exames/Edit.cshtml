@@ -123,9 +123,9 @@
                                                 <select name="estadosIds" class="form-control form-control-sm">
                                                     @foreach (var estado in (ViewBag.ListaEstadosMateriais as SelectList))
                                                     {
-                                                        @* CORREÇÃO: Força o ID 9 (Reservado) se for novo ou carregado da receita *@
+                                                        @* CORREÇÃO: Força o ID 1 (Reservado) se for novo ou carregado da receita *@
                                                         bool sel = (estaAtivo && registro.MaterialStatusId.ToString() == estado.Value)
-                                                        || (!estaAtivo && estado.Value == "9");
+                                                        || (!estaAtivo && estado.Value == "1");
 
                                                         <option value="@estado.Value" selected="@(sel ? "selected" : null)">@estado.Text</option>
                                                     }

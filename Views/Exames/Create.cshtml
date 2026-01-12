@@ -24,7 +24,6 @@
 
         <div class="card-body p-4">
             <form asp-action="Create" method="post" id="mainForm">
-                @* Campos ocultos para manter o estado no Refresh *@
                 <input type="hidden" name="actionType" id="actionType" value="Save" />
                 <input type="hidden" name="novoExameTipoId" id="novoExameTipoId" value="" />
                 <input type="hidden" name="adicionarLinhas" id="adicionarLinhas" value="@linhasExtras" />
@@ -32,6 +31,7 @@
                 <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
                 <div class="row">
+                    @* --- Coluna Esquerda: Informação do Exame --- *@
                     <div class="col-md-5 border-end">
                         <h6 class="text-muted text-uppercase small mb-3 border-bottom pb-2">Informação Base</h6>
 
@@ -87,6 +87,7 @@
                         </div>
                     </div>
 
+                    @* --- Coluna Direita: Materiais --- *@
                     <div class="col-md-7">
                         <h6 class="text-muted text-uppercase small mb-3 border-bottom pb-2">Materiais do Catálogo</h6>
 
@@ -117,15 +118,18 @@
                                             </td>
                                             <td>
                                                 <input type="number" name="quantidades" class="form-control form-control-sm"
-                                                       value="@(isChecked? regReceita.Quantidade: 1)" min="1" />
+                                                       value="@(isChecked ? regReceita.Quantidade : 1)" min="1" />
                                             </td>
                                             <td>
                                                 <select name="estadosIds" class="form-select form-select-sm">
                                                     @foreach (var est in (ViewBag.ListaEstadosMateriais as SelectList))
                                                     {
-                                                        @* CORREÇÃO: Força a seleção do ID 9 (Reservado) para novos itens ou carregados da receita *@
+                                                        @* Lógica Corrigida: 
+                                                           1. Se o item está na receita, mantém o que vem da receita.
+                                                           2. Se é um novo item (não checked), o padrão é "1" (Reservado).
+                                                        *@
                                                         bool isSelected = (isChecked && regReceita.MaterialStatusId.ToString() == est.Value)
-                                                        || (!isChecked && est.Value == "9");
+                                                                       || (!isChecked && est.Value == "1");
 
                                                         <option value="@est.Value" selected="@(isSelected ? "selected" : null)">@est.Text</option>
                                                     }
@@ -137,8 +141,9 @@
                             </table>
                         </div>
 
+                        @* --- Novos Materiais (Opção B) --- *@
                         <div class="mt-4 p-3 border rounded bg-light shadow-sm">
-                            <h6 class="fw-bold text-success mb-3"><i class="bi bi-plus-square-fill me-1"></i> Novos Materiais (Opção B)</h6>
+                            <h6 class="fw-bold text-success mb-3"><i class="bi bi-plus-square-fill me-1"></i> Adição Manual de Materiais</h6>
 
                             @for (int i = 0; i < linhasExtras; i++)
                             {
@@ -157,8 +162,8 @@
                                         <select name="estadosIds" class="form-select form-select-sm">
                                             @foreach (var est in (ViewBag.ListaEstadosMateriais as SelectList))
                                             {
-                                                @* CORREÇÃO: Garante que novas linhas também iniciam como "Reservado" (ID 9) *@
-                                                <option value="@est.Value" selected="@(est.Value == "9" ? "selected" : null)">@est.Text</option>
+                                                @* Novos itens manuais sempre iniciam como "1" (Reservado) *@
+                                                <option value="@est.Value" selected="@(est.Value == "1" ? "selected" : null)">@est.Text</option>
                                             }
                                         </select>
                                     </div>

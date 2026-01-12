@@ -25,7 +25,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // ==========================================
-        // INDEX (Com Filtros e Paginação)
+        // INDEX
         // ==========================================
         public async Task<IActionResult> Index(string pesquisaUtente, DateTime? pesquisaData, int pagina = 1)
         {
@@ -36,21 +36,17 @@ namespace HealthWellbeing.Controllers
                 .Include(e => e.SalaDeExame)
                 .AsQueryable();
 
-            // Filtro por Nome de Utente
             if (!string.IsNullOrWhiteSpace(pesquisaUtente))
             {
                 examesQuery = examesQuery.Where(e => e.Utente.Nome.Contains(pesquisaUtente));
             }
 
-            // Filtro por Data (Compara apenas o dia)
             if (pesquisaData.HasValue)
             {
                 examesQuery = examesQuery.Where(e => e.DataHoraMarcacao.Date == pesquisaData.Value.Date);
             }
 
             int totalExames = await examesQuery.CountAsync();
-
-            // Passar filtros de volta para a View manter os inputs preenchidos
             ViewBag.PesquisaUtente = pesquisaUtente;
             ViewBag.PesquisaData = pesquisaData;
 
@@ -77,7 +73,7 @@ namespace HealthWellbeing.Controllers
                 .Include(e => e.MedicoSolicitante)
                 .Include(e => e.ProfissionalExecutante)
                 .Include(e => e.SalaDeExame)
-                .Include(e => e.RegistoMateriais) // Carrega materiais para a View
+                .Include(e => e.RegistoMateriais)
                 .FirstOrDefaultAsync(m => m.ExameId == id);
 
             if (exame == null) return NotFound();
@@ -111,7 +107,6 @@ namespace HealthWellbeing.Controllers
 
             if (ModelState.IsValid)
             {
-                // Hack para evitar SqlException de NULL na coluna legada da BD
                 exame.MaterialEquipamentoAssociadoId = (selecionadosIds != null && selecionadosIds.Any(id => id > 0))
                     ? selecionadosIds.First(id => id > 0) : 1;
 
@@ -233,20 +228,28 @@ namespace HealthWellbeing.Controllers
         {
             var receita = await _context.ExameTipoRecursos.Where(x => x.ExameTipoId == tipoId).Include(x => x.Recurso).ToListAsync();
             foreach (var r in receita)
-                exame.RegistoMateriais.Add(new RegistoMateriais { Nome = r.Recurso.NomeEquipamento, Tamanho = r.Recurso.Tamanho, Quantidade = r.QuantidadeNecessaria, MaterialStatusId = 9 });
+                exame.RegistoMateriais.Add(new RegistoMateriais
+                {
+                    Nome = r.Recurso.NomeEquipamento,
+                    Tamanho = r.Recurso.Tamanho,
+                    Quantidade = r.QuantidadeNecessaria,
+                    MaterialStatusId = 1 // ID 1 = Reservado
+                });
         }
 
         private async Task ProcessarRegistoMateriais(int exameId, int[] selecionadosIds, int[] quantidades, int[] estadosIds, string[] nomesNovos, string[] tamanhosNovos, string estadoExame)
         {
-            int ID_PADRAO = 9;
+            int ID_RESERVADO = 1; //
+
+            // Mapeamento automático baseado no estado do exame
             int estadoAuto = estadoExame switch
             {
-                "Marcado" => 9,
-                "Remarcado" => 9,
-                "Cancelado" => 14,
-                "Realizado" => 13,
-                _ => 9
-            }; //
+                "Marcado" => 1,    // Reservado
+                "Remarcado" => 1,  // Reservado
+                "Cancelado" => 2,  // Cancelado
+                "Realizado" => 4,  // Usado
+                _ => 1
+            };
 
             int idxNovo = 0;
             if (selecionadosIds == null) return;
@@ -254,7 +257,7 @@ namespace HealthWellbeing.Controllers
             for (int i = 0; i < selecionadosIds.Length; i++)
             {
                 string nome = ""; string tam = "";
-                if (selecionadosIds[i] == 0) // Criar novo no dicionário
+                if (selecionadosIds[i] == 0)
                 {
                     if (nomesNovos != null && idxNovo < nomesNovos.Length && !string.IsNullOrWhiteSpace(nomesNovos[idxNovo]))
                     {
@@ -264,15 +267,25 @@ namespace HealthWellbeing.Controllers
                     }
                     else { idxNovo++; continue; }
                 }
-                else // Usar existente
+                else
                 {
                     var m = await _context.MaterialEquipamentoAssociado.FindAsync(selecionadosIds[i]);
                     if (m == null) continue;
                     nome = m.NomeEquipamento; tam = m.Tamanho;
                 }
 
-                int estFinal = (estadosIds != null && i < estadosIds.Length && estadosIds[i] != ID_PADRAO) ? estadosIds[i] : estadoAuto;
-                _context.RegistoMateriais.Add(new RegistoMateriais { ExameId = exameId, Nome = nome, Tamanho = tam, Quantidade = (quantidades != null && i < quantidades.Length) ? quantidades[i] : 1, MaterialStatusId = estFinal });
+                // Se o ID for o padrão antigo ou o novo 'Reservado', deixamos o estadoAuto assumir o controle
+                int estFinal = (estadosIds != null && i < estadosIds.Length && estadosIds[i] != 9 && estadosIds[i] != ID_RESERVADO)
+                                ? estadosIds[i] : estadoAuto;
+
+                _context.RegistoMateriais.Add(new RegistoMateriais
+                {
+                    ExameId = exameId,
+                    Nome = nome,
+                    Tamanho = tam,
+                    Quantidade = (quantidades != null && i < quantidades.Length) ? quantidades[i] : 1,
+                    MaterialStatusId = estFinal
+                });
             }
         }
 

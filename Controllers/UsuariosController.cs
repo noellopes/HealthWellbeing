@@ -73,11 +73,10 @@ namespace HealthWellbeing.Controllers
 
                 if (result.Succeeded)
                 {
-                    // --- CORREÇÃO PARA LOGIN: Confirmar Email Automaticamente ---
+                    // Força a confirmação do email para permitir login imediato
                     var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     await _userManager.ConfirmEmailAsync(user, token);
 
-                    // Atribuir o Papel (Role)
                     if (!string.IsNullOrEmpty(model.Role))
                     {
                         await _userManager.AddToRoleAsync(user, model.Role);
@@ -122,6 +121,10 @@ namespace HealthWellbeing.Controllers
         {
             if (id != model.Id) return NotFound();
 
+            // Importante: Removemos a validação de Password porque ela não vem do formulário de Edit
+            ModelState.Remove("Password");
+            ModelState.Remove("ConfirmPassword");
+
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByIdAsync(id);
@@ -133,7 +136,7 @@ namespace HealthWellbeing.Controllers
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
-                    // Atualizar Papéis (Remove os antigos e adiciona o novo)
+                    // Atualiza as Roles: Remove todas e adiciona a selecionada
                     var rolesAtuais = await _userManager.GetRolesAsync(user);
                     await _userManager.RemoveFromRolesAsync(user, rolesAtuais);
 
