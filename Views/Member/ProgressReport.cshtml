@@ -1,0 +1,64 @@
+﻿@model HealthWellbeing.ViewModels.ProgressReportViewModel
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-primary fw-bold">Progress Report: @ViewBag.MemberName</h1>
+        <a asp-action="Details" asp-route-id="@Model.MemberId" class="btn btn-secondary">Back to Profile</a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-primary text-white h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-calendar-check display-4 mb-3"></i>
+                    <h5>Trainings Attended</h5>
+                    <h2 class="fw-bold">@Model.TotalTrainingsAttended</h2>
+                    <p class="small opacity-75">From @Model.From.ToShortDateString() to @Model.To.ToShortDateString()</p>
+                </div>
+            </div>
+        </div>
+
+        @* Tabela de Evolução Física *@
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="mb-0">Physical Evolution History</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Assessments.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Weight (kg)</th>
+                                        <th>BMI</th>
+                                        <th>Muscle Mass</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var eval in Model.Assessments)
+                                    {
+                                        <tr>
+                                            <td>@eval.AssessmentDate.ToString("dd/MM/yyyy")</td>
+                                            <td class="fw-bold">@eval.Weight</td>
+                                            <td>
+                                                <span class="badge bg-info text-dark">@eval.BMI.ToString("F2")</span>
+                                            </td>
+                                            <td>@eval.MuscleMass kg</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted italic">No assessments found for this period.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
