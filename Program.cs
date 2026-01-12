@@ -17,8 +17,8 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // --- CONFIGURAÇÃO DE IDENTIDADE ---
 builder.Services.AddDefaultIdentity<IdentityUser>(options => {
-    options.SignIn.RequireConfirmedAccount = true; // Segurança: Exige confirmação de email
-    options.Password.RequireDigit = true;          // Reforça a complexidade da password
+    options.SignIn.RequireConfirmedAccount = true; 
+    options.Password.RequireDigit = true;          
     options.Password.RequiredLength = 6;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>();

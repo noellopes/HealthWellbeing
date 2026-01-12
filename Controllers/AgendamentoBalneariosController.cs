@@ -240,7 +240,7 @@ public async Task<IActionResult> Edit(int? id)
 
 
         [HttpGet]
-        public async Task<IActionResult> GetDadosServico(int servicoId) // O nome 'servicoId' deve bater com o JS
+        public async Task<IActionResult> GetDadosServico(int servicoId) 
         {
             try
             {
@@ -253,7 +253,7 @@ public async Task<IActionResult> Edit(int? id)
                 {
                     preco = servico.Preco,
                     duracao = servico.DuracaoMinutos,
-                    tipoServicoId = servico.TipoServicosId // Verifique se o nome bate com o Model
+                    tipoServicoId = servico.TipoServicosId 
                 });
             }
             catch (Exception ex)
