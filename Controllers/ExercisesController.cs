@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
@@ -20,9 +21,30 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Exercises
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, string searchName = "", string searchMuscle = "")
         {
-            return View(await _context.Exercise.ToListAsync());
+            var query = _context.Exercise.AsQueryable();
+
+            // Filtros
+            if (!string.IsNullOrEmpty(searchName))
+                query = query.Where(e => e.Name.Contains(searchName));
+
+            if (!string.IsNullOrEmpty(searchMuscle))
+                query = query.Where(e => e.MuscleGroup.Contains(searchMuscle));
+
+            int totalItems = await query.CountAsync();
+            var pagination = new PaginationInfo<Exercise>(page, totalItems, 10);
+
+            pagination.Items = await query
+                .OrderBy(e => e.Name)
+                .Skip(pagination.ItemsToSkip)
+                .Take(pagination.ItemsPerPage)
+                .ToListAsync();
+
+            ViewBag.SearchName = searchName;
+            ViewBag.SearchMuscle = searchMuscle;
+
+            return View(pagination);
         }
 
         // GET: Exercises/Details/5

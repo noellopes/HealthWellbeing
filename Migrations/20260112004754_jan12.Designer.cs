@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260111220706_jan11")]
-    partial class jan11
+    [Migration("20260112004754_jan12")]
+    partial class jan12
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -73,6 +73,34 @@ namespace HealthWellbeing.Migrations
                         .IsUnique();
 
                     b.ToTable("Client");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Exercise", b =>
+                {
+                    b.Property<int>("ExerciseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ExerciseId"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Equipment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MuscleGroup")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("ExerciseId");
+
+                    b.ToTable("Exercise");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Member", b =>
