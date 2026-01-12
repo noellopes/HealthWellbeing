@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
@@ -23,7 +21,7 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Index(
             int page = 1,
             string searchActive = "",
-            int? searchDuration = null)
+            int? searchMaxParticipants = null)
         {
             var trainingTypesQuery = _context.TrainingType.AsQueryable();
 
@@ -36,15 +34,15 @@ namespace HealthWellbeing.Controllers
                     trainingTypesQuery = trainingTypesQuery.Where(t => !t.IsActive);
             }
 
-            // Filtro por duração
-            if (searchDuration.HasValue)
+            // Filtro por número máximo de participantes
+            if (searchMaxParticipants.HasValue)
             {
                 trainingTypesQuery = trainingTypesQuery
-                    .Where(t => t.DurationMinutes == searchDuration.Value);
+                    .Where(t => t.MaxParticipants == searchMaxParticipants.Value);
             }
 
             ViewBag.SearchActive = searchActive;
-            ViewBag.SearchDuration = searchDuration;
+            ViewBag.SearchMaxParticipants = searchMaxParticipants;
 
             int totalItems = await trainingTypesQuery.CountAsync();
 
@@ -84,7 +82,7 @@ namespace HealthWellbeing.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Name,Description,DurationMinutes,IsActive")] TrainingType trainingType)
+            [Bind("Name,Description,MaxParticipants,IsActive")] TrainingType trainingType)
         {
             if (ModelState.IsValid)
             {
@@ -115,7 +113,7 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             int id,
-            [Bind("TrainingTypeId,Name,Description,DurationMinutes,IsActive")] TrainingType trainingType)
+            [Bind("TrainingTypeId,Name,Description,MaxParticipants,IsActive")] TrainingType trainingType)
         {
             if (id != trainingType.TrainingTypeId)
                 return NotFound();
@@ -178,3 +176,4 @@ namespace HealthWellbeing.Controllers
         }
     }
 }
+

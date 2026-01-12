@@ -1,0 +1,65 @@
+﻿@model IEnumerable<HealthWellbeing.Models.TrainingExercise>
+
+@{
+    ViewData["Title"] = "Training Exercise";
+    int trainingId = ViewBag.TrainingId;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-primary fw-bold">Plan Details: @ViewBag.TrainingName</h2>
+            <p class="text-muted">Manage the exercises for this training session.</p>
+        </div>
+        <div>
+            <a asp-action="Create" asp-route-trainingId="@trainingId" class="btn btn-success">
+                <i class="bi bi-plus-lg me-2"></i>Add Exercise
+            </a>
+            <a asp-controller="Training" asp-action="Index" class="btn btn-secondary ms-2">Back to Trainings</a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Exercise</th>
+                        <th>Muscle Group</th>
+                        <th>Sets</th>
+                        <th>Reps</th>
+                        <th>Rest</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-bold">@item.Exercise.Name</td>
+                            <td>@item.Exercise.MuscleGroup</td>
+                            <td><span class="badge bg-primary rounded-pill">@item.Sets</span></td>
+                            <td>@item.Reps</td>
+                            <td>@item.RestTime</td>
+                            <td class="text-end pe-4">
+                                <a asp-action="Edit" asp-route-id="@item.TrainingExerciseId" class="btn btn-sm btn-outline-warning me-1">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.TrainingExerciseId" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-dumbbell display-4"></i>
+                    <p class="mt-2">No exercises added to this training yet.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

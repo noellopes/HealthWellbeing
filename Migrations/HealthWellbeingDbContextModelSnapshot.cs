@@ -248,6 +248,9 @@ namespace HealthWellbeing.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -281,9 +284,6 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("Duration")
                         .HasColumnType("int");
 
-                    b.Property<int>("MaxParticipants")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -305,6 +305,39 @@ namespace HealthWellbeing.Migrations
                     b.HasIndex("TrainingTypeId");
 
                     b.ToTable("Training");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.TrainingExercise", b =>
+                {
+                    b.Property<int>("TrainingExerciseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TrainingExerciseId"));
+
+                    b.Property<int>("ExerciseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Reps")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RestTime")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Sets")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TrainingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TrainingExerciseId");
+
+                    b.HasIndex("ExerciseId");
+
+                    b.HasIndex("TrainingId");
+
+                    b.ToTable("TrainingExercise");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.TrainingPlan", b =>
@@ -342,13 +375,14 @@ namespace HealthWellbeing.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TrainingTypeId"));
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DurationMinutes")
-                        .HasColumnType("int");
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
+
+                    b.Property<int>("MaxParticipants")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -426,6 +460,25 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Trainer");
 
                     b.Navigation("TrainingType");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.TrainingExercise", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Exercise", "Exercise")
+                        .WithMany()
+                        .HasForeignKey("ExerciseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Training", "Training")
+                        .WithMany()
+                        .HasForeignKey("TrainingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Exercise");
+
+                    b.Navigation("Training");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.TrainingPlan", b =>

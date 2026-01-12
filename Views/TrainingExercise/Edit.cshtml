@@ -1,0 +1,53 @@
+﻿@model HealthWellbeing.Models.TrainingExercise
+
+@{
+    ViewData["Title"] = "Edit Exercise";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-warning text-dark py-3">
+                    <h5 class="mb-0 fw-bold">Edit Exercise Details</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="TrainingExerciseId" />
+                        <input type="hidden" asp-for="TrainingId" />
+
+                        <div class="mb-3">
+                            <label asp-for="ExerciseId" class="form-label fw-bold">Exercise</label>
+                            <select asp-for="ExerciseId" class="form-select" asp-items="ViewBag.ExerciseId"></select>
+                            <span asp-validation-for="ExerciseId" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Sets" class="form-label fw-bold">Sets</label>
+                                <input asp-for="Sets" class="form-control" />
+                                <span asp-validation-for="Sets" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Reps" class="form-label fw-bold">Reps</label>
+                                <input asp-for="Reps" class="form-control" />
+                                <span asp-validation-for="Reps" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="RestTime" class="form-label fw-bold">Rest</label>
+                                <input asp-for="RestTime" class="form-control" />
+                                <span asp-validation-for="RestTime" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">Save Changes</button>
+                            <a asp-action="Index" asp-route-trainingId="@Model.TrainingId" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

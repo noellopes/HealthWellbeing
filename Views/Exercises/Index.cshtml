@@ -1,4 +1,4 @@
-﻿@model IEnumerable<HealthWellbeing.Models.Exercise>
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.Exercise>
 
 <div class="container py-4">
     <h1 class="text-primary fw-bold mb-4">Exercise Library</h1>
@@ -8,6 +8,21 @@
             <a asp-action="Create" class="btn btn-success px-4">Add New Exercise</a>
         </div>
         <div class="card-body">
+            @* Barra de Pesquisa *@
+            <form method="get" asp-action="Index">
+                <div class="row g-2 mb-4">
+                    <div class="col-md-5">
+                        <input type="text" name="searchName" class="form-control" placeholder="Search by name..." value="@ViewBag.SearchName">
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" name="searchMuscle" class="form-control" placeholder="Search by muscle group..." value="@ViewBag.SearchMuscle">
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">Search</button>
+                    </div>
+                </div>
+            </form>
+
             <table class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
@@ -18,7 +33,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model)
+                    @foreach (var item in Model.Items)
                     {
                         <tr>
                             <td class="fw-bold">@item.Name</td>
@@ -35,6 +50,24 @@
                     }
                 </tbody>
             </table>
+
+            @* Paginação *@
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-route-page="1" asp-route-searchName="@ViewBag.SearchName" asp-route-searchMuscle="@ViewBag.SearchMuscle">First</a>
+                    </li>
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-route-page="@i" asp-route-searchName="@ViewBag.SearchName" asp-route-searchMuscle="@ViewBag.SearchMuscle">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-route-page="@Model.TotalPages" asp-route-searchName="@ViewBag.SearchName" asp-route-searchMuscle="@ViewBag.SearchMuscle">Last</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>

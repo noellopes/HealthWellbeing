@@ -1,0 +1,97 @@
+﻿@model IEnumerable<HealthWellbeing.Models.PhysicalAssessment>
+
+@{
+    ViewData["Title"] = "My Evolution";
+    var latest = Model.FirstOrDefault();
+    var oldest = Model.LastOrDefault();
+}
+
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h2 class="text-primary fw-bold">My Fitness Journey</h2>
+        <p class="text-muted">Track your progress and celebrate your achievements.</p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center shadow-sm">
+            <i class="bi bi-info-circle fs-3 d-block mb-2"></i>
+            You don't have any physical assessments yet. Please schedule one with your trainer!
+        </div>
+    }
+    else
+    {
+        <div class="row mb-5">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm text-center p-3">
+                    <h6 class="text-muted text-uppercase small">Current Weight</h6>
+                    <h2 class="fw-bold text-primary">@latest.Weight <small>kg</small></h2>
+                    @if (Model.Count() > 1)
+                    {
+                        var diff = latest.Weight - oldest.Weight;
+                        <span class="badge @(diff <= 0 ? "bg-success" : "bg-danger") rounded-pill">
+                            @(diff > 0 ? "+" : "") @diff kg since start
+                        </span>
+                    }
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm text-center p-3">
+                    <h6 class="text-muted text-uppercase small">Body Fat</h6>
+                    <h2 class="fw-bold text-info">@latest.BodyFatPercentage <small>%</small></h2>
+                    @if (Model.Count() > 1)
+                    {
+                        var diff = latest.BodyFatPercentage - oldest.BodyFatPercentage;
+                        <span class="badge @(diff <= 0 ? "bg-success" : "bg-danger") rounded-pill">
+                            @(diff > 0 ? "+" : "") @diff %
+                        </span>
+                    }
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm text-center p-3">
+                    <h6 class="text-muted text-uppercase small">Muscle Mass</h6>
+                    <h2 class="fw-bold text-success">@latest.MuscleMass <small>kg</small></h2>
+                    @if (Model.Count() > 1)
+                    {
+                        var diff = latest.MuscleMass - oldest.MuscleMass;
+                        <span class="badge @(diff >= 0 ? "bg-success" : "bg-danger") rounded-pill">
+                            @(diff > 0 ? "+" : "") @diff kg
+                        </span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <h4 class="mb-4 fw-bold"><i class="bi bi-clock-history me-2"></i>Assessment History</h4>
+        <div class="card border-0 shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Trainer</th>
+                            <th>Weight</th>
+                            <th>Body Fat</th>
+                            <th>Muscle Mass</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold">@item.AssessmentDate.ToShortDateString()</td>
+                                <td>@item.Trainer?.Name</td>
+                                <td>@item.Weight kg</td>
+                                <td>@item.BodyFatPercentage %</td>
+                                <td>@item.MuscleMass kg</td>
+                                <td class="small text-muted">@item.Notes</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

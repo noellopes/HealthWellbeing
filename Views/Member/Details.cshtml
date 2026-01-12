@@ -85,6 +85,52 @@
                         <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back to Home</a>
                     }
                 </div>
+
+                @* Secção de Histórico de Evolução Física *@
+                <div class="card shadow-sm border-0 mt-4">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i>Histórico de Evolução Física</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.PhysicalAssessments != null && Model.PhysicalAssessments.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Peso (kg)</th>
+                                            <th>Altura (m)</th>
+                                            <th>IMC</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var eval in Model.PhysicalAssessments)
+                                        {
+                                            <tr>
+                                                <td>@eval.AssessmentDate.ToShortDateString()</td>
+                                                <td>@eval.Weight</td>
+                                                <td>@eval.Height</td>
+                                                <td>
+                                                    <span class="badge bg-primary">@eval.BMI.ToString("F1")</span>
+                                                </td>
+                                                <td>
+                                                    <a asp-controller="PhysicalAssessments" asp-action="Details" asp-route-id="@eval.PhysicalAssessmentId" class="btn btn-sm btn-outline-info">Ver Relatório</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted italic">Ainda não existem avaliações físicas registadas para este membro.</p>
+                        }
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

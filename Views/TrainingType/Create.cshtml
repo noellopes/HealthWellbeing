@@ -47,13 +47,14 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label asp-for="DurationMinutes" class="form-label fw-bold"></label>
-                        <input asp-for="DurationMinutes"
+                        <label asp-for="MaxParticipants" class="form-label fw-bold"></label>
+                        <input asp-for="MaxParticipants"
                                class="form-control shadow-sm"
                                type="number"
-                               min="45"
-                               max="120" />
-                        <span asp-validation-for="DurationMinutes" class="invalid-feedback"></span>
+                               min="1"
+                               max="50"
+                               placeholder="e.g. 20" />
+                        <span asp-validation-for="MaxParticipants" class="invalid-feedback"></span>
                     </div>
 
                     <div class="col-md-6 mb-3 d-flex align-items-center">

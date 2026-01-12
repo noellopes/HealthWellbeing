@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
@@ -22,6 +17,7 @@ namespace HealthWellbeing.Controllers
         // GET: Exercises
         public async Task<IActionResult> Index()
         {
+            // Devolve lista simples para ser compatível com a View padrão
             return View(await _context.Exercise.ToListAsync());
         }
 
@@ -33,13 +29,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var exercise = await _context.Exercise
-                .FirstOrDefaultAsync(m => m.ExerciseId == id);
-            if (exercise == null)
-            {
-                return NotFound();
-            }
-
+            var exercise = await _context.Exercise.FirstOrDefaultAsync(m => m.ExerciseId == id);
             return View(exercise);
         }
 
@@ -54,7 +44,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ExerciseId,Name,MuscleGroup,Equipment,Description")] Exercise exercise)
+        public async Task<IActionResult> Create([Bind("ExerciseId,Name,Description,MuscleGroup,Equipment")] Exercise exercise)
         {
             if (ModelState.IsValid)
             {
@@ -68,16 +58,9 @@ namespace HealthWellbeing.Controllers
         // GET: Exercises/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
+            if (id == null) return NotFound();
             var exercise = await _context.Exercise.FindAsync(id);
-            if (exercise == null)
-            {
-                return NotFound();
-            }
+            if (exercise == null) return NotFound();
             return View(exercise);
         }
 
@@ -86,7 +69,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ExerciseId,Name,MuscleGroup,Equipment,Description")] Exercise exercise)
+        public async Task<IActionResult> Edit(int id, [Bind("ExerciseId,Name,Description,MuscleGroup,Equipment")] Exercise exercise)
         {
             if (id != exercise.ExerciseId)
             {
@@ -102,14 +85,8 @@ namespace HealthWellbeing.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ExerciseExists(exercise.ExerciseId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!_context.Exercise.Any(e => e.ExerciseId == id)) return NotFound();
+                    else throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -119,18 +96,9 @@ namespace HealthWellbeing.Controllers
         // GET: Exercises/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var exercise = await _context.Exercise
-                .FirstOrDefaultAsync(m => m.ExerciseId == id);
-            if (exercise == null)
-            {
-                return NotFound();
-            }
-
+            if (id == null) return NotFound();
+            var exercise = await _context.Exercise.FirstOrDefaultAsync(m => m.ExerciseId == id);
+            if (exercise == null) return NotFound();
             return View(exercise);
         }
 
@@ -143,15 +111,9 @@ namespace HealthWellbeing.Controllers
             if (exercise != null)
             {
                 _context.Exercise.Remove(exercise);
+                await _context.SaveChangesAsync();
             }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool ExerciseExists(int id)
-        {
-            return _context.Exercise.Any(e => e.ExerciseId == id);
         }
     }
 }

@@ -27,6 +27,7 @@
 
                 <div class="row g-3">
 
+                    <!-- Name -->
                     <div class="col-md-12 mb-3">
                         <label asp-for="Name" class="form-label fw-bold"></label>
                         <input asp-for="Name"
@@ -35,6 +36,7 @@
                         <span asp-validation-for="Name" class="invalid-feedback"></span>
                     </div>
 
+                    <!-- Description -->
                     <div class="col-md-12 mb-3">
                         <label asp-for="Description" class="form-label fw-bold"></label>
                         <textarea asp-for="Description"
@@ -43,16 +45,18 @@
                         <span asp-validation-for="Description" class="invalid-feedback"></span>
                     </div>
 
+                    <!-- Max Participants -->
                     <div class="col-md-6 mb-3">
-                        <label asp-for="DurationMinutes" class="form-label fw-bold"></label>
-                        <input asp-for="DurationMinutes"
+                        <label asp-for="MaxParticipants" class="form-label fw-bold"></label>
+                        <input asp-for="MaxParticipants"
                                class="form-control shadow-sm"
                                type="number"
-                               min="45"
-                               max="120" />
-                        <span asp-validation-for="DurationMinutes" class="invalid-feedback"></span>
+                               min="1"
+                               max="50" />
+                        <span asp-validation-for="MaxParticipants" class="invalid-feedback"></span>
                     </div>
 
+                    <!-- Active -->
                     <div class="col-md-6 mb-3 d-flex align-items-center">
                         <div class="form-check mt-4">
                             <input asp-for="IsActive"
