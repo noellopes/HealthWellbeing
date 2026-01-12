@@ -30,8 +30,17 @@ namespace HealthWellbeing.Controllers
         [HttpPost]
         public IActionResult Create(UtenteBalneario utente)
         {
-            if (!ModelState.IsValid) return View(utente);
+            // Temporariamente: remove validações de objetos que não estão no form
+            ModelState.Remove("SeguroSaude");
+            ModelState.Remove("DadosMedicos");
 
+            if (!ModelState.IsValid)
+            {
+                // Se cair aqui, olhe a variável 'ModelState' no Debug para ver o que falta
+                return View(utente);
+            }
+
+            utente.DataInscricao = DateTime.Now; // Garante a data no servidor
             _context.Utentes.Add(utente);
             _context.SaveChanges();
 

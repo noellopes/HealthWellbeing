@@ -63,9 +63,12 @@
                         <label asp-for="TipoServicosId" class="form-label"></label>
                         <select asp-for="TipoServicosId"
                                 class="form-control"
-                                asp-items="ViewBag.TipoServicosId">
-                            <option value="">-- Selecione o Tipo de Serviço --</option>
+                                asp-items="ViewBag.TipoServicosId"
+                                id="TipoServicosId"
+                                disabled>
+                            <option value=""></option>
                         </select>
+                        <input type="hidden" asp-for="TipoServicosId" id="TipoServicosIdHidden" />
                         <span asp-validation-for="TipoServicosId" class="text-danger"></span>
                     </div>
 
@@ -140,4 +143,59 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const comboServico = document.getElementById("ServicoId");
+
+            // No EDITAR: Disparamos a busca assim que a página carrega
+            // para garantir que os campos readonly mostrem os valores do banco
+            if (comboServico && comboServico.value) {
+                buscarDadosServico(comboServico.value);
+            }
+
+            // Monitora mudanças manuais
+            if (comboServico) {
+                comboServico.addEventListener("change", function () {
+                    buscarDadosServico(this.value);
+                });
+            }
+        });
+
+        function buscarDadosServico(servicoId) {
+            const campoPreco = document.getElementById("Preco");
+            const campoDuracao = document.getElementById("DuracaoMinutos");
+            const campoTipoSelect = document.getElementById("TipoServicosId");
+            const campoTipoHidden = document.getElementById("TipoServicosIdHidden");
+
+            if (!servicoId) {
+                limparCampos();
+                return;
+            }
+
+            fetch('@Url.Action("GetDadosServico", "AgendamentoBalneario")' + '?servicoId=' + servicoId)
+                .then(response => {
+                    if (!response.ok) throw new Error("Serviço não encontrado.");
+                    return response.json();
+                })
+                .then(data => {
+                    if (data) {
+                        campoPreco.value = data.preco;
+                        campoDuracao.value = data.duracao;
+                        campoTipoSelect.value = data.tipoServicoId;
+                        campoTipoHidden.value = data.tipoServicoId;
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro:", error);
+                });
+        }
+
+        function limparCampos() {
+            document.getElementById("Preco").value = "";
+            document.getElementById("DuracaoMinutos").value = "";
+            document.getElementById("TipoServicosId").value = "";
+            document.getElementById("TipoServicosIdHidden").value = "";
+        }
+    </script>
 }

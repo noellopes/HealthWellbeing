@@ -87,11 +87,11 @@ namespace HealthWellbeing.Controllers
         // GET: AgendamentoBalnearios/Create
         public IActionResult Create()
         {
-            ViewBag.UtenteBalnearioId =
-                new SelectList(_context.Utentes, "UtenteBalnearioId", "NomeCompleto");
+            ViewBag.UtenteBalnearioId = new SelectList(_context.Utentes.OrderBy(u => u.NomeCompleto), "UtenteBalnearioId", "NomeCompleto");
+            ViewBag.TerapeutaId = new SelectList(_context.Terapeuta.OrderBy(t => t.Email), "TerapeutaId", "Email");
 
-            ViewBag.TerapeutaId =
-                new SelectList(_context.Terapeuta, "TerapeutaId", "Email");
+            var listaServicos = _context.Servicos.OrderBy(s => s.Nome).ToList();
+            ViewBag.ServicoId = new SelectList(listaServicos, "ServicoId", "Nome");
 
             ViewBag.TipoServicosId = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome", null);
             return View();
@@ -149,10 +149,10 @@ public async Task<IActionResult> Edit(int? id)
             {
                 return NotFound();
             }
-            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "Nome", agendamentoBalneario.ServicoId);
-            ViewData["TerapeutaId"] = new SelectList(_context.Terapeuta, "TerapeutaId", "Email", agendamentoBalneario.TerapeutaId);
-            ViewData["TipoServicosId"] = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome", agendamentoBalneario.TipoServicosId);
-            ViewData["UtenteBalnearioId"] = new SelectList(_context.Utentes, "UtenteBalnearioId", "NomeCompleto", agendamentoBalneario.UtenteBalnearioId);
+            ViewData["ServicoId"] = new SelectList(_context.Servicos.OrderBy(s => s.Nome), "ServicoId", "Nome", agendamentoBalneario.ServicoId);
+            ViewData["TerapeutaId"] = new SelectList(_context.Terapeuta.OrderBy(t => t.Email), "TerapeutaId", "Email", agendamentoBalneario.TerapeutaId);
+            ViewData["TipoServicosId"] = new SelectList(_context.TipoServicos.OrderBy(t => t.Nome), "TipoServicosId", "Nome", agendamentoBalneario.TipoServicosId);
+            ViewData["UtenteBalnearioId"] = new SelectList(_context.Utentes.OrderBy(u => u.NomeCompleto), "UtenteBalnearioId", "NomeCompleto", agendamentoBalneario.UtenteBalnearioId);
             return View(agendamentoBalneario);
         }
 
@@ -192,7 +192,7 @@ public async Task<IActionResult> Edit(int? id)
                     successMessage = "Dados do Agendamento alterado com sucesso!"
                 });
             }
-            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "Nome", agendamentoBalneario.ServicoId);
+            ViewData["ServicoId"] = new SelectList(_context.Servicos.OrderBy(s => s.Nome), "ServicoId", "Nome", agendamentoBalneario.ServicoId);
             ViewData["TerapeutaId"] = new SelectList(_context.Terapeuta, "TerapeutaId", "Email", agendamentoBalneario.TerapeutaId);
             ViewData["TipoServicoId"] = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome", agendamentoBalneario.TipoServicosId);
             ViewData["UtenteBalnearioId"] = new SelectList(_context.Utentes, "UtenteBalnearioId", "NomeCompleto", agendamentoBalneario.UtenteBalnearioId);

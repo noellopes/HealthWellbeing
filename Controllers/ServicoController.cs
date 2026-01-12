@@ -69,8 +69,12 @@ namespace HealthWellbeing.Controllers
         // GET: Servico/Create
         public IActionResult Create()
         {
-            // Alterado para TipoServicoId (singular) para bater com a View
-            ViewBag.TipoServicosId = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome");
+            // Buscamos os tipos de serviço do banco e ordenamos pelo nome de A-Z
+            var tiposOrdenados = _context.TipoServicos.OrderBy(t => t.Nome).ToList();
+
+            // Passamos a lista já ordenada para a SelectList
+            ViewBag.TipoServicosId = new SelectList(tiposOrdenados, "TipoServicosId", "Nome");
+
             return View();
         }
 
