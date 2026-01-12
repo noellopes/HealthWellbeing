@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace HealthWellbeing.Migrations.HealthWellbeingDb
+namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class jan12 : Migration
+    public partial class trainingExer : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -209,6 +209,35 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                 });
 
             migrationBuilder.CreateTable(
+                name: "TrainingExercise",
+                columns: table => new
+                {
+                    TrainingExerciseId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TrainingId = table.Column<int>(type: "int", nullable: false),
+                    ExerciseId = table.Column<int>(type: "int", nullable: false),
+                    Sets = table.Column<int>(type: "int", nullable: false),
+                    Reps = table.Column<int>(type: "int", nullable: false),
+                    RestTime = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrainingExercise", x => x.TrainingExerciseId);
+                    table.ForeignKey(
+                        name: "FK_TrainingExercise_Exercise_ExerciseId",
+                        column: x => x.ExerciseId,
+                        principalTable: "Exercise",
+                        principalColumn: "ExerciseId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TrainingExercise_Training_TrainingId",
+                        column: x => x.TrainingId,
+                        principalTable: "Training",
+                        principalColumn: "TrainingId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TrainingPlan",
                 columns: table => new
                 {
@@ -278,6 +307,16 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                 column: "TrainingTypeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TrainingExercise_ExerciseId",
+                table: "TrainingExercise",
+                column: "ExerciseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrainingExercise_TrainingId",
+                table: "TrainingExercise",
+                column: "TrainingId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TrainingPlan_PlanId",
                 table: "TrainingPlan",
                 column: "PlanId");
@@ -292,19 +331,22 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Exercise");
-
-            migrationBuilder.DropTable(
                 name: "MemberPlan");
 
             migrationBuilder.DropTable(
                 name: "PhysicalAssessment");
 
             migrationBuilder.DropTable(
+                name: "TrainingExercise");
+
+            migrationBuilder.DropTable(
                 name: "TrainingPlan");
 
             migrationBuilder.DropTable(
                 name: "Member");
+
+            migrationBuilder.DropTable(
+                name: "Exercise");
 
             migrationBuilder.DropTable(
                 name: "Plan");

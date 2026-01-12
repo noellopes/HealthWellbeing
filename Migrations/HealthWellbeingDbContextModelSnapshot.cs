@@ -4,19 +4,16 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace HealthWellbeing.Migrations.HealthWellbeingDb
+namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260112010501_jan")]
-    partial class jan
+    partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -307,6 +304,39 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                     b.ToTable("Training");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.TrainingExercise", b =>
+                {
+                    b.Property<int>("TrainingExerciseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TrainingExerciseId"));
+
+                    b.Property<int>("ExerciseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Reps")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RestTime")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Sets")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TrainingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TrainingExerciseId");
+
+                    b.HasIndex("ExerciseId");
+
+                    b.HasIndex("TrainingId");
+
+                    b.ToTable("TrainingExercise");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.TrainingPlan", b =>
                 {
                     b.Property<int>("TrainingPlanId")
@@ -427,6 +457,25 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                     b.Navigation("Trainer");
 
                     b.Navigation("TrainingType");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.TrainingExercise", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Exercise", "Exercise")
+                        .WithMany()
+                        .HasForeignKey("ExerciseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Training", "Training")
+                        .WithMany()
+                        .HasForeignKey("TrainingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Exercise");
+
+                    b.Navigation("Training");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.TrainingPlan", b =>

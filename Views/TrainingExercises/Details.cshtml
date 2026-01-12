@@ -1,0 +1,39 @@
+﻿@model HealthWellbeing.Models.TrainingExercise
+
+@{
+    ViewData["Title"] = "Exercise Details";
+}
+
+<div class="container mt-5">
+    <div class="card shadow border-0 mx-auto" style="max-width: 600px;">
+        <div class="card-header bg-info text-white py-3">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-info-circle me-2"></i>Exercise Details</h5>
+        </div>
+        <div class="card-body p-4">
+
+            <div class="text-center mb-4">
+                <h3 class="text-primary">@Model.Exercise.Name</h3>
+                <span class="badge bg-secondary">@Model.Exercise.MuscleGroup</span>
+            </div>
+
+            <dl class="row">
+                <dt class="col-sm-4 text-end">Training Plan:</dt>
+                <dd class="col-sm-8 fw-bold">@Model.Training.Name</dd>
+
+                <dt class="col-sm-4 text-end">Sets:</dt>
+                <dd class="col-sm-8">@Model.Sets</dd>
+
+                <dt class="col-sm-4 text-end">Reps:</dt>
+                <dd class="col-sm-8">@Model.Reps</dd>
+
+                <dt class="col-sm-4 text-end">Rest Time:</dt>
+                <dd class="col-sm-8">@Model.RestTime</dd>
+            </dl>
+
+            <div class="d-grid gap-2 mt-4">
+                <a asp-action="Edit" asp-route-id="@Model.TrainingExerciseId" class="btn btn-warning">Edit</a>
+                <a asp-action="Index" asp-route-trainingId="@Model.TrainingId" class="btn btn-outline-secondary">Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>

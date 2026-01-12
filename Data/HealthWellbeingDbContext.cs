@@ -24,6 +24,7 @@ namespace HealthWellbeing.Data
         public DbSet<Training> Training { get; set; } = default!;
         public DbSet<TrainingType> TrainingType { get; set; } = default!;
         public DbSet<Exercise> Exercise { get; set; } = default!;
+        public DbSet<TrainingExercise> TrainingExercise { get; set; } = default!;
         public DbSet<PhysicalAssessment> PhysicalAssessment { get; set; } = default!;
 
         // Tabelas Intermédias e Auxiliares
