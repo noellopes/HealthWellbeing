@@ -40,11 +40,19 @@ namespace HealthWellbeing.Controllers
                 return View(utente);
             }
 
-            utente.DataInscricao = DateTime.Now; // Garante a data no servidor
-            _context.Utentes.Add(utente);
-            _context.SaveChanges();
-
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                utente.DataInscricao = DateTime.Now;
+                _context.Utentes.Add(utente);
+                _context.SaveChanges();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                // Caso ocorra erro de base de dados (como o OFFSET que apareceu)
+                ModelState.AddModelError("", "Erro ao guardar na base de dados: " + ex.Message);
+                return View(utente);
+            }
         }
         public IActionResult Edit(int id)
         {

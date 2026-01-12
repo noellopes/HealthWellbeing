@@ -32,7 +32,6 @@ namespace HealthWellbeing.Controllers
                 .Include(a => a.TipoServico)
                 .AsQueryable();
 
-            // Pesquisa pelo nome do cliente
             if (!string.IsNullOrEmpty(pesquisarNomeUtente))
             {
                 query = query.Where(a =>
