@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace HealthWellbeing.Controllers
 {
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Roles = "Gestor de armazenamento")]
     public class CategoriaConsumivelController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
