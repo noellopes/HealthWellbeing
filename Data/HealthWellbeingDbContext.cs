@@ -79,7 +79,7 @@ namespace HealthWellbeing.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<AgendamentoBalneario>()
-                .HasOne(a => a.Utentes)
+                .HasOne(a => a.UtenteBalneario)
                 .WithMany()
                 .HasForeignKey(a => a.UtenteBalnearioId)
                 .IsRequired(false); 

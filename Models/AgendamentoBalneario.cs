@@ -29,7 +29,7 @@ namespace HealthWellbeing.Models
         public int? UtenteBalnearioId { get; set; }
 
         [ForeignKey(nameof(UtenteBalnearioId))]
-        public UtenteBalneario? Utentes { get; set; }
+        public virtual UtenteBalneario? UtenteBalneario { get; set; }
 
 
         [Required(ErrorMessage = "O Terapeuta é obrigatório.")]
@@ -87,5 +87,6 @@ namespace HealthWellbeing.Models
         [Required(ErrorMessage = "O estado da reserva é obrigatório.")]
         [Display(Name = "Estado")]
         public EstadoAgendamento Estado { get; set; } = EstadoAgendamento.Pendente;
+       
     }
 }

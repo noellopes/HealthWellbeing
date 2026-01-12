@@ -28,15 +28,17 @@ namespace HealthWellbeing.Controllers
         public IActionResult Create() => View();
 
         [HttpPost]
+        [ValidateAntiForgeryToken] 
         public IActionResult Create(UtenteBalneario utente)
         {
-            // Temporariamente: remove validações de objetos que não estão no form
+            // Remova as validações de todas as propriedades que NÃO estão no formulário HTML
             ModelState.Remove("SeguroSaude");
             ModelState.Remove("DadosMedicos");
+            ModelState.Remove("Agendamentos"); 
 
             if (!ModelState.IsValid)
             {
-                // Se cair aqui, olhe a variável 'ModelState' no Debug para ver o que falta
+                
                 return View(utente);
             }
 
@@ -49,7 +51,7 @@ namespace HealthWellbeing.Controllers
             }
             catch (Exception ex)
             {
-                // Caso ocorra erro de base de dados (como o OFFSET que apareceu)
+                
                 ModelState.AddModelError("", "Erro ao guardar na base de dados: " + ex.Message);
                 return View(utente);
             }

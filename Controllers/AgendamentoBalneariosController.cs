@@ -26,17 +26,17 @@ namespace HealthWellbeing.Controllers
             int itensPorPagina = 5;
 
             var query = _context.Agendamentos
-                .Include(a => a.Utentes)
-                .Include(a => a.Terapeuta)
-                .Include(a => a.Servico)
-                .Include(a => a.TipoServico)
-                .AsQueryable();
+    .Include(a => a.UtenteBalneario) 
+    .Include(a => a.Terapeuta)
+    .Include(a => a.Servico)
+    .Include(a => a.TipoServico)
+    .AsQueryable();
 
             if (!string.IsNullOrEmpty(pesquisarNomeUtente))
             {
-                query = query.Where(a =>
-                    a.Utentes != null &&
-                    a.Utentes.NomeCompleto.Contains(pesquisarNomeUtente));
+                
+                query = query.Where(a => a.UtenteBalneario != null &&
+                                    a.UtenteBalneario.NomeCompleto.Contains(pesquisarNomeUtente));
             }
 
             int totalItens = await query.CountAsync();
@@ -73,7 +73,7 @@ namespace HealthWellbeing.Controllers
                 .Include(a => a.Servico)
                 .Include(a => a.Terapeuta)
                 .Include(a => a.TipoServico)
-                .Include(a => a.Utentes)
+                .Include(a => a.UtenteBalneario)
                 .FirstOrDefaultAsync(m => m.AgendamentoId == id);
             if (agendamentoBalneario == null)
             {
@@ -86,6 +86,9 @@ namespace HealthWellbeing.Controllers
         // GET: AgendamentoBalnearios/Create
         public IActionResult Create()
         {
+
+
+           
             ViewBag.UtenteBalnearioId = new SelectList(_context.Utentes.OrderBy(u => u.NomeCompleto), "UtenteBalnearioId", "NomeCompleto");
             ViewBag.TerapeutaId = new SelectList(_context.Terapeuta.OrderBy(t => t.Email), "TerapeutaId", "Email");
 
@@ -104,7 +107,7 @@ namespace HealthWellbeing.Controllers
             AgendamentoBalneario agendamentoBalneario)
         {
             // Remove navigation properties (igual ao Servico)
-            ModelState.Remove("Utentes");
+            ModelState.Remove("UtenteBalneario");
             ModelState.Remove("Servico");
             ModelState.Remove("Terapeuta");
             ModelState.Remove("TipoServico");
@@ -210,7 +213,7 @@ public async Task<IActionResult> Edit(int? id)
                 .Include(a => a.Servico)
                 .Include(a => a.Terapeuta)
                 .Include(a => a.TipoServico)
-                .Include(a => a.Utentes)
+                .Include(a => a.UtenteBalneario)
                 .FirstOrDefaultAsync(m => m.AgendamentoId == id);
             if (agendamentoBalneario == null)
             {
@@ -273,6 +276,7 @@ public async Task<IActionResult> Edit(int? id)
             return Json(terapeutas);
         }
 
+       
         private bool AgendamentoBalnearioExists(int id)
         {
             return _context.Agendamentos.Any(e => e.AgendamentoId == id);

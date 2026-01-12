@@ -106,7 +106,7 @@
             @foreach (var item in Model.ListaAgendamentos)
             {
                 <tr>
-                    <td>@(item.Utentes?.NomeCompleto ?? "---")</td>
+                    <td>@(item.UtenteBalneario?.NomeCompleto ?? "---")</td>
                     <td>@(item.Terapeuta?.Nome ?? "---")</td>
                     <td>@item.Servico?.Nome</td>
                     <td>@item.TipoServico?.Nome</td>
@@ -129,6 +129,7 @@
                     </td>
 
                     <td>
+
                         <a asp-action="Edit" asp-route-id="@item.AgendamentoId"
                            class="btn btn-sm btn-primary me-2">
                             <i class="bi bi-pencil-square"></i> Edit
