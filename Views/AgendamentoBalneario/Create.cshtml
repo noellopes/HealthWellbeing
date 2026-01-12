@@ -51,7 +51,9 @@
                         <label asp-for="ServicoId" class="form-label"></label>
                         <select asp-for="ServicoId"
                                 class="form-control"
-                                asp-items="ViewBag.ServicoId">
+                                asp-items="ViewBag.ServicoId"
+                                id="ServicoId">
+
                             <option value="">-- Selecione o Serviço --</option>
                         </select>
                         <span asp-validation-for="ServicoId" class="text-danger"></span>
@@ -62,9 +64,13 @@
                         <label asp-for="TipoServicosId" class="form-label"></label>
                         <select asp-for="TipoServicosId"
                                 class="form-control"
-                                asp-items="ViewBag.TipoServicosId">
-                            <option value="">-- Selecione o Tipo de Serviço --</option>
+                                asp-items="ViewBag.TipoServicosId"
+                                id="TipoServicosId"
+                                disabled>
+                            <option value=""></option>
                         </select>
+
+                        <input type="hidden" asp-for="TipoServicosId" id="TipoServicosIdHidden" />
                         <span asp-validation-for="TipoServicosId" class="text-danger"></span>
                     </div>
 
@@ -102,14 +108,14 @@
                     <!-- DURAÇÃO -->
                     <div class="mb-3">
                         <label asp-for="DuracaoMinutos" class="form-label"></label>
-                        <input asp-for="DuracaoMinutos" class="form-control" />
+                        <input asp-for="DuracaoMinutos" class="form-control" id="DuracaoMinutos" readonly />
                         <span asp-validation-for="DuracaoMinutos" class="text-danger"></span>
                     </div>
 
                     <!-- PREÇO -->
                     <div class="mb-3">
                         <label asp-for="Preco" class="form-label"></label>
-                        <input asp-for="Preco" class="form-control" />
+                        <input asp-for="Preco" class="form-control" id="Preco" readonly />
                         <span asp-validation-for="Preco" class="text-danger"></span>
                     </div>
 
@@ -129,7 +135,57 @@
     </div>
 </div>
 
+@section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        // Usamos DOMContentLoaded para garantir que os elementos já existem no HTML
+        document.addEventListener("DOMContentLoaded", function () {
+            const comboServico = document.getElementById("ServicoId");
+
+            if (comboServico) {
+                comboServico.addEventListener("change", function () {
+                    const servicoId = this.value;
+                    const campoPreco = document.getElementById("Preco");
+                    const campoDuracao = document.getElementById("DuracaoMinutos");
+                    const campoTipoSelect = document.getElementById("TipoServicosId");
+                    const campoTipoHidden = document.getElementById("TipoServicosIdHidden");
+
+                    if (!servicoId) {
+                        limparCampos();
+                        return;
+                    }
+
+                    fetch('@Url.Action("GetDadosServico", "AgendamentoBalneario")' + '?servicoId=' + servicoId)
+                        .then(response => {
+                            if (!response.ok) throw new Error("Serviço não encontrado.");
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data) {
+                                campoPreco.value = data.preco;
+                                campoDuracao.value = data.duracao;
+                                campoTipoSelect.value = data.tipoServicoId;
+                                campoTipoHidden.value = data.tipoServicoId;
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Erro:", error);
+                            alert("Erro ao obter dados do serviço.");
+                            limparCampos();
+                        });
+                });
+            }
+        });
+
+        function limparCampos() {
+            const campos = ["Preco", "DuracaoMinutos", "TipoServicosId", "TipoServicosIdHidden"];
+            campos.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = "";
+            });
+        }
+    </script>
 }

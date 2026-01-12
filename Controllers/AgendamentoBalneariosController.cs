@@ -96,8 +96,7 @@ namespace HealthWellbeing.Controllers
             ViewBag.ServicoId =
                 new SelectList(_context.Servicos, "ServicoId", "Nome");
 
-            ViewBag.TipoServicosId =
-                new SelectList(_context.TipoServicos, "TipoServicosId", "Nome");
+            ViewBag.TipoServicosId = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome", null);
 
             return View();
         }
@@ -241,6 +240,29 @@ public async Task<IActionResult> Edit(int? id)
             return RedirectToAction(nameof(Index), new { successMessage = "Agendamento eliminado com sucesso!" });
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> GetDadosServico(int servicoId) // O nome 'servicoId' deve bater com o JS
+        {
+            try
+            {
+                var servico = await _context.Servicos
+                    .FirstOrDefaultAsync(s => s.ServicoId == servicoId);
+
+                if (servico == null) return NotFound();
+
+                return Json(new
+                {
+                    preco = servico.Preco,
+                    duracao = servico.DuracaoMinutos,
+                    tipoServicoId = servico.TipoServicosId // Verifique se o nome bate com o Model
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         private bool AgendamentoBalnearioExists(int id)
         {
             return _context.Agendamentos.Any(e => e.AgendamentoId == id);
