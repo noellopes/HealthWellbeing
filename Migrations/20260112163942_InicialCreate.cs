@@ -6,7 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
+<<<<<<<< HEAD:Migrations/20260112163942_InicialCreate.cs
     public partial class InicialCreate : Migration
+========
+    public partial class reb : Migration
+>>>>>>>> 7873017ed9a8fe91f5bd007c95d99e5e59ac7f20:Migrations/20260112163726_reb.cs
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

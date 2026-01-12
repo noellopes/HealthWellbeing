@@ -4,9 +4,10 @@ using HealthWellbeing.Models;
 
 namespace HealthWellbeing.ViewModels
 {
-    public class ProgressReport
+    public class ProgressReportViewModel
     {
         // Filtros
+        public int MemberId { get; set; }
         public DateTime From { get; set; }
         public DateTime To { get; set; }
 

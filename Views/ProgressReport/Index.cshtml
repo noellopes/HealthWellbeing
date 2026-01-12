@@ -1,4 +1,4 @@
-﻿@model HealthWellbeing.ViewModels.ProgressReport
+﻿@model HealthWellbeing.ViewModels.ProgressReportViewModel
 
 @{
     ViewData["Title"] = "Progress Report";
@@ -6,94 +6,96 @@
 
 <div class="container-fluid px-4">
     <h1 class="mt-4 text-primary fw-bold">
-        <i class="bi bi-graph-up-arrow me-2"></i>Progress Report
+        <i class="bi bi-clipboard-data me-2"></i>Relatório de Progresso
     </h1>
 
-    <!-- Filters -->
+    <!-- FILTROS -->
     <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-dark text-white py-3">
-            <h5 class="mb-0 fw-bold">
-                <i class="bi bi-funnel-fill me-2"></i>Filters
-            </h5>
-        </div>
-
         <div class="card-body">
-            <form method="post" class="row g-3">
+            <form method="get" class="row g-3">
+
+                <input type="hidden" name="memberId" value="@Model.MemberId" />
+
                 <div class="col-md-4">
-                    <label class="form-label fw-bold">From</label>
-                    <input asp-for="From" type="date" class="form-control shadow-sm" />
+                    <label class="form-label fw-bold">Data inicial</label>
+                    <input type="date"
+                           name="from"
+                           value="@Model.From.ToString("yyyy-MM-dd")"
+                           class="form-control shadow-sm" />
                 </div>
 
                 <div class="col-md-4">
-                    <label class="form-label fw-bold">To</label>
-                    <input asp-for="To" type="date" class="form-control shadow-sm" />
+                    <label class="form-label fw-bold">Data final</label>
+                    <input type="date"
+                           name="to"
+                           value="@Model.To.ToString("yyyy-MM-dd")"
+                           class="form-control shadow-sm" />
                 </div>
 
                 <div class="col-md-4 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100 shadow-sm fw-bold">
-                        <i class="bi bi-search"></i> Generate Report
+                        <i class="bi bi-search me-1"></i>Gerar Relatório
                     </button>
                 </div>
+
             </form>
         </div>
     </div>
 
-    <!-- Summary -->
+    <!-- RESUMO -->
     <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-primary text-white py-3">
-            <h5 class="mb-0 fw-bold">
-                <i class="bi bi-bar-chart-fill me-2"></i>Summary
-            </h5>
-        </div>
-
         <div class="card-body">
+            <h5 class="fw-bold mb-3">
+                <i class="bi bi-activity me-2"></i>Resumo
+            </h5>
+
             <p class="mb-0">
-                <strong>Total Trainings Attended:</strong>
+                <strong>Total de treinos realizados:</strong>
                 @Model.TotalTrainingsAttended
             </p>
         </div>
     </div>
 
-    <!-- Physical Assessments -->
+    <!-- AVALIAÇÕES FÍSICAS -->
     <div class="card shadow-sm border-0">
-        <div class="card-header bg-success text-white py-3">
-            <h5 class="mb-0 fw-bold">
-                <i class="bi bi-heart-pulse-fill me-2"></i>Physical Assessments
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-heart-pulse-fill me-2"></i>Avaliações Físicas
             </h5>
         </div>
 
-        <div class="card-body">
+        <div class="card-body p-0">
             @if (!Model.Assessments.Any())
             {
-                <p class="text-muted">No assessments found for this period.</p>
+                <div class="p-4 text-muted text-center">
+                    Nenhuma avaliação física encontrada no período selecionado.
+                </div>
             }
             else
             {
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Data</th>
+                            <th>Peso (kg)</th>
+                            <th>Altura (m)</th>
+                            <th>% Gordura</th>
+                            <th>Massa Muscular</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var a in Model.Assessments)
+                        {
                             <tr>
-                                <th>Date</th>
-                                <th>Weight</th>
-                                <th>Body Fat %</th>
-                                <th>Muscle Mass</th>
-                                <th>Trainer</th>
+                                <td>@a.AssessmentDate.ToShortDateString()</td>
+                                <td>@a.Weight</td>
+                                <td>@a.Height</td>
+                                <td>@a.BodyFatPercentage</td>
+                                <td>@a.MuscleMass</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var a in Model.Assessments)
-                            {
-                                <tr>
-                                    <td>@a.AssessmentDate.ToShortDateString()</td>
-                                    <td>@a.Weight</td>
-                                    <td>@a.BodyFatPercentage</td>
-                                    <td>@a.MuscleMass</td>
-                                    <td>@a.Trainer?.Name</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                        }
+                    </tbody>
+                </table>
             }
         </div>
     </div>

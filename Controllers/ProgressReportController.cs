@@ -17,50 +17,45 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: ProgressReport
-        public IActionResult Index()
+        public IActionResult Index(
+            int memberId,
+            DateTime? from,
+            DateTime? to)
         {
-            var vm = new ProgressReport
-            {
-                From = DateTime.Today.AddMonths(-1),
-                To = DateTime.Today
-            };
+            // Datas por defeito (últimos 3 meses)
+            DateTime fromDate = from ?? DateTime.Today.AddMonths(-3);
+            DateTime toDate = to ?? DateTime.Today;
 
-            return View(vm);
-        }
-
-        // POST: ProgressReport
-        [HttpPost]
-        public IActionResult Index(ProgressReport vm)
-        {
-            // ⚠️ EXEMPLO SIMPLES
-            // depois podes trocar pelo member logado
-            int memberId = 1;
-
-            // 1️⃣ Planos do membro no período
-            var memberPlanIds = _context.MemberPlan
-                .Where(mp =>
-                    mp.MemberId == memberId &&
-                    mp.StartDate >= vm.From &&
-                    mp.StartDate <= vm.To)
-                .Select(mp => mp.PlanId)
+            // Avaliações físicas do membro no período
+            var assessments = _context.PhysicalAssessment
+                .Include(a => a.Trainer)
+                .Where(a =>
+                    a.MemberId == memberId &&
+                    a.AssessmentDate >= fromDate &&
+                    a.AssessmentDate <= toDate)
+                .OrderBy(a => a.AssessmentDate)
                 .ToList();
 
-            // 2️⃣ Número de treinos associados a esses planos
-            vm.TotalTrainingsAttended = _context.TrainingPlan
-                .Where(tp => memberPlanIds.Contains(tp.PlanId))
+            // Número total de treinos realizados
+            // (simplificação aceitável para o trabalho)
+            int totalTrainings = _context.MemberPlan
+                .Where(mp =>
+                mp.MemberId == memberId &&
+                mp.StartDate <= toDate &&
+                mp.EndDate >= fromDate)
                 .Count();
 
-            // 3️⃣ Avaliações físicas no período
-            vm.Assessments = _context.PhysicalAssessment
-                .Include(pa => pa.Trainer)
-                .Where(pa =>
-                    pa.MemberId == memberId &&
-                    pa.AssessmentDate >= vm.From &&
-                    pa.AssessmentDate <= vm.To)
-                .OrderBy(pa => pa.AssessmentDate)
-                .ToList();
 
-            return View(vm);
+            var report = new ProgressReportViewModel
+            {
+                MemberId = memberId,
+                From = fromDate,
+                To = toDate,
+                TotalTrainingsAttended = totalTrainings,
+                Assessments = assessments
+            };
+
+            return View(report);
         }
     }
 }
