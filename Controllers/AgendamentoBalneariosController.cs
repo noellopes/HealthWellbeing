@@ -259,6 +259,21 @@ public async Task<IActionResult> Edit(int? id)
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet]
+        public async Task<JsonResult> GetTerapeutasPorTipo(int? tipoServicoId)
+        {
+            // Devolvemos todos os terapeutas ativos sem olhar para a especialidade técnica
+            var terapeutas = await _context.Terapeuta
+                .Where(t => t.Ativo)
+                .Select(t => new {
+                    id = t.TerapeutaId,
+                    nome = t.Nome
+                })
+                .ToListAsync();
+
+            return Json(terapeutas);
+        }
+
         private bool AgendamentoBalnearioExists(int id)
         {
             return _context.Agendamentos.Any(e => e.AgendamentoId == id);

@@ -49,5 +49,7 @@ namespace HealthWellbeing.Models
 
         // Relação: um terapeuta pode ter vários agendamentos
         public ICollection<AgendamentoBalneario> Agendamentos { get; set; } = new List<AgendamentoBalneario>();
+    
+  
     }
 }

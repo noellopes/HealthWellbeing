@@ -129,6 +129,29 @@
                         <span asp-validation-for="Estado" class="text-danger"></span>
                     </div>
 
+
+                    <div class="form-group mt-3">
+                        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#modalTerapeutas">
+                            <i class="fas fa-search"></i> Consultar Terapeutas e Especialidades
+                        </button>
+                    </div>
+
+                    <div class="modal fade" id="modalTerapeutas" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header bg-primary text-white">
+                                    <h5 class="modal-title" id="modalLabel">Lista de Terapeutas Disponíveis</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div id="listaTerapeutasContainer">
+                                        <p class="text-center">A carregar dados...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </form>
@@ -142,16 +165,39 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // Referências aos elementos do formulário
             const comboServico = document.getElementById("ServicoId");
+            const selectTerapeuta = document.getElementById("TerapeutaId");
+            const campoPreco = document.getElementById("Preco");
+            const campoDuracao = document.getElementById("DuracaoMinutos");
+            const campoTipoSelect = document.getElementById("TipoServicosId");
+            const campoTipoHidden = document.getElementById("TipoServicosIdHidden");
+
+            // --- LÓGICA DA MODAL (CONSULTA RÁPIDA) ---
+            const btnConsultar = document.querySelector('[data-bs-target="#modalTerapeutas"]');
+            if (btnConsultar) {
+                btnConsultar.addEventListener('click', function() {
+                    // Carrega apenas a tabela da página Index de Terapeutas para dentro da modal
+                    $("#listaTerapeutasContainer").load("@Url.Action("Index", "Terapeuta") table", function(response, status, xhr) {
+                        if (status == "error") {
+                            $("#listaTerapeutasContainer").html("<p class='text-danger text-center'>Erro ao carregar a lista do colega. Verifique a ligação.</p>");
+                        }
+                    });
+                });
+            }
+
+            // 1. CARREGAR TERAPEUTAS NO DROPDOWN IMEDIATAMENTE
+            carregarTodosTerapeutas();
 
             if (comboServico) {
                 comboServico.addEventListener("change", function () {
                     const servicoId = this.value;
                     if (!servicoId) {
-                        limparCampos();
+                        limparCamposServico();
                         return;
                     }
 
+                    // 2. OBTER DADOS DO SERVIÇO (Preço e Duração)
                     fetch('@Url.Action("GetDadosServico", "AgendamentoBalneario")' + '?servicoId=' + servicoId)
                         .then(response => {
                             if (!response.ok) throw new Error("Serviço não encontrado.");
@@ -167,10 +213,32 @@
                         })
                         .catch(error => {
                             console.error("Erro:", error);
-                            alert("Erro ao obter dados do serviço.");
-                            limparCampos();
+                            limparCamposServico();
                         });
                 });
+            }
+
+            function carregarTodosTerapeutas() {
+                if (!selectTerapeuta) return;
+                fetch('@Url.Action("GetTerapeutasPorTipo", "AgendamentoBalneario")')
+                    .then(response => response.json())
+                    .then(terapeutas => {
+                        selectTerapeuta.innerHTML = '<option value="">-- Selecione o Terapeuta --</option>';
+                        if (terapeutas && terapeutas.length > 0) {
+                            terapeutas.forEach(t => {
+                                selectTerapeuta.add(new Option(t.nome, t.id));
+                            });
+                        } else {
+                            selectTerapeuta.innerHTML = '<option value="">Nenhum terapeuta ativo encontrado</option>';
+                        }
+                    });
+            }
+
+            function limparCamposServico() {
+                if (campoPreco) campoPreco.value = "";
+                if (campoDuracao) campoDuracao.value = "";
+                if (campoTipoSelect) campoTipoSelect.value = "";
+                if (campoTipoHidden) campoTipoHidden.value = "";
             }
         });
     </script>
