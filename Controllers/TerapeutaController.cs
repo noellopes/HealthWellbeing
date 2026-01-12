@@ -11,10 +11,10 @@ namespace HealthWellbeing.Controllers
 {
     public class TerapeutaController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly HealthWellbeingDbContext _context;
 
         // Construtor que injeta a base de dados no controlador
-        public TerapeutaController(ApplicationDbContext context)
+        public TerapeutaController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
@@ -38,7 +38,7 @@ namespace HealthWellbeing.Controllers
             ViewBag.AtivoFiltro = ativoFiltro;
 
             // Query base
-            var query = _context.Terapeutas.AsQueryable();
+            var query = _context.Terapeuta.AsQueryable();
 
             // Aplicar filtro: nome
             if (!string.IsNullOrWhiteSpace(nomeFiltro))
@@ -91,7 +91,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var terapeuta = await _context.Terapeutas
+            var terapeuta = await _context.Terapeuta
                 .FirstOrDefaultAsync(m => m.TerapeutaId == id);
 
             if (terapeuta == null)
@@ -142,7 +142,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var terapeuta = await _context.Terapeutas.FindAsync(id);
+            var terapeuta = await _context.Terapeuta.FindAsync(id);
             if (terapeuta == null)
             {
                 return NotFound();
@@ -203,7 +203,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var terapeuta = await _context.Terapeutas
+            var terapeuta = await _context.Terapeuta
                 .FirstOrDefaultAsync(m => m.TerapeutaId == id);
 
             if (terapeuta == null)
@@ -219,11 +219,11 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var terapeuta = await _context.Terapeutas.FindAsync(id);
+            var terapeuta = await _context.Terapeuta.FindAsync(id);
 
             if (terapeuta != null)
             {
-                _context.Terapeutas.Remove(terapeuta);
+                _context.Terapeuta.Remove(terapeuta);
                 await _context.SaveChangesAsync();
             }
 
@@ -236,7 +236,7 @@ namespace HealthWellbeing.Controllers
         // Verifica se existe terapeuta
         private bool TerapeutaExists(int id)
         {
-            return _context.Terapeutas.Any(e => e.TerapeutaId == id);
+            return _context.Terapeuta.Any(e => e.TerapeutaId == id);
         }
     }
 }

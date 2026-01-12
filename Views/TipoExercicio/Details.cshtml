@@ -1,0 +1,66 @@
+﻿@model HealthWellbeing.Models.TipoExercicio
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>TipoExercicio</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.NomeTipoExercicios)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.NomeTipoExercicios)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DescricaoTipoExercicios)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DescricaoTipoExercicios)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CaracteristicasTipoExercicios)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CaracteristicasTipoExercicios)
+        </dd>
+
+        <!-- ✅ ADICIONADO: Benefícios Associados -->
+        <dt class="col-sm-2">
+            Benefícios Associados
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.Beneficios != null && Model.Beneficios.Any())
+            {
+                <ul class="list-unstyled">
+                    @foreach (var beneficio in Model.Beneficios)
+                    {
+                        <li>
+                            <a href="@Url.Action("Details", "Beneficio", new { id = beneficio.BeneficioId })"
+                               target="_blank"
+                               class="text-decoration-none">
+                                📌 @beneficio.NomeBeneficio
+                            </a>
+                            @if (!string.IsNullOrEmpty(beneficio.DescricaoBeneficio))
+                            {
+                                <small class="text-muted d-block ms-3">@beneficio.DescricaoBeneficio</small>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <span class="text-muted">Nenhum benefício associado</span>
+            }
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.TipoExercicioId" class="btn btn-warning">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>

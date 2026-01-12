@@ -1,0 +1,242 @@
+﻿@model HealthWellbeing.Models.AgendamentoBalneario
+
+@{
+    ViewData["Title"] = "Criar Novo Agendamento";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-plus-circle me-2"></i>Novo Agendamento
+        </h4>
+    </div>
+
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+
+            <!-- ERROS GERAIS -->
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <div class="row">
+
+                <!-- ================= COLUNA ESQUERDA ================= -->
+                <div class="col-md-6">
+
+                    <!-- UTENTE -->
+                    <div class="mb-3">
+                        <label class="control-label">Utente</label>
+                        <select asp-for="UtenteBalnearioId" class="form-control" asp-items="ViewBag.UtenteBalnearioId">
+                            <option value="">-- Selecione o Utente --</option>
+                        </select>
+                    </div>
+
+                    <!-- TERAPEUTA -->
+                    <div class="mb-3">
+                        <label asp-for="TerapeutaId" class="form-label"></label>
+                        <select asp-for="TerapeutaId"
+                                class="form-control"
+                                asp-items="ViewBag.TerapeutaId">
+                            <option value="">-- Selecione o Terapeuta --</option>
+                        </select>
+                        <span asp-validation-for="TerapeutaId" class="text-danger"></span>
+                    </div>
+
+                    <!-- SERVIÇO -->
+                    <div class="mb-3">
+                        <label asp-for="ServicoId" class="form-label"></label>
+                        <select asp-for="ServicoId"
+                                class="form-control"
+                                asp-items="ViewBag.ServicoId"
+                                id="ServicoId">
+
+                            <option value="">-- Selecione o Serviço --</option>
+                        </select>
+                        <span asp-validation-for="ServicoId" class="text-danger"></span>
+                    </div>
+
+                    <!-- TIPO DE SERVIÇO -->
+                    <div class="mb-3">
+                        <label asp-for="TipoServicosId" class="form-label"></label>
+                        <select asp-for="TipoServicosId"
+                                class="form-control"
+                                asp-items="ViewBag.TipoServicosId"
+                                id="TipoServicosId"
+                                disabled>
+                            <option value=""></option>
+                        </select>
+
+                        <input type="hidden" asp-for="TipoServicosId" id="TipoServicosIdHidden" />
+                        <span asp-validation-for="TipoServicosId" class="text-danger"></span>
+                    </div>
+
+                    <!-- DESCRIÇÃO -->
+                    <div class="mb-3">
+                        <label asp-for="Descricao" class="form-label"></label>
+                        <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Descricao" class="text-danger"></span>
+                    </div>
+
+                    <!-- BOTÕES -->
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="bi bi-check-circle me-1"></i>
+                            Criar Agendamento
+                        </button>
+
+                        <a asp-action="Index" class="btn btn-secondary px-4">
+                            <i class="bi bi-arrow-left-circle me-1"></i>
+                            Voltar
+                        </a>
+                    </div>
+                </div>
+
+                <!-- ================= COLUNA DIREITA ================= -->
+                <div class="col-md-6">
+
+                    <!-- DATA / HORA -->
+                    <div class="mb-3">
+                        <label asp-for="HoraInicio" class="form-label"></label>
+                        <input asp-for="HoraInicio" type="datetime-local" class="form-control" />
+                        <span asp-validation-for="HoraInicio" class="text-danger"></span>
+                    </div>
+
+                    <!-- DURAÇÃO -->
+                    <div class="mb-3">
+                        <label asp-for="DuracaoMinutos" class="form-label"></label>
+                        <input asp-for="DuracaoMinutos" class="form-control" id="DuracaoMinutos" readonly />
+                        <span asp-validation-for="DuracaoMinutos" class="text-danger"></span>
+                    </div>
+
+                    <!-- PREÇO -->
+                    <div class="mb-3">
+                        <label asp-for="Preco" class="form-label"></label>
+                        <input asp-for="Preco" class="form-control" id="Preco" readonly />
+                        <span asp-validation-for="Preco" class="text-danger"></span>
+                    </div>
+
+                    <!-- ESTADO -->
+                    <div class="mb-3">
+                        <label asp-for="Estado" class="form-label"></label>
+                        <select asp-for="Estado"
+                                class="form-control"
+                                asp-items="Html.GetEnumSelectList<HealthWellbeing.Models.EstadoAgendamento>()">
+                        </select>
+                        <span asp-validation-for="Estado" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="form-group mt-3">
+                        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#modalTerapeutas">
+                            <i class="fas fa-search"></i> Consultar Terapeutas e Especialidades
+                        </button>
+                    </div>
+
+                    <div class="modal fade" id="modalTerapeutas" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header bg-primary text-white">
+                                    <h5 class="modal-title" id="modalLabel">Lista de Terapeutas Disponíveis</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div id="listaTerapeutasContainer">
+                                        <p class="text-center">A carregar dados...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Referências aos elementos do formulário
+            const comboServico = document.getElementById("ServicoId");
+            const selectTerapeuta = document.getElementById("TerapeutaId");
+            const campoPreco = document.getElementById("Preco");
+            const campoDuracao = document.getElementById("DuracaoMinutos");
+            const campoTipoSelect = document.getElementById("TipoServicosId");
+            const campoTipoHidden = document.getElementById("TipoServicosIdHidden");
+
+            // --- LÓGICA DA MODAL (CONSULTA RÁPIDA) ---
+            const btnConsultar = document.querySelector('[data-bs-target="#modalTerapeutas"]');
+            if (btnConsultar) {
+                btnConsultar.addEventListener('click', function() {
+                    // Carrega apenas a tabela da página Index de Terapeutas para dentro da modal
+                    $("#listaTerapeutasContainer").load("@Url.Action("Index", "Terapeuta") table", function(response, status, xhr) {
+                        if (status == "error") {
+                            $("#listaTerapeutasContainer").html("<p class='text-danger text-center'>Erro ao carregar a lista do colega. Verifique a ligação.</p>");
+                        }
+                    });
+                });
+            }
+
+            // 1. CARREGAR TERAPEUTAS NO DROPDOWN IMEDIATAMENTE
+            carregarTodosTerapeutas();
+
+            if (comboServico) {
+                comboServico.addEventListener("change", function () {
+                    const servicoId = this.value;
+                    if (!servicoId) {
+                        limparCamposServico();
+                        return;
+                    }
+
+                    // 2. OBTER DADOS DO SERVIÇO (Preço e Duração)
+                    fetch('@Url.Action("GetDadosServico", "AgendamentoBalneario")' + '?servicoId=' + servicoId)
+                        .then(response => {
+                            if (!response.ok) throw new Error("Serviço não encontrado.");
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data) {
+                                campoPreco.value = data.preco;
+                                campoDuracao.value = data.duracao;
+                                campoTipoSelect.value = data.tipoServicoId;
+                                campoTipoHidden.value = data.tipoServicoId;
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Erro:", error);
+                            limparCamposServico();
+                        });
+                });
+            }
+
+            function carregarTodosTerapeutas() {
+                if (!selectTerapeuta) return;
+                fetch('@Url.Action("GetTerapeutasPorTipo", "AgendamentoBalneario")')
+                    .then(response => response.json())
+                    .then(terapeutas => {
+                        selectTerapeuta.innerHTML = '<option value="">-- Selecione o Terapeuta --</option>';
+                        if (terapeutas && terapeutas.length > 0) {
+                            terapeutas.forEach(t => {
+                                selectTerapeuta.add(new Option(t.nome, t.id));
+                            });
+                        } else {
+                            selectTerapeuta.innerHTML = '<option value="">Nenhum terapeuta ativo encontrado</option>';
+                        }
+                    });
+            }
+
+            function limparCamposServico() {
+                if (campoPreco) campoPreco.value = "";
+                if (campoDuracao) campoDuracao.value = "";
+                if (campoTipoSelect) campoTipoSelect.value = "";
+                if (campoTipoHidden) campoTipoHidden.value = "";
+            }
+        });
+    </script>
+}

@@ -1,0 +1,116 @@
+﻿@model HealthWellbeing.Models.ProblemaSaude
+
+@{
+    ViewData["Title"] = "Editar Problema de Saúde";
+
+    // ✅ 1. Obter a lista COMPLETA de profissionais
+    var allProfissionais = ViewData["Profissionais"] as List<ProfissionalExecutante> ?? new List<ProfissionalExecutante>();
+
+    // ✅ 2. Obter a lista de IDs que já estão SELECIONADOS para este problema
+    var selectedProfissionais = ViewData["SelectedProfissionais"] as List<int> ?? new List<int>();
+}
+
+<div class="container py-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
+            <h2 class="mb-0"><i class="bi bi-pencil-square me-2"></i>@ViewData["Title"]</h2>
+        </div>
+
+        <div class="card-body px-5 py-4">
+            <form asp-action="Edit" class="needs-validation" novalidate>
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input type="hidden" asp-for="ProblemaSaudeId" />
+
+                <div class="mb-3">
+                    <label asp-for="ProblemaCategoria" class="form-label fw-semibold text-secondary"></label>
+                    <input asp-for="ProblemaCategoria" class="form-control rounded-3 shadow-sm" placeholder="Ex: Doença Respiratória" />
+                    <span asp-validation-for="ProblemaCategoria" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ProblemaNome" class="form-label fw-semibold text-secondary"></label>
+                    <input asp-for="ProblemaNome" class="form-control rounded-3 shadow-sm" placeholder="Ex: Asma" />
+                    <span asp-validation-for="ProblemaNome" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ZonaAtingida" class="form-label fw-semibold text-secondary"></label>
+                    <input asp-for="ZonaAtingida" class="form-control rounded-3 shadow-sm" placeholder="Ex: Pulmões" />
+                    <span asp-validation-for="ZonaAtingida" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-secondary">Profissionais de Apoio</label>
+                    <div class="card p-3" style="max-height: 200px; overflow-y: auto; background-color: #f8f9fa;">
+
+                        @foreach (var prof in allProfissionais)
+                        {
+                            // Lógica para pré-selecionar a checkbox
+                            var isChecked = selectedProfissionais.Contains(prof.Id);
+
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       name="selectedProfissionais"
+                                       value="@prof.Id"
+                                       id="prof_@prof.Id"
+                                       @(isChecked ? "checked" : "") />
+
+                                <label class="form-check-label" for="prof_@prof.Id">
+                                    @prof.Nome (@prof.Funcao)
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label asp-for="Gravidade" class="form-label fw-semibold text-secondary"></label>
+                    <input asp-for="Gravidade" type="number" min="1" max="10" class="form-control rounded-3 shadow-sm" />
+                    <span asp-validation-for="Gravidade" class="text-danger small"></span>
+                    <small class="text-muted">Indique a gravidade entre 1 e 10.</small>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success px-4 me-2 shadow-sm">
+                        <i class="bi bi-save2"></i> Guardar
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
+                        <i class="bi bi-arrow-left-circle"></i> Voltar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<style>
+    .card {
+        transition: all 0.3s ease;
+    }
+
+        .card:hover {
+            transform: scale(1.01);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+    label {
+        font-weight: 600;
+    }
+
+    input.form-control {
+        border: 1px solid #ddd;
+        transition: all 0.2s ease;
+    }
+
+        input.form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+        }
+</style>
+

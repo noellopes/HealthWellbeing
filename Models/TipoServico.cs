@@ -1,22 +1,22 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 
 namespace HealthWellbeing.Models
 {
-    public class TipoServico
+    public class TipoServicos
     {
         [Key]
-        public int TipoServicoId { get; set; }
+        public int TipoServicosId { get; set; }
 
         [Required(ErrorMessage = "O nome do tipo de serviço é obrigatório.")]
-        [StringLength(100)]
+        [RegularExpression(@"^[^0-9]+$", ErrorMessage = "O nome não pode conter números.")]
+        [StringLength(100, ErrorMessage = "O nome é demasiado longo.")]
         public string Nome { get; set; }// Ex.: "massagens", "banhos", "tratamentos", "fisioterapia", "Programas de bem-estar"
 
         [Display(Name = "Descrição")]
+        [RegularExpression(@"^[^0-9]+$", ErrorMessage = "A descrição não pode conter números.")]
         public string? Descricao { get; set; }// Detalhes do tipo de serviço
 
-        // Relacionamento 1:N com os serviços específicos
-        //public ICollection<Servico> Servicos { get; set; }
+        public ICollection<Servico> Servicos { get; set; } = new List<Servico>();
     }
 }

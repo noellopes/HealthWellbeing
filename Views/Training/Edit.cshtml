@@ -1,0 +1,90 @@
+﻿@model HealthWellbeing.Models.Training
+
+@{
+    ViewData["Title"] = "Edit Training Session";
+}
+
+<h1 class="display-4 text-primary mb-4">Edit Training Session</h1>
+
+<h4 class="mb-3">Training Session Details</h4>
+<hr class="mb-4" />
+
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+        <div class="card shadow-lg p-4">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <input type="hidden" asp-for="TrainingId" />
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="TrainerId" class="form-label fw-bold"></label>
+                        <select asp-for="TrainerId" class="form-control" asp-items="ViewBag.TrainerId"></select>
+                        <span asp-validation-for="TrainerId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="TrainingTypeId" class="form-label fw-bold"></label>
+                        <select asp-for="TrainingTypeId" class="form-control" asp-items="ViewBag.TrainingTypeId"></select>
+                        <span asp-validation-for="TrainingTypeId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label fw-bold"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label fw-bold"></label>
+                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="DayOfWeek" class="form-label fw-bold"></label>
+                        <input asp-for="DayOfWeek" class="form-control" />
+                        <span asp-validation-for="DayOfWeek" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="StartTime" class="form-label fw-bold"></label>
+                        <input asp-for="StartTime" class="form-control" type="time" />
+                        <span asp-validation-for="StartTime" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Duration" class="form-label fw-bold"></label>
+                        <input asp-for="Duration" class="form-control" type="number" min="45" max="120" />
+                        <span asp-validation-for="Duration" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="MaxParticipants" class="form-label fw-bold"></label>
+                        <input asp-for="MaxParticipants" class="form-control" type="number" min="1" max="50" />
+                        <span asp-validation-for="MaxParticipants" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3 d-flex justify-content-between pt-2">
+                    <input type="submit" value="Save Changes" class="btn btn-primary btn-lg shadow" />
+                    <a asp-action="Index" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

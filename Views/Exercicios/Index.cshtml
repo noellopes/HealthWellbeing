@@ -1,0 +1,167 @@
+﻿@model PaginationInfoExercicios<Exercicio>
+
+@{
+    ViewData["Title"] = "Exercícios";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3 text-primary"><i class="fas fa-dumbbell"></i> Exercícios</h2>
+    <p class="text-muted">Lista dos exercícios registados no sistema:</p>
+
+    @if (Model?.Items?.Any() == true)
+    {
+        <div class="d-flex justify-content-end align-items-center mb-3">
+            <div>
+                <a class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#searchForm" aria-expanded="false" aria-controls="searchForm">
+                    <i class="bi bi-search me-1"></i> Pesquisa
+                </a>
+                <a asp-action="Create" class="btn btn-success">
+                    <i class="bi bi-plus-circle me-1"></i> Criar Novo
+                </a>
+                <a href="/" class="btn btn-secondary">
+                    <i class="fas fa-home me-1"></i> Início
+                </a>
+            </div>
+        </div>
+
+        <div class="collapse mb-3" id="searchForm">
+            <div class="card card-body">
+                <form asp-action="Index" method="get" class="row g-2 align-items-end">
+                    <div class="col-md-3">
+                        <label for="searchNome" class="form-label">Nome</label>
+                        <input id="searchNome" name="searchNome" value="@ViewBag.SearchNome" class="form-control" placeholder="Procurar por nome" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="searchDescricao" class="form-label">Descrição</label>
+                        <input id="searchDescricao" name="searchDescricao" value="@ViewBag.SearchDescricao" class="form-control" placeholder="Procurar por descrição" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="searchGenero" class="form-label">Gênero</label>
+                        <input id="searchGenero" name="searchGenero" value="@ViewBag.SearchGenero" class="form-control" placeholder="Procurar por gênero" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="searchGrupoMuscular" class="form-label">Grupo Muscular</label>
+                        <input id="searchGrupoMuscular" name="searchGrupoMuscular" value="@ViewBag.SearchGrupoMuscular" class="form-control" placeholder="Procurar por grupo muscular" />
+                    </div>
+
+                    <div class="col-12 mt-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Pesquisar
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">Limpar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Descrição</th>
+                        <th>Duração</th>
+                        <th>Intensidade</th>
+                        <th>Calorias</th>
+                        <th class="text-center" style="width: 260px;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var exercicio in Model.Items)
+                    {
+                        <tr>
+                            <td>@exercicio.ExercicioNome</td>
+                            <td>
+                                @(exercicio.Descricao?.Length > 50
+                                                        ? exercicio.Descricao.Substring(0, 50) + "..."
+                                                        : exercicio.Descricao)
+                    </td>
+                    <td>@exercicio.Duracao min</td>
+                    <td>
+                        <span class="badge bg-info">@exercicio.Intencidade / 10</span>
+                    </td>
+                    <td>@exercicio.CaloriasGastas kcal</td>
+                    <td class="text-center">
+                        <a asp-action="Details" asp-route-id="@exercicio.ExercicioId" class="btn btn-primary btn-sm me-1">
+                            <i class="fas fa-eye"></i> Ver
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@exercicio.ExercicioId" class="btn btn-warning btn-sm me-1">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@exercicio.ExercicioId" class="btn btn-danger btn-sm"
+                           onclick="return confirm('Tem a certeza que deseja apagar este exercício?');">
+                            <i class="fas fa-trash-alt"></i> Apagar
+                        </a>
+                    </td>
+                </tr>
+                                }
+                </tbody>
+            </table>
+
+            <!-- Paginação -->
+            <nav aria-label="Exercicios page">
+                <ul class="pagination">
+                    @if (Model.CurrentPage == 1)
+                    {
+                        <li class="page-item disabled"><a class="page-link">Início</a></li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-page="1"
+                               asp-route-searchNome="@ViewBag.SearchNome"
+                               asp-route-searchDescricao="@ViewBag.SearchDescricao"
+                               asp-route-searchGenero="@ViewBag.SearchGenero"
+                               asp-route-searchGrupoMuscular="@ViewBag.SearchGrupoMuscular">Início</a>
+                        </li>
+                    }
+
+                    @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                    {
+                        if (p == Model.CurrentPage)
+                        {
+                            <li class="page-item active"><a class="page-link" href="#">@p</a></li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-page="@p"
+                                   asp-route-searchNome="@ViewBag.SearchNome"
+                                   asp-route-searchDescricao="@ViewBag.SearchDescricao"
+                                   asp-route-searchGenero="@ViewBag.SearchGenero"
+                                   asp-route-searchGrupoMuscular="@ViewBag.SearchGrupoMuscular">@p</a>
+                            </li>
+                        }
+                    }
+
+                    @if (Model.CurrentPage == Model.TotalPages)
+                    {
+                        <li class="page-item disabled"><a class="page-link">Fim</a></li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-page="@Model.TotalPages"
+                               asp-route-searchNome="@ViewBag.SearchNome"
+                               asp-route-searchDescricao="@ViewBag.SearchDescricao"
+                               asp-route-searchGenero="@ViewBag.SearchGenero"
+                               asp-route-searchGrupoMuscular="@ViewBag.SearchGrupoMuscular">Fim</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning mt-3">
+            Nenhum exercício encontrado.
+        </div>
+    }
+</div>

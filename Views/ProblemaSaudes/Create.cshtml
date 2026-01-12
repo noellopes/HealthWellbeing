@@ -1,0 +1,104 @@
+﻿@model HealthWellbeing.Models.ProblemaSaude
+
+@{
+    ViewData["Title"] = "Adicionar Problema de Saúde";
+
+    // ✅ 1. Obter a lista de profissionais que o controlador enviou
+    var allProfissionais = ViewData["Profissionais"] as List<ProfissionalExecutante> ?? new List<ProfissionalExecutante>();
+}
+
+<div class="container py-4" style="max-width: 600px;">
+    <h2 class="text-center text-primary fw-bold mb-4">
+        <i class="bi bi-heart-pulse-fill"></i> @ViewData["Title"]
+    </h2>
+
+    <form asp-action="Create" class="shadow-sm p-4 rounded-3 bg-light">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="ProblemaCategoria" class="form-label fw-semibold"></label>
+            <input asp-for="ProblemaCategoria" class="form-control" placeholder="Ex: Muscular, Respiratório..." />
+            <span asp-validation-for="ProblemaCategoria" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ProblemaNome" class="form-label fw-semibold"></label>
+            <input asp-for="ProblemaNome" class="form-control" placeholder="Ex: Dores nas costas" />
+            <span asp-validation-for="ProblemaNome" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ZonaAtingida" class="form-label fw-semibold"></label>
+            <input asp-for="ZonaAtingida" class="form-control" placeholder="Ex: Costas, Pernas, Cabeça..." />
+            <span asp-validation-for="ZonaAtingida" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Profissionais de Apoio</label>
+            <div class="card p-3" style="max-height: 200px; overflow-y: auto; background-color: #fff;">
+                @if (!allProfissionais.Any())
+                {
+                    <span class="text-muted small">
+                        Nenhum profissional encontrado.
+                        <a asp-controller="ProfissionalExecutante" asp-action="Create">Adicionar um?</a>
+                    </span>
+                }
+
+                @foreach (var prof in allProfissionais)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="selectedProfissionais"
+                               value="@prof.Id"
+                               id="prof_@prof.Id" />
+
+                        <label class="form-check-label" for="prof_@prof.Id">
+                            @prof.Nome (@prof.Funcao)
+                        </label>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="mb-4">
+            <label asp-for="Gravidade" class="form-label fw-semibold"></label>
+            <input asp-for="Gravidade" type="number" min="1" max="10" class="form-control" placeholder="1 a 10" />
+            <span asp-validation-for="Gravidade" class="text-danger small"></span>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-check2-circle"></i> Guardar
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<style>
+    input.form-control {
+        border-radius: 0.5rem;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+        input.form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.15);
+        }
+
+    form {
+        transition: all 0.2s ease;
+    }
+
+        form:hover {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+</style>

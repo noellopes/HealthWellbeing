@@ -1,0 +1,56 @@
+﻿@model HealthWellbeing.Models.Registo
+
+@{
+    ViewData["Title"] = "Add New Record";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="form-group mb-2">
+        <label asp-for="UserId"></label>
+        <input asp-for="UserId" class="form-control" />
+        <span asp-validation-for="UserId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-2">
+        <label asp-for="MealDateTime"></label>
+        <input asp-for="MealDateTime" type="datetime-local" class="form-control" />
+        <span asp-validation-for="MealDateTime" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-2">
+        <label asp-for="MealType"></label>
+        <input asp-for="MealType" class="form-control" />
+        <span asp-validation-for="MealType" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-2">
+        <label asp-for="FoodName"></label>
+        <input asp-for="FoodName" class="form-control" />
+        <span asp-validation-for="FoodName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-2">
+        <label asp-for="Quantity"></label>
+        <input asp-for="Quantity" class="form-control" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Notes"></label>
+        <input asp-for="Notes" class="form-control" />
+        <span asp-validation-for="Notes" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

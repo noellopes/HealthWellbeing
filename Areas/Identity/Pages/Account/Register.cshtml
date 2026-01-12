@@ -1,0 +1,103 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Criar Conta";
+}
+
+<style>
+    /* Cartão ajustado com a cor da barra de navegação */
+    .custom-register-card {
+        background-color: #1a75ff; /* Azul igual à barra superior */
+        border-radius: 80px 20px 20px 20px; /* Canto arredondado característico */
+        padding: 50px 40px;
+        width: 100%;
+        max-width: 500px;
+        color: white;
+        border: none;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        margin: 50px auto; /* Centraliza horizontalmente sem fundo azul total */
+    }
+
+    /* Título minimalista */
+    .register-title {
+        font-size: 3rem;
+        font-weight: 300;
+        text-align: center;
+        margin-bottom: 30px;
+        letter-spacing: -1px;
+    }
+
+    /* Inputs arredondados com contorno branco */
+    .custom-input {
+        background: transparent !important;
+        border: 2px solid white !important;
+        border-radius: 30px !important;
+        color: white !important;
+        padding: 12px 20px !important;
+        margin-bottom: 5px;
+    }
+
+        .custom-input::placeholder {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+    /* Botão de ação escuro para contraste */
+    .register-btn {
+        background-color: #1a1a1a;
+        color: #1a75ff; /* Texto azul para combinar com o cartão */
+        font-weight: bold;
+        border-radius: 40px;
+        padding: 12px;
+        font-size: 1.5rem;
+        border: none;
+        width: 100%;
+        margin-top: 20px;
+        transition: 0.3s;
+    }
+
+        .register-btn:hover {
+            background-color: #000;
+            transform: scale(1.02);
+        }
+
+    .link-light {
+        color: white;
+        text-decoration: none;
+    }
+</style>
+
+<div class="container">
+    <div class="custom-register-card shadow-lg">
+        <h1 class="register-title">Registar</h1>
+
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger small" role="alert"></div>
+
+            <div class="mb-3">
+                <input asp-for="Input.Email" class="form-control custom-input" autocomplete="username" placeholder="E-mail" />
+                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <input asp-for="Input.Password" class="form-control custom-input" autocomplete="new-password" placeholder="Palavra-passe" />
+                <span asp-validation-for="Input.Password" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <input asp-for="Input.ConfirmPassword" class="form-control custom-input" autocomplete="new-password" placeholder="Confirmar Palavra-passe" />
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
+            </div>
+
+            <button id="registerSubmit" type="submit" class="register-btn">CRIAR CONTA</button>
+
+            <div class="text-center mt-4 small">
+                <span>Já tem uma conta? </span>
+                <a asp-page="./Login" class="link-light fw-bold">Entre aqui</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
