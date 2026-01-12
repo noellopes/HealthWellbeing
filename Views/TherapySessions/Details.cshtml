@@ -1,66 +1,137 @@
 ﻿@model HealthWellbeing.Models.TherapySession
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Session Details";
 }
 
-<h1>Details</h1>
+<div class="container py-4">
+    <div class="page-header mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><i class="bi bi-calendar-check"></i> Session Details</h1>
+                <p class="text-muted mb-0">View therapy session information</p>
+            </div>
+            <div>
+                <a asp-action="Edit" asp-route-id="@Model.SessionId" class="btn btn-warning">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
 
-<div>
-    <h4>TherapySession</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ScheduledDateTime)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ScheduledDateTime)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DurationMinutes)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DurationMinutes)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Type)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Type)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Notes)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Notes)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CompletedDateTime)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CompletedDateTime)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Patient)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Patient.FullName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Professional)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Professional.FullName)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.SessionId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <div class="row">
+        <!-- Session Information Card -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Session Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Session ID</dt>
+                        <dd class="col-sm-7">@Model.SessionId</dd>
+
+                        <dt class="col-sm-5">Scheduled Date & Time</dt>
+                        <dd class="col-sm-7">
+                            <strong>@Model.ScheduledDateTime.ToString("MMMM dd, yyyy")</strong><br>
+                            <small class="text-muted">@Model.ScheduledDateTime.ToString("hh:mm tt")</small>
+                        </dd>
+
+                        <dt class="col-sm-5">Duration</dt>
+                        <dd class="col-sm-7">
+                            <span class="badge bg-secondary">@Model.DurationMinutes minutes</span>
+                        </dd>
+
+                        <dt class="col-sm-5">Session Type</dt>
+                        <dd class="col-sm-7">
+                            <span class="badge bg-primary">@Model.Type.ToString()</span>
+                        </dd>
+
+                        <dt class="col-sm-5">Status</dt>
+                        <dd class="col-sm-7">
+                            @switch (Model.Status)
+                            {
+                                case SessionStatus.Scheduled:
+                                    <span class="badge bg-info"><i class="bi bi-calendar-check"></i> Scheduled</span>
+                                    break;
+                                case SessionStatus.Completed:
+                                    <span class="badge bg-success"><i class="bi bi-check-circle"></i> Completed</span>
+                                    break;
+                                case SessionStatus.Cancelled:
+                                    <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Cancelled</span>
+                                    break;
+                                case SessionStatus.NoShow:
+                                    <span class="badge bg-warning"><i class="bi bi-exclamation-circle"></i> No Show</span>
+                                    break;
+                                case SessionStatus.Rescheduled:
+                                    <span class="badge bg-secondary"><i class="bi bi-arrow-repeat"></i> Rescheduled</span>
+                                    break;
+                            }
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient & Professional Information Card -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-people"></i> Patient & Professional</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Patient</dt>
+                        <dd class="col-sm-7">
+                            <strong>@Model.Patient?.FullName</strong><br>
+                            <small class="text-muted">@Model.Patient?.Email</small>
+                        </dd>
+
+                        <dt class="col-sm-5">Mental Health Professional</dt>
+                        <dd class="col-sm-7">
+                            <strong>@Model.Professional?.FirstName @Model.Professional?.LastName</strong><br>
+                            <small class="text-muted">@Model.Professional?.Type.ToString()</small>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Notes Card -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-journal-text"></i> Session Notes</h5>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <p>@Model.Notes</p>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No notes recorded for this session.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mt-4">
+        <a asp-action="Edit" asp-route-id="@Model.SessionId" class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+        <a asp-action="Delete" asp-route-id="@Model.SessionId" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Delete
+        </a>
+    </div>
 </div>

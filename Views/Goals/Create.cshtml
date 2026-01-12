@@ -1,64 +1,119 @@
 ﻿@model HealthWellbeing.Models.Goal
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Goal";
 }
 
-<h1>Create</h1>
+<div class="container py-4">
+    <div class="page-header mb-4">
+        <h1><i class="bi bi-plus-circle"></i> Create New Goal</h1>
+        <p class="text-muted">Set a new therapeutic goal for a patient</p>
+    </div>
 
-<h4>Goal</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="PatientId" class="control-label"></label>
-                <select asp-for="PatientId" class ="form-control" asp-items="ViewBag.PatientId"></select>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Goal Information</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="PatientId" class="form-label"></label>
+                            <select asp-for="PatientId" class="form-control" asp-items="ViewBag.PatientId">
+                                <option value="">-- Select Patient --</option>
+                            </select>
+                            <span asp-validation-for="PatientId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label"></label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                            <small class="form-text text-muted">e.g., "Reduce anxiety in social situations"</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label"></label>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="StartDate" class="form-label"></label>
+                                    <input asp-for="StartDate" class="form-control" type="date" />
+                                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="TargetDate" class="form-label"></label>
+                                    <input asp-for="TargetDate" class="form-control" type="date" />
+                                    <span asp-validation-for="TargetDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ProgressPercentage" class="form-label"></label>
+                            <input asp-for="ProgressPercentage" class="form-control" type="number" min="0" max="100" />
+                            <span asp-validation-for="ProgressPercentage" class="text-danger"></span>
+                            <small class="form-text text-muted">Enter progress as percentage (0-100)</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Status" class="form-label"></label>
+                            <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<GoalStatus>()">
+                                <option value="">-- Select Status --</option>
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Create Goal
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-lightbulb"></i> Tips</h5>
+                    <ul class="small">
+                        <li>Make goals specific and measurable</li>
+                        <li>Set realistic target dates</li>
+                        <li>Break large goals into smaller milestones</li>
+                        <li>Regularly update progress percentage</li>
+                        <li>Include detailed descriptions for clarity</li>
+                    </ul>
+
+                    <h6 class="mt-3"><i class="bi bi-bookmark"></i> Goal Examples:</h6>
+                    <ul class="small mb-0">
+                        <li>Practice mindfulness daily</li>
+                        <li>Attend social events weekly</li>
+                        <li>Reduce panic attacks frequency</li>
+                        <li>Improve sleep quality</li>
+                        <li>Build healthy coping mechanisms</li>
+                    </ul>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StartDate" class="control-label"></label>
-                <input asp-for="StartDate" class="form-control" />
-                <span asp-validation-for="StartDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TargetDate" class="control-label"></label>
-                <input asp-for="TargetDate" class="form-control" />
-                <span asp-validation-for="TargetDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<GoalStatus>()">
-                    <option value="">-Select Goal Status-</option>
-                </select>
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProgressPercentage" class="control-label"></label>
-                <input asp-for="ProgressPercentage" class="form-control" />
-                <span asp-validation-for="ProgressPercentage" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

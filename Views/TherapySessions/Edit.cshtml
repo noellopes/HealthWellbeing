@@ -1,73 +1,106 @@
 ﻿@model HealthWellbeing.Models.TherapySession
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Session";
 }
 
-<h1>Edit</h1>
+<div class="container py-4">
+    <div class="page-header mb-4">
+        <h1><i class="bi bi-pencil"></i> Edit Therapy Session</h1>
+        <p class="text-muted">Update session information</p>
+    </div>
 
-<h4>TherapySession</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="SessionId" />
-            <div class="form-group">
-                <label asp-for="PatientId" class="control-label"></label>
-                <select asp-for="PatientId" class="form-control" asp-items="ViewBag.PatientId"></select>
-                <span asp-validation-for="PatientId" class="text-danger"></span>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Session Information</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="SessionId" />
+
+                        <div class="mb-3">
+                            <label asp-for="PatientId" class="form-label"></label>
+                            <select asp-for="PatientId" class="form-control" asp-items="ViewBag.PatientId"></select>
+                            <span asp-validation-for="PatientId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ProfessionalId" class="form-label"></label>
+                            <select asp-for="ProfessionalId" class="form-control" asp-items="ViewBag.ProfessionalId"></select>
+                            <span asp-validation-for="ProfessionalId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ScheduledDateTime" class="form-label"></label>
+                            <input asp-for="ScheduledDateTime" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="ScheduledDateTime" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DurationMinutes" class="form-label"></label>
+                            <input asp-for="DurationMinutes" class="form-control" />
+                            <span asp-validation-for="DurationMinutes" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Type" class="form-label"></label>
+                            <select asp-for="Type" class="form-control" asp-items="Html.GetEnumSelectList<SessionType>()"></select>
+                            <span asp-validation-for="Type" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Status" class="form-label"></label>
+                            <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<SessionStatus>()"></select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label"></label>
+                            <textarea asp-for="Notes" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-save"></i> Save Changes
+                            </button>
+                            <a asp-action="Details" asp-route-id="@Model.SessionId" class="btn btn-info">
+                                <i class="bi bi-eye"></i> View Details
+                            </a>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="ProfessionalId" class="control-label"></label>
-                <select asp-for="ProfessionalId" class="form-control" asp-items="ViewBag.ProfessionalId"></select>
-                <span asp-validation-for="ProfessionalId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-info-circle"></i> Current Session</h5>
+                    <dl class="mb-0">
+                        <dt>Session ID</dt>
+                        <dd>@Model.SessionId</dd>
+
+                        <dt>Patient</dt>
+                        <dd>@Model.Patient?.FullName</dd>
+
+                        <dt>Professional</dt>
+                        <dd>@Model.Professional?.FirstName @Model.Professional?.LastName</dd>
+                    </dl>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="ScheduledDateTime" class="control-label"></label>
-                <input asp-for="ScheduledDateTime" class="form-control" />
-                <span asp-validation-for="ScheduledDateTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DurationMinutes" class="control-label"></label>
-                <input asp-for="DurationMinutes" class="form-control" />
-                <span asp-validation-for="DurationMinutes" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<SessionStatus>()">
-                    <option value="">-Select Status-</option>
-                </select>
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Type" class="control-label"></label>
-                <select asp-for="Type" class="form-control" asp-items="Html.GetEnumSelectList<SessionType>()">
-                    <option value="">-Select Session Type-</option>
-                </select>
-                <span asp-validation-for="Type" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Notes" class="control-label"></label>
-                <input asp-for="Notes" class="form-control" />
-                <span asp-validation-for="Notes" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CompletedDateTime" class="control-label"></label>
-                <input asp-for="CompletedDateTime" class="form-control" />
-                <span asp-validation-for="CompletedDateTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

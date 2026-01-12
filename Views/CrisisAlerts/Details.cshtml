@@ -1,60 +1,191 @@
 ﻿@model HealthWellbeing.Models.CrisisAlert
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Crisis Alert Details";
 }
 
-<h1>Details</h1>
+<div class="container py-4">
+    <div class="page-header mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Crisis Alert Details</h1>
+                <p class="text-muted mb-0">View crisis alert information</p>
+            </div>
+            <div>
+                <a asp-action="Edit" asp-route-id="@Model.AlertId" class="btn btn-warning">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
 
-<div>
-    <h4>CrisisAlert</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AlertDateTime)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AlertDateTime)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Level)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Level)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsResolved)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsResolved)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ResolvedDateTime)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ResolvedDateTime)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Resolution)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Resolution)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Patient)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Patient.FullName)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.AlertId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    @if (!Model.IsResolved)
+    {
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading"><i class="bi bi-exclamation-circle-fill"></i> ACTIVE CRISIS ALERT</h4>
+            <p class="mb-0">This crisis alert is currently active and requires attention.</p>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Alert Information Card -->
+        <div class="col-md-6">
+            <div class="card mb-4 @(Model.Level == CrisisLevel.Critical ? "border-danger" : "")">
+                <div class="card-header @(Model.Level == CrisisLevel.Critical ? "bg-danger text-white" : "bg-primary text-white")">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Alert Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Alert ID</dt>
+                        <dd class="col-sm-7">@Model.AlertId</dd>
+
+                        <dt class="col-sm-5">Alert Date & Time</dt>
+                        <dd class="col-sm-7">
+                            <strong>@Model.AlertDateTime.ToString("MMMM dd, yyyy")</strong><br>
+                            <small class="text-muted">@Model.AlertDateTime.ToString("hh:mm tt")</small>
+                        </dd>
+
+                        <dt class="col-sm-5">Crisis Level</dt>
+                        <dd class="col-sm-7">
+                            @switch (Model.Level)
+                            {
+                                case CrisisLevel.Critical:
+                                    <span class="badge bg-danger" style="font-size: 1rem; padding: 8px 12px;">
+                                        <i class="bi bi-exclamation-triangle-fill"></i> CRITICAL
+                                    </span>
+                                    break;
+                                case CrisisLevel.High:
+                                    <span class="badge bg-warning" style="font-size: 1rem; padding: 8px 12px;">
+                                        <i class="bi bi-exclamation-circle"></i> HIGH
+                                    </span>
+                                    break;
+                                case CrisisLevel.Medium:
+                                    <span class="badge bg-info" style="font-size: 1rem; padding: 8px 12px;">MEDIUM</span>
+                                    break;
+                                case CrisisLevel.Low:
+                                    <span class="badge bg-secondary" style="font-size: 1rem; padding: 8px 12px;">LOW</span>
+                                    break;
+                            }
+                        </dd>
+
+                        <dt class="col-sm-5">Status</dt>
+                        <dd class="col-sm-7">
+                            @if (Model.IsResolved)
+                            {
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle-fill"></i> RESOLVED
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-exclamation-circle-fill"></i> ACTIVE
+                                </span>
+                            }
+                        </dd>
+
+                        @if (Model.IsResolved && Model.ResolvedDateTime.HasValue)
+                        {
+                            <dt class="col-sm-5">Resolved Date</dt>
+                            <dd class="col-sm-7">
+                                <strong>@Model.ResolvedDateTime.Value.ToString("MMMM dd, yyyy")</strong><br>
+                                <small class="text-muted">@Model.ResolvedDateTime.Value.ToString("hh:mm tt")</small>
+                            </dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient Information Card -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-person"></i> Patient Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Patient</dt>
+                        <dd class="col-sm-7">
+                            <strong>@Model.Patient?.FullName</strong><br>
+                            <small class="text-muted">@Model.Patient?.Email</small>
+                        </dd>
+
+                        <dt class="col-sm-5">Phone</dt>
+                        <dd class="col-sm-7">
+                            @if (!string.IsNullOrEmpty(Model.Patient?.Phone))
+                            {
+                                <a href="tel:@Model.Patient.Phone">@Model.Patient.Phone</a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not provided</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-5">Emergency Contact</dt>
+                        <dd class="col-sm-7">
+                            @if (!string.IsNullOrEmpty(Model.Patient?.EmergencyContact))
+                            {
+                                <strong>@Model.Patient.EmergencyContact</strong>
+                            
+                                <br>
+                                @if (!string.IsNullOrEmpty(Model.Patient.EmergencyPhone))
+                                {
+                                    <small><a href="tel:@Model.Patient.EmergencyPhone">@Model.Patient.EmergencyPhone</a></small>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not provided</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Description Card -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card @(Model.Level == CrisisLevel.Critical ? "border-danger" : "")">
+                <div class="card-header @(Model.Level == CrisisLevel.Critical ? "bg-danger text-white" : "bg-info text-white")">
+                    <h5 class="mb-0"><i class="bi bi-journal-text"></i> Crisis Description</h5>
+                </div>
+                <div class="card-body">
+                    <p>@Model.Description</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    {
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="bi bi-journal"></i> Additional Notes</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Action Buttons -->
+    <div class="mt-4">
+        <a asp-action="Edit" asp-route-id="@Model.AlertId" class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+        <a asp-action="Delete" asp-route-id="@Model.AlertId" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Delete
+        </a>
+    </div>
 </div>

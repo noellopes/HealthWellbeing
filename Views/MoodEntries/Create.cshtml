@@ -1,61 +1,105 @@
 ﻿@model HealthWellbeing.Models.MoodEntry
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Add Mood Entry";
 }
 
-<h1>Create</h1>
+<div class="container py-4">
+    <div class="page-header mb-4">
+        <h1><i class="bi bi-plus-circle"></i> Add New Mood Entry</h1>
+        <p class="text-muted">Track patient's emotional state and mood</p>
+    </div>
 
-<h4>MoodEntry</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="PatientId" class="control-label"></label>
-                <select asp-for="PatientId" class ="form-control" asp-items="ViewBag.PatientId"></select>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Mood Entry Information</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="PatientId" class="form-label"></label>
+                            <select asp-for="PatientId" class="form-control" asp-items="ViewBag.PatientId">
+                                <option value="">-- Select Patient --</option>
+                            </select>
+                            <span asp-validation-for="PatientId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="EntryDateTime" class="form-label"></label>
+                            <input asp-for="EntryDateTime" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="EntryDateTime" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="MoodScore" class="form-label"></label>
+                            <input asp-for="MoodScore" class="form-control" type="number" min="1" max="10" />
+                            <span asp-validation-for="MoodScore" class="text-danger"></span>
+                            <small class="form-text text-muted">Rate mood from 1 (very low) to 10 (very high)</small>
+                            <div class="mt-2">
+                                <span class="badge bg-danger">1-4: Low Mood</span>
+                                <span class="badge bg-warning">5-7: Medium Mood</span>
+                                <span class="badge bg-success">8-10: High Mood</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Emotion" class="form-label"></label>
+                            <input asp-for="Emotion" class="form-control" />
+                            <span asp-validation-for="Emotion" class="text-danger"></span>
+                            <small class="form-text text-muted">e.g., Happy, Sad, Anxious, Calm, Angry</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label"></label>
+                            <textarea asp-for="Notes" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Save Mood Entry
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="EntryDateTime" class="control-label"></label>
-                <input asp-for="EntryDateTime" class="form-control" />
-                <span asp-validation-for="EntryDateTime" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-lightbulb"></i> Tips</h5>
+                    <ul class="small">
+                        <li>Be honest about how you're feeling</li>
+                        <li>Record entries regularly for better tracking</li>
+                        <li>Note any triggers or events in the notes section</li>
+                        <li>Include details for context</li>
+                        <li>Mood scores help identify patterns over time</li>
+                    </ul>
+
+                    <h6 class="mt-3"><i class="bi bi-emoji-smile"></i> Mood Scale Guide:</h6>
+                    <ul class="small mb-0">
+                        <li><strong>1-3:</strong> Very low, depressed</li>
+                        <li><strong>4-5:</strong> Below average, struggling</li>
+                        <li><strong>6-7:</strong> Okay, manageable</li>
+                        <li><strong>8-9:</strong> Good, positive</li>
+                        <li><strong>10:</strong> Excellent, euphoric</li>
+                    </ul>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="MoodScore" class="control-label"></label>
-                <input asp-for="MoodScore" class="form-control" />
-                <span asp-validation-for="MoodScore" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Emotion" class="control-label"></label>
-                <select asp-for="Emotion" class="form-control" asp-items="Html.GetEnumSelectList<EmotionType>()">
-                    <option value="">-- Select Your Emotion --</option>
-                </select>
-                <span asp-validation-for="Emotion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Notes" class="control-label"></label>
-                <input asp-for="Notes" class="form-control" />
-                <span asp-validation-for="Notes" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Trigger" class="control-label"></label>
-                <select asp-for="Trigger" class="form-control" asp-items="Html.GetEnumSelectList<TriggerType>()">
-                    <option value="">-- Select a Trigger (Optional) --</option>
-                </select>
-                <span asp-validation-for="Trigger" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

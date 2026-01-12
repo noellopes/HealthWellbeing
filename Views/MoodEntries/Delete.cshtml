@@ -1,57 +1,112 @@
 ﻿@model HealthWellbeing.Models.MoodEntry
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Delete Mood Entry";
 }
 
-<h1>Delete</h1>
+<div class="container py-4">
+    <div class="page-header mb-4">
+        <h1 class="text-danger"><i class="bi bi-trash"></i> Delete Mood Entry</h1>
+        <p class="text-muted">Are you sure you want to delete this mood entry?</p>
+    </div>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>MoodEntry</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EntryDateTime)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EntryDateTime)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MoodScore)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MoodScore)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Emotion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Emotion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Notes)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Notes)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Trigger)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Trigger)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Patient)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Patient.Email)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Warning!</h4>
+        <p>This action cannot be undone. Deleting this mood entry will permanently remove it from the patient's mood tracking history.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Mood Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Entry ID</dt>
+                        <dd class="col-sm-7">@Model.MoodEntryId</dd>
+
+                        <dt class="col-sm-5">Entry Date & Time</dt>
+                        <dd class="col-sm-7">
+                            <strong>@Model.EntryDateTime.ToString("MMMM dd, yyyy")</strong><br>
+                            <small>@Model.EntryDateTime.ToString("hh:mm tt")</small>
+                        </dd>
+
+                        <dt class="col-sm-5">Mood Score</dt>
+                        <dd class="col-sm-7">
+                            @{
+                                var moodClass = Model.MoodScore >= 8 ? "bg-success" :
+                                Model.MoodScore >= 5 ? "bg-warning" : "bg-danger";
+                            }
+                            <span class="badge @moodClass">@Model.MoodScore / 10</span>
+                        </dd>
+
+                        <dt class="col-sm-5">Emotion</dt>
+                        <dd class="col-sm-7">
+                            @if (Model.Emotion != null)
+                            {
+                                <span class="badge bg-info">@Model.Emotion.ToString()</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not specified</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Patient Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Patient</dt>
+                        <dd class="col-sm-7">
+                            <strong>@Model.Patient?.FullName</strong><br>
+                            <small class="text-muted">@Model.Patient?.Email</small>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Notes))
+    {
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="card border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">Notes</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>@Model.Notes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <form asp-action="Delete" class="mt-4">
         <input type="hidden" asp-for="MoodEntryId" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Confirm Delete
+        </button>
+        <a asp-action="Details" asp-route-id="@Model.MoodEntryId" class="btn btn-info">
+            <i class="bi bi-eye"></i> View Details
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-x-circle"></i> Cancel
+        </a>
     </form>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

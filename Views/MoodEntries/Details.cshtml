@@ -1,54 +1,141 @@
 ﻿@model HealthWellbeing.Models.MoodEntry
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Mood Entry Details";
 }
 
-<h1>Details</h1>
+<div class="container py-4">
+    <div class="page-header mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><i class="bi bi-emoji-smile"></i> Mood Entry Details</h1>
+                <p class="text-muted mb-0">View mood tracking information</p>
+            </div>
+            <div>
+                <a asp-action="Edit" asp-route-id="@Model.MoodEntryId" class="btn btn-warning">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
 
-<div>
-    <h4>MoodEntry</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EntryDateTime)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EntryDateTime)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MoodScore)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MoodScore)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Emotion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Emotion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Notes)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Notes)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Trigger)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Trigger)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Patient)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Patient.FullName)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.MoodEntryId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <div class="row">
+        <!-- Mood Information Card -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Mood Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Entry ID</dt>
+                        <dd class="col-sm-7">@Model.MoodEntryId</dd>
+
+                        <dt class="col-sm-5">Entry Date & Time</dt>
+                        <dd class="col-sm-7">
+                            <strong>@Model.EntryDateTime.ToString("MMMM dd, yyyy")</strong><br>
+                            <small class="text-muted">@Model.EntryDateTime.ToString("hh:mm tt")</small>
+                        </dd>
+
+                        <dt class="col-sm-5">Mood Score</dt>
+                        <dd class="col-sm-7">
+                            @{
+                                var moodClass = Model.MoodScore >= 8 ? "bg-success" :
+                                Model.MoodScore >= 5 ? "bg-warning" : "bg-danger";
+                                var moodIcon = Model.MoodScore >= 8 ? "bi-emoji-smile-fill" :
+                                Model.MoodScore >= 5 ? "bi-emoji-neutral-fill" : "bi-emoji-frown-fill";
+                            }
+                            <span class="badge @moodClass" style="font-size: 1.2rem; padding: 10px 15px;">
+                                <i class="bi @moodIcon"></i> @Model.MoodScore / 10
+                            </span>
+                        </dd>
+
+                        <dt class="col-sm-5">Emotion</dt>
+                        <dd class="col-sm-7">
+                            @if (Model.Emotion != null)
+                            {
+                                <span class="badge bg-info">@Model.Emotion.ToString()</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not specified</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient Information Card -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-person"></i> Patient Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Patient</dt>
+                        <dd class="col-sm-7">
+                            <strong>@Model.Patient?.FullName</strong><br>
+                            <small class="text-muted">@Model.Patient?.Email</small>
+                        </dd>
+
+                        <dt class="col-sm-5">Age</dt>
+                        <dd class="col-sm-7">
+                            <span class="badge bg-info">@Model.Patient?.Age years</span>
+                        </dd>
+
+                        <dt class="col-sm-5">Phone</dt>
+                        <dd class="col-sm-7">
+                            @if (!string.IsNullOrEmpty(Model.Patient?.Phone))
+                            {
+                                @Model.Patient.Phone
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not provided</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes Card -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-journal-text"></i> Notes</h5>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <p>@Model.Notes</p>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No additional notes recorded for this mood entry.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mt-4">
+        <a asp-action="Edit" asp-route-id="@Model.MoodEntryId" class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+        <a asp-action="Delete" asp-route-id="@Model.MoodEntryId" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Delete
+        </a>
+    </div>
 </div>

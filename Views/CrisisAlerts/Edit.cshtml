@@ -1,66 +1,138 @@
 ﻿@model HealthWellbeing.Models.CrisisAlert
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Crisis Alert";
 }
 
-<h1>Edit</h1>
+<div class="container py-4">
+    <div class="page-header mb-4">
+        <h1 class="text-danger"><i class="bi bi-pencil"></i> Edit Crisis Alert</h1>
+        <p class="text-muted">Update crisis alert information</p>
+    </div>
 
-<h4>CrisisAlert</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="AlertId" />
-            <div class="form-group">
-                <label asp-for="PatientId" class="control-label"></label>
-                <select asp-for="PatientId" class="form-control" asp-items="ViewBag.PatientId"></select>
-                <span asp-validation-for="PatientId" class="text-danger"></span>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Crisis Alert Information</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="AlertId" />
+
+                        <div class="mb-3">
+                            <label asp-for="PatientId" class="form-label"></label>
+                            <select asp-for="PatientId" class="form-control" asp-items="ViewBag.PatientId"></select>
+                            <span asp-validation-for="PatientId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="AlertDateTime" class="form-label"></label>
+                            <input asp-for="AlertDateTime" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="AlertDateTime" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Level" class="form-label"></label>
+                            <select asp-for="Level" class="form-control" asp-items="Html.GetEnumSelectList<CrisisLevel>()"></select>
+                            <span asp-validation-for="Level" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label"></label>
+                            <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input asp-for="IsResolved" class="form-check-input" type="checkbox" />
+                                <label asp-for="IsResolved" class="form-check-label"></label>
+                            </div>
+                            <span asp-validation-for="IsResolved" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3" id="resolvedDateContainer" style="display: @(Model.IsResolved ? "block" : "none");">
+                            <label asp-for="ResolvedDateTime" class="form-label"></label>
+                            <input asp-for="ResolvedDateTime" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="ResolvedDateTime" class="text-danger"></span>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-save"></i> Save Changes
+                            </button>
+                            <a asp-action="Details" asp-route-id="@Model.AlertId" class="btn btn-info">
+                                <i class="bi bi-eye"></i> View Details
+                            </a>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="AlertDateTime" class="control-label"></label>
-                <input asp-for="AlertDateTime" class="form-control" />
-                <span asp-validation-for="AlertDateTime" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-info-circle"></i> Current Alert</h5>
+                    <dl class="mb-0">
+                        <dt>Alert ID</dt>
+                        <dd>@Model.AlertId</dd>
+
+                        <dt>Patient</dt>
+                        <dd>@Model.Patient?.FullName</dd>
+
+                        <dt>Current Level</dt>
+                        <dd>
+                            @switch (Model.Level)
+                            {
+                                case CrisisLevel.Critical:
+                                    <span class="badge bg-danger">CRITICAL</span>
+                                    break;
+                                case CrisisLevel.High:
+                                    <span class="badge bg-warning">HIGH</span>
+                                    break;
+                                case CrisisLevel.Medium:
+                                    <span class="badge bg-info">MEDIUM</span>
+                                    break;
+                                case CrisisLevel.Low:
+                                    <span class="badge bg-secondary">LOW</span>
+                                    break;
+                            }
+                        </dd>
+
+                        <dt>Status</dt>
+                        <dd>
+                            @if (Model.IsResolved)
+                            {
+                                <span class="badge bg-success">RESOLVED</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">ACTIVE</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Level" class="control-label"></label>
-                <select asp-for="Level" class="form-control" asp-items="Html.GetEnumSelectList<CrisisLevel>()">
-                    <option value="">-Select Crisis Level-</option>
-                </select>
-                <span asp-validation-for="Level" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsResolved" /> @Html.DisplayNameFor(model => model.IsResolved)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="ResolvedDateTime" class="control-label"></label>
-                <input asp-for="ResolvedDateTime" class="form-control" />
-                <span asp-validation-for="ResolvedDateTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Resolution" class="control-label"></label>
-                <input asp-for="Resolution" class="form-control" />
-                <span asp-validation-for="Resolution" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Show/hide resolved date field based on checkbox
+        document.getElementById('IsResolved').addEventListener('change', function() {
+            var container = document.getElementById('resolvedDateContainer');
+            container.style.display = this.checked ? 'block' : 'none';
+        });
+    </script>
 }
