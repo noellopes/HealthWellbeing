@@ -152,20 +152,24 @@
                              alt="Logo HealthWellbeing"
                              class="logo-img" />
                     </div>
+                    @if (User.IsInRole("DiretorClinico"))
+                    {
+                        <div class="top-nav">
 
-                    <div class="top-nav">
-                        <a class="top-btn" asp-controller="Doctor" asp-action="Index">
-                            <i class="bi bi-heart-pulse"></i> Médicos
-                        </a>
+                            <a class="top-btn" asp-controller="Doctor" asp-action="Index">
+                                <i class="bi bi-heart-pulse"></i> Médicos
+                            </a>
 
-                        <a class="top-btn" asp-controller="Specialities" asp-action="Index">
-                            <i class="bi bi-diagram-3"></i> Especialidades
-                        </a>
+                            <a class="top-btn" asp-controller="Specialities" asp-action="Index">
+                                <i class="bi bi-diagram-3"></i> Especialidades
+                            </a>
 
-                        <a class="top-btn active" href="#" aria-disabled="true" tabindex="-1">
-                            <i class="bi bi-people"></i> Utentes
-                        </a>
-                    </div>
+                            <a class="top-btn active" href="#" aria-disabled="true" tabindex="-1">
+                                <i class="bi bi-people"></i> Utentes
+                            </a>
+                        </div>
+                    }
+                    
 
                 </div>
             </div>
