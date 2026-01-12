@@ -1,6 +1,7 @@
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 internal class SeedData
 {
@@ -18,14 +19,20 @@ internal class SeedData
         PopulateReceitas(dbContext);
         PopulateComponentesReceita(dbContext);
 
+        // Clients and food-plan related seeds
+        PopulateClients(dbContext);
+        PopulateMetas(dbContext);
+        PopulatePlanosAlimentares(dbContext);
+        PopulateClientAlergias(dbContext);
+        PopulateClientRestricoes(dbContext);
+        PopulateReceitasParaPlanosAlimentares(dbContext);
+
         PopulateSpecialities(dbContext);
         // PopulateConsultas IS NOT WORKING
         // PopulateConsultas(dbContext);
         PopulateDoctor(dbContext);
         PopulateUtenteSaude(dbContext);
 
-        var clients = PopulateClients(dbContext);
-        PopulateMember(dbContext, clients);
         PopulateTrainingType(dbContext);
         PopulatePlan(dbContext);
 
@@ -39,7 +46,15 @@ internal class SeedData
         PopulateEvents(dbContext);
         PopulateLevels(dbContext);
 
+        // Seed MetaCorporal (body goals)
+        SeedDataMetaCorporal.Populate(dbContext);
+
         Initialize(dbContext);
+    }
+
+    internal static void SeedProgressRecords(UserManager<IdentityUser> userManager, HealthWellbeingDbContext dbContext)
+    {
+        SeedDataProgressRecord.Populate(dbContext, userManager);
     }
 
     internal static void SeedRoles(RoleManager<IdentityRole> roleManager)
@@ -57,17 +72,84 @@ internal class SeedData
         }
     }
 
-    internal static void SeedUsers(UserManager<IdentityUser> userManager)
+    internal static void SeedUsers(UserManager<IdentityUser> userManager, HealthWellbeingDbContext dbContext)
     {
-        EnsureUserIsCreatedAsync(userManager, "cliente@health.com", "Secret123$", new[] { "Cliente" }).Wait();
-        EnsureUserIsCreatedAsync(userManager, "nutri@health.com", "Secret123$", new[] { "Nutricionista" }).Wait();
+        EnsureUserIsCreatedAsync(userManager, "cliente@health.com", "Secret123$", new[] { "Cliente" }, dbContext).Wait();
+        EnsureUserIsCreatedAsync(userManager, "nutri@health.com", "Secret123$", new[] { "Nutricionista" }, dbContext).Wait();
     }
 
-    private static async Task EnsureUserIsCreatedAsync(
+    internal static void SeedPopulateClientsAsUsers(UserManager<IdentityUser> userManager, HealthWellbeingDbContext dbContext)
+    {
+        SeedPopulateClientsAsUsersAsync(userManager, dbContext).GetAwaiter().GetResult();
+    }
+
+    private static async Task SeedPopulateClientsAsUsersAsync(UserManager<IdentityUser> userManager, HealthWellbeingDbContext dbContext)
+    {
+        if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
+
+        dbContext.Database.EnsureCreated();
+
+        var clients = PopulateClients(dbContext) ?? dbContext.Client.ToList();
+        var anyClientUpdated = false;
+
+        foreach (var client in clients)
+        {
+            var email = client.Email?.Trim();
+            if (string.IsNullOrWhiteSpace(email))
+                continue;
+
+            var user = await userManager.FindByEmailAsync(email) ?? await userManager.FindByNameAsync(email);
+
+            if (user == null)
+            {
+                user = new IdentityUser(email)
+                {
+                    UserName = email,
+                    Email = email,
+                    EmailConfirmed = true
+                };
+
+                var createResult = await userManager.CreateAsync(user, "Secret123$");
+                if (!createResult.Succeeded)
+                {
+                    // If creation failed due to a race/duplicate, try loading it again.
+                    user = await userManager.FindByEmailAsync(email) ?? await userManager.FindByNameAsync(email);
+                    if (user == null)
+                        continue;
+                }
+            }
+
+            if (!await userManager.IsInRoleAsync(user, "Cliente"))
+            {
+                await userManager.AddToRoleAsync(user, "Cliente");
+            }
+
+            if (!string.Equals(client.IdentityUserId, user.Id, StringComparison.Ordinal))
+            {
+                client.IdentityUserId = user.Id;
+                anyClientUpdated = true;
+            }
+        }
+
+        if (anyClientUpdated)
+        {
+            await dbContext.SaveChangesAsync();
+        }
+
+        // Ensure food-plan related seed data after clients exist.
+        PopulateMetas(dbContext);
+        PopulatePlanosAlimentares(dbContext);
+        PopulateClientAlergias(dbContext);
+        PopulateClientRestricoes(dbContext);
+        PopulateReceitasParaPlanosAlimentares(dbContext);
+    }
+
+    private static async Task<IdentityUser> EnsureUserIsCreatedAsync(
         UserManager<IdentityUser> userManager,
         string username,
         string password,
-        string[] roles)
+        string[] roles,
+        HealthWellbeingDbContext? dbContext = null)
     {
         var user = await userManager.FindByNameAsync(username);
 
@@ -82,6 +164,45 @@ internal class SeedData
             if (!await userManager.IsInRoleAsync(user, role))
                 await userManager.AddToRoleAsync(user, role);
         }
+        if (dbContext != null && roles.Contains("Cliente", StringComparer.OrdinalIgnoreCase))
+        {
+            await EnsureClientProfileAsync(dbContext, user);
+        }
+
+        return user;
+    }
+
+    private static async Task EnsureClientProfileAsync(HealthWellbeingDbContext dbContext, IdentityUser user)
+    {
+
+        var client = await dbContext.Client
+            .FirstOrDefaultAsync(c => c.IdentityUserId == user.Id || (c.IdentityUserId == null && c.Email == user.Email));
+
+        if (client == null)
+        {
+            client = new Client
+            {
+                ClientId = Guid.NewGuid().ToString("N"),
+                IdentityUserId = user.Id,
+                Name = "Cliente Health",          // passa regex (nome + apelido)
+                Email = user.Email ?? user.UserName ?? "",
+                Phone = "555-0000000",
+                Address = "",
+                BirthDate = null,
+                Gender = "",
+                RegistrationDate = DateTime.Now
+            };
+
+            dbContext.Client.Add(client);
+        }
+        else
+        {
+            client.IdentityUserId = user.Id;
+            if (!string.IsNullOrWhiteSpace(user.Email))
+                client.Email = user.Email;
+        }
+
+        await dbContext.SaveChangesAsync();
     }
 
     internal static void SeedDefaultAdmin(UserManager<IdentityUser> userManager)
@@ -91,176 +212,590 @@ internal class SeedData
 
     private static void PopulateCategorias(HealthWellbeingDbContext context)
     {
-        if (context.CategoriaAlimento.Any())
+        var seedCategorias = new List<CategoriaAlimento>
+        {
+            // Mantém as 5 categorias originais primeiro (para estabilidade em bases novas)
+            new CategoriaAlimento { Name = "Frutas", Description = "Frutas frescas e derivados simples." },
+            new CategoriaAlimento { Name = "Vegetais", Description = "Hortícolas, folhas, legumes e cogumelos." },
+            new CategoriaAlimento { Name = "Grãos", Description = "Cereais, grãos e pseudocereais." },
+            new CategoriaAlimento { Name = "Laticínios", Description = "Laticínios e alternativas vegetais (bebidas/iogurtes/queijos)." },
+            new CategoriaAlimento { Name = "Carnes", Description = "Carnes (bovina/suína/aves) e enchidos." },
+
+            // Categorias adicionais (divisão mais realista e justa)
+            new CategoriaAlimento { Name = "Peixes e Mariscos", Description = "Peixes, mariscos e moluscos." },
+            new CategoriaAlimento { Name = "Ovos", Description = "Ovos e derivados." },
+            new CategoriaAlimento { Name = "Leguminosas", Description = "Feijões, lentilhas, grão-de-bico e similares." },
+            new CategoriaAlimento { Name = "Tubérculos", Description = "Batata, batata-doce e derivados." },
+            new CategoriaAlimento { Name = "Pães e Tortilhas", Description = "Pães, wraps e tortilhas." },
+            new CategoriaAlimento { Name = "Massas", Description = "Massas (ex.: lasanha, massa integral)." },
+            new CategoriaAlimento { Name = "Farinhas e Panificação", Description = "Farinhas e ingredientes base de panificação." },
+            new CategoriaAlimento { Name = "Oleaginosas e Sementes", Description = "Amendoim, amêndoas e sementes." },
+            new CategoriaAlimento { Name = "Óleos e Gorduras", Description = "Azeites, óleos, manteigas e margarinas." },
+            new CategoriaAlimento { Name = "Ervas e Especiarias", Description = "Ervas frescas/secas e especiarias." },
+            new CategoriaAlimento { Name = "Condimentos e Molhos", Description = "Vinagres, alcaparras, azeitonas e condimentos." },
+            new CategoriaAlimento { Name = "Açúcares e Adoçantes", Description = "Açúcares, mel, xaropes e adoçantes." },
+            new CategoriaAlimento { Name = "Proteínas Vegetais", Description = "Fontes de proteína vegetal (ex.: tofu)." },
+        };
+
+        var existingNames = new HashSet<string>(
+            context.CategoriaAlimento.Select(c => c.Name),
+            StringComparer.OrdinalIgnoreCase);
+
+        var toAdd = seedCategorias
+            .Where(c => !existingNames.Contains(c.Name))
+            .ToList();
+
+        if (toAdd.Count == 0)
         {
             return;
         }
 
-        context.CategoriaAlimento.AddRange(
-            new CategoriaAlimento { Name = "Frutas", Description = "Categoria de frutas." },
-            new CategoriaAlimento { Name = "Vegetais", Description = "Categoria de vegetais." },
-            new CategoriaAlimento { Name = "Grãos", Description = "Categoria de grãos." },
-            new CategoriaAlimento { Name = "Laticínios", Description = "Categoria de laticínios." },
-            new CategoriaAlimento { Name = "Carnes", Description = "Categoria de carnes." }
-        );
-
+        context.CategoriaAlimento.AddRange(toAdd);
         context.SaveChanges();
     }
 
     private static void PopulateAlimentos(HealthWellbeingDbContext context)
     {
-        if (context.Alimentos.Any())
+        var categoriasByNome = context.CategoriaAlimento
+            .AsNoTracking()
+            .ToList()
+            .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+        int Cat(string nome)
+        {
+            if (!categoriasByNome.TryGetValue(nome, out var cat))
+                throw new InvalidOperationException($"CategoriaAlimento não encontrada para seed: '{nome}'.");
+            return cat.CategoriaAlimentoId;
+        }
+
+        var seedAlimentos = new List<Alimento>
+        {
+            // Frutas
+            new Alimento { Name = "Maçã", Description = "Fruta doce e crocante.", CategoriaAlimentoId = Cat("Frutas"), Calories = 52, KcalPor100g = 52, ProteinaGPor100g = 0.3m, HidratosGPor100g = 14m, GorduraGPor100g = 0.2m },
+            new Alimento { Name = "Banana", Description = "Fruta energética, boa fonte de potássio.", CategoriaAlimentoId = Cat("Frutas"), Calories = 89, KcalPor100g = 89, ProteinaGPor100g = 1.1m, HidratosGPor100g = 23m, GorduraGPor100g = 0.3m },
+            new Alimento { Name = "Limão", Description = "Fruta cítrica usada para temperar.", CategoriaAlimentoId = Cat("Frutas"), Calories = 29, KcalPor100g = 29, ProteinaGPor100g = 1.1m, HidratosGPor100g = 9.3m, GorduraGPor100g = 0.3m },
+            new Alimento { Name = "Laranja", Description = "Fruta cítrica, usada como sobremesa/acompanhamento.", CategoriaAlimentoId = Cat("Frutas"), Calories = 47, KcalPor100g = 47, ProteinaGPor100g = 0.9m, HidratosGPor100g = 12m, GorduraGPor100g = 0.1m },
+            new Alimento { Name = "Pêra", Description = "Fruta doce e suculenta, alternativa à maçã/banana.", CategoriaAlimentoId = Cat("Frutas"), Calories = 57, KcalPor100g = 57, ProteinaGPor100g = 0.4m, HidratosGPor100g = 15m, GorduraGPor100g = 0.1m },
+            new Alimento { Name = "Morangos", Description = "Fruta com sabor ácido-doce, ótima em saladas e iogurtes.", CategoriaAlimentoId = Cat("Frutas"), Calories = 32, KcalPor100g = 32, ProteinaGPor100g = 0.7m, HidratosGPor100g = 7.7m, GorduraGPor100g = 0.3m },
+            new Alimento { Name = "Manga", Description = "Fruta tropical doce, boa em batidos e sobremesas.", CategoriaAlimentoId = Cat("Frutas"), Calories = 60, KcalPor100g = 60, ProteinaGPor100g = 0.8m, HidratosGPor100g = 15m, GorduraGPor100g = 0.4m },
+            new Alimento { Name = "Uvas", Description = "Fruta doce usada em lanches e saladas.", CategoriaAlimentoId = Cat("Frutas"), Calories = 69, KcalPor100g = 69, ProteinaGPor100g = 0.7m, HidratosGPor100g = 18m, GorduraGPor100g = 0.2m },
+            new Alimento { Name = "Pêssego", Description = "Fruta suave e aromática, boa em sobremesas.", CategoriaAlimentoId = Cat("Frutas"), Calories = 39, KcalPor100g = 39, ProteinaGPor100g = 0.9m, HidratosGPor100g = 9.5m, GorduraGPor100g = 0.3m },
+
+            // Vegetais
+            new Alimento { Name = "Cenoura", Description = "Vegetal rico em vitamina A.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 41, KcalPor100g = 41, ProteinaGPor100g = 0.9m, HidratosGPor100g = 10m, GorduraGPor100g = 0.2m },
+            new Alimento { Name = "Cebola", Description = "Base aromática comum em muitas receitas.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 40, KcalPor100g = 40, ProteinaGPor100g = 1.1m, HidratosGPor100g = 9.3m, GorduraGPor100g = 0.1m },
+            new Alimento { Name = "Alho", Description = "Aromático usado em temperos e refogados.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 149, KcalPor100g = 149, ProteinaGPor100g = 6.4m, HidratosGPor100g = 33m, GorduraGPor100g = 0.5m },
+            new Alimento { Name = "Tomate", Description = "Vegetal usado em molhos e saladas.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 18, KcalPor100g = 18, ProteinaGPor100g = 0.9m, HidratosGPor100g = 3.9m, GorduraGPor100g = 0.2m },
+            new Alimento { Name = "Alface", Description = "Folha verde para saladas e sanduíches.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 15, KcalPor100g = 15, ProteinaGPor100g = 1.4m, HidratosGPor100g = 2.9m, GorduraGPor100g = 0.2m },
+            new Alimento { Name = "Couve", Description = "Folha verde muito usada em sopas.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 25, KcalPor100g = 25, ProteinaGPor100g = 2.5m, HidratosGPor100g = 5.6m, GorduraGPor100g = 0.4m },
+            new Alimento { Name = "Abóbora", Description = "Vegetal rico em fibras; muito usado em sopas e purés.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 26, KcalPor100g = 26, ProteinaGPor100g = 1m, HidratosGPor100g = 6.5m, GorduraGPor100g = 0.1m },
+            new Alimento { Name = "Espinafres", Description = "Folhas verdes ricas em ferro e folato.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 23, KcalPor100g = 23, ProteinaGPor100g = 2.9m, HidratosGPor100g = 3.6m, GorduraGPor100g = 0.4m },
+            new Alimento { Name = "Rúcula", Description = "Folha verde de sabor ligeiramente picante para saladas.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 25, KcalPor100g = 25, ProteinaGPor100g = 2.6m, HidratosGPor100g = 3.7m, GorduraGPor100g = 0.7m },
+            new Alimento { Name = "Pimento Vermelho", Description = "Vegetal rico em vitamina C, usado cru ou assado.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 31, KcalPor100g = 31, ProteinaGPor100g = 1m, HidratosGPor100g = 6m, GorduraGPor100g = 0.3m },
+            new Alimento { Name = "Alho Francês", Description = "Vegetal aromático (alho-poró), alternativa suave à cebola.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 61, KcalPor100g = 61, ProteinaGPor100g = 1.5m, HidratosGPor100g = 14.2m, GorduraGPor100g = 0.3m },
+            new Alimento { Name = "Beringela", Description = "Vegetal versátil, boa alternativa em pratos com cogumelos.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 25, KcalPor100g = 25, ProteinaGPor100g = 1m, HidratosGPor100g = 6m, GorduraGPor100g = 0.2m },
+            new Alimento { Name = "Cogumelos", Description = "Cogumelos frescos, usados em risottos e molhos.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 22, KcalPor100g = 22, ProteinaGPor100g = 3.1m, HidratosGPor100g = 3.3m, GorduraGPor100g = 0.3m },
+
+            // Ervas e Especiarias
+            new Alimento { Name = "Coentros", Description = "Erva aromática (coentro) usada para finalizar pratos.", CategoriaAlimentoId = Cat("Ervas e Especiarias"), Calories = 23, KcalPor100g = 23, ProteinaGPor100g = 2.1m, HidratosGPor100g = 3.7m, GorduraGPor100g = 0.5m },
+            new Alimento { Name = "Salsa", Description = "Erva aromática usada como alternativa a coentros em muitos pratos.", CategoriaAlimentoId = Cat("Ervas e Especiarias"), Calories = 36, KcalPor100g = 36, ProteinaGPor100g = 3m, HidratosGPor100g = 6.3m, GorduraGPor100g = 0.8m },
+            new Alimento { Name = "Manjericão", Description = "Erva aromática muito usada em molhos e saladas.", CategoriaAlimentoId = Cat("Ervas e Especiarias"), Calories = 23, KcalPor100g = 23, ProteinaGPor100g = 3.2m, HidratosGPor100g = 2.7m, GorduraGPor100g = 0.6m },
+            new Alimento { Name = "Orégãos", Description = "Erva aromática (geralmente seca) usada em temperos.", CategoriaAlimentoId = Cat("Ervas e Especiarias"), Calories = 265, KcalPor100g = 265, ProteinaGPor100g = 9m, HidratosGPor100g = 69m, GorduraGPor100g = 4.3m },
+
+            // Condimentos e Molhos
+            new Alimento { Name = "Azeitonas", Description = "Azeitonas (pretas/verdes), usadas como complemento.", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 115, KcalPor100g = 115, ProteinaGPor100g = 0.8m, HidratosGPor100g = 6.3m, GorduraGPor100g = 10.7m },
+            new Alimento { Name = "Alcaparras", Description = "Condimento salgado usado como alternativa às azeitonas em saladas.", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 23, KcalPor100g = 23, ProteinaGPor100g = 2.4m, HidratosGPor100g = 4.9m, GorduraGPor100g = 0.9m },
+            new Alimento { Name = "Vinagre de Maçã", Description = "Condimento ácido usado como alternativa ao limão em temperos.", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 21, KcalPor100g = 21, ProteinaGPor100g = 0m, HidratosGPor100g = 0.9m, GorduraGPor100g = 0m },
+            new Alimento { Name = "Mostarda", Description = "Condimento usado em molhos e sanduíches.", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 66, KcalPor100g = 66, ProteinaGPor100g = 4.4m, HidratosGPor100g = 5.8m, GorduraGPor100g = 3.6m },
+            new Alimento { Name = "Molho de Soja", Description = "Tempero líquido salgado (shoyu).", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 53, KcalPor100g = 53, ProteinaGPor100g = 8.1m, HidratosGPor100g = 4.9m, GorduraGPor100g = 0.6m },
+            new Alimento { Name = "Tamari", Description = "Molho tipo shoyu (frequentemente sem glúten).", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 60, KcalPor100g = 60, ProteinaGPor100g = 10m, HidratosGPor100g = 5m, GorduraGPor100g = 0m },
+            new Alimento { Name = "Aminos de Coco", Description = "Tempero líquido com perfil semelhante ao shoyu (sem soja).", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 40, KcalPor100g = 40, ProteinaGPor100g = 0.5m, HidratosGPor100g = 10m, GorduraGPor100g = 0m },
+            new Alimento { Name = "Molho de Tomate", Description = "Base de tomate cozinhada para massas e guisados.", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 29, KcalPor100g = 29, ProteinaGPor100g = 1.4m, HidratosGPor100g = 6.6m, GorduraGPor100g = 0.2m },
+
+            // Óleos e Gorduras
+            new Alimento { Name = "Azeite", Description = "Gordura vegetal usada em temperos e cozinhados.", CategoriaAlimentoId = Cat("Óleos e Gorduras"), Calories = 884, KcalPor100g = 884, ProteinaGPor100g = 0m, HidratosGPor100g = 0m, GorduraGPor100g = 100m },
+            new Alimento { Name = "Óleo de Girassol", Description = "Óleo vegetal neutro, alternativa ao azeite para cozinhar.", CategoriaAlimentoId = Cat("Óleos e Gorduras"), Calories = 884, KcalPor100g = 884, ProteinaGPor100g = 0m, HidratosGPor100g = 0m, GorduraGPor100g = 100m },
+            new Alimento { Name = "Manteiga", Description = "Gordura láctea usada em confeitaria e risottos.", CategoriaAlimentoId = Cat("Óleos e Gorduras"), Calories = 717, KcalPor100g = 717, ProteinaGPor100g = 0.9m, HidratosGPor100g = 0.1m, GorduraGPor100g = 81m },
+            new Alimento { Name = "Margarina Vegetal", Description = "Gordura vegetal usada como alternativa à manteiga.", CategoriaAlimentoId = Cat("Óleos e Gorduras"), Calories = 717, KcalPor100g = 717, ProteinaGPor100g = 0m, HidratosGPor100g = 0m, GorduraGPor100g = 80m },
+
+            // Grãos (cereais e pseudocereais)
+            new Alimento { Name = "Arroz", Description = "Grão básico na alimentação.", CategoriaAlimentoId = Cat("Grãos"), Calories = 130, KcalPor100g = 130, ProteinaGPor100g = 2.7m, HidratosGPor100g = 28m, GorduraGPor100g = 0.3m },
+            new Alimento { Name = "Aveia", Description = "Cereal integral, boa fonte de fibras.", CategoriaAlimentoId = Cat("Grãos"), Calories = 389, KcalPor100g = 389, ProteinaGPor100g = 17m, HidratosGPor100g = 66m, GorduraGPor100g = 7m },
+            new Alimento { Name = "Trigo", Description = "Cereal com glúten, base para farinhas e pães.", CategoriaAlimentoId = Cat("Grãos"), Calories = 339, KcalPor100g = 339, ProteinaGPor100g = 13m, HidratosGPor100g = 72m, GorduraGPor100g = 2.5m },
+            new Alimento { Name = "Quinoa", Description = "Pseudocereal sem glúten, alternativa ao arroz.", CategoriaAlimentoId = Cat("Grãos"), Calories = 120, KcalPor100g = 120, ProteinaGPor100g = 4.4m, HidratosGPor100g = 21.3m, GorduraGPor100g = 1.9m },
+            new Alimento { Name = "Granola", Description = "Mistura de cereais; alternativa à aveia em pequenos-almoços.", CategoriaAlimentoId = Cat("Grãos"), Calories = 471, KcalPor100g = 471, ProteinaGPor100g = 10m, HidratosGPor100g = 64m, GorduraGPor100g = 20m },
+            new Alimento { Name = "Cuscuz", Description = "Cereal (geralmente de sêmola) usado como acompanhamento.", CategoriaAlimentoId = Cat("Grãos"), Calories = 112, KcalPor100g = 112, ProteinaGPor100g = 3.8m, HidratosGPor100g = 23.2m, GorduraGPor100g = 0.2m },
+            new Alimento { Name = "Milho", Description = "Cereal usado em grãos, farinhas e preparações.", CategoriaAlimentoId = Cat("Grãos"), Calories = 365, KcalPor100g = 365, ProteinaGPor100g = 9.4m, HidratosGPor100g = 74m, GorduraGPor100g = 4.7m },
+            new Alimento { Name = "Cevada", Description = "Cereal usado em sopas e acompanhamentos.", CategoriaAlimentoId = Cat("Grãos"), Calories = 354, KcalPor100g = 354, ProteinaGPor100g = 12.5m, HidratosGPor100g = 73.5m, GorduraGPor100g = 2.3m },
+
+            // Leguminosas
+            new Alimento { Name = "Feijão", Description = "Leguminosa rica em fibras e proteínas.", CategoriaAlimentoId = Cat("Leguminosas"), Calories = 347, KcalPor100g = 347, ProteinaGPor100g = 21m, HidratosGPor100g = 63m, GorduraGPor100g = 1.2m },
+            new Alimento { Name = "Lentilhas", Description = "Leguminosa rica em proteínas e fibras.", CategoriaAlimentoId = Cat("Leguminosas"), Calories = 116, KcalPor100g = 116, ProteinaGPor100g = 9m, HidratosGPor100g = 20m, GorduraGPor100g = 0.4m },
+            new Alimento { Name = "Grão-de-bico", Description = "Leguminosa usada em saladas, sopas e húmus.", CategoriaAlimentoId = Cat("Leguminosas"), Calories = 164, KcalPor100g = 164, ProteinaGPor100g = 8.9m, HidratosGPor100g = 27.4m, GorduraGPor100g = 2.6m },
+            new Alimento { Name = "Ervilhas", Description = "Leguminosa usada em sopas, arroz e saladas.", CategoriaAlimentoId = Cat("Leguminosas"), Calories = 81, KcalPor100g = 81, ProteinaGPor100g = 5.4m, HidratosGPor100g = 14m, GorduraGPor100g = 0.4m },
+            new Alimento { Name = "Favas", Description = "Leguminosa rica em fibra e proteína.", CategoriaAlimentoId = Cat("Leguminosas"), Calories = 88, KcalPor100g = 88, ProteinaGPor100g = 7.6m, HidratosGPor100g = 18.7m, GorduraGPor100g = 0.7m },
+
+            // Tubérculos
+            new Alimento { Name = "Batata", Description = "Tubérculo versátil.", CategoriaAlimentoId = Cat("Tubérculos"), Calories = 77, KcalPor100g = 77, ProteinaGPor100g = 2m, HidratosGPor100g = 17m, GorduraGPor100g = 0.1m },
+            new Alimento { Name = "Batata Doce", Description = "Tubérculo rico em betacaroteno e fibras.", CategoriaAlimentoId = Cat("Tubérculos"), Calories = 86, KcalPor100g = 86, ProteinaGPor100g = 1.6m, HidratosGPor100g = 20m, GorduraGPor100g = 0.1m },
+            new Alimento { Name = "Batata Palha", Description = "Batata frita em palha, usada em pratos tradicionais.", CategoriaAlimentoId = Cat("Tubérculos"), Calories = 550, KcalPor100g = 550, ProteinaGPor100g = 6m, HidratosGPor100g = 50m, GorduraGPor100g = 35m },
+            new Alimento { Name = "Inhame", Description = "Tubérculo usado em purés e sopas.", CategoriaAlimentoId = Cat("Tubérculos"), Calories = 118, KcalPor100g = 118, ProteinaGPor100g = 1.5m, HidratosGPor100g = 28m, GorduraGPor100g = 0.2m },
+
+            // Pães e Tortilhas
+            new Alimento { Name = "Pão", Description = "Fonte de hidratos, geralmente à base de trigo.", CategoriaAlimentoId = Cat("Pães e Tortilhas"), Calories = 265, KcalPor100g = 265, ProteinaGPor100g = 9m, HidratosGPor100g = 49m, GorduraGPor100g = 3.2m },
+            new Alimento { Name = "Pão Integral", Description = "Pão com maior teor de fibra, alternativa ao pão branco.", CategoriaAlimentoId = Cat("Pães e Tortilhas"), Calories = 247, KcalPor100g = 247, ProteinaGPor100g = 13m, HidratosGPor100g = 41m, GorduraGPor100g = 4.2m },
+            new Alimento { Name = "Pão Sem Glúten", Description = "Pão preparado sem glúten.", CategoriaAlimentoId = Cat("Pães e Tortilhas"), Calories = 250, KcalPor100g = 250, ProteinaGPor100g = 5m, HidratosGPor100g = 50m, GorduraGPor100g = 3m },
+            new Alimento { Name = "Tortilha de Milho", Description = "Tortilha sem glúten, alternativa ao pão.", CategoriaAlimentoId = Cat("Pães e Tortilhas"), Calories = 218, KcalPor100g = 218, ProteinaGPor100g = 5.7m, HidratosGPor100g = 44.6m, GorduraGPor100g = 2.9m },
+            new Alimento { Name = "Tortilha de Trigo", Description = "Wrap de trigo usado em sanduíches e tacos.", CategoriaAlimentoId = Cat("Pães e Tortilhas"), Calories = 327, KcalPor100g = 327, ProteinaGPor100g = 9m, HidratosGPor100g = 54m, GorduraGPor100g = 8.5m },
+
+            // Massas
+            new Alimento { Name = "Massa de Lasanha", Description = "Massa para lasanha (seca).", CategoriaAlimentoId = Cat("Massas"), Calories = 371, KcalPor100g = 371, ProteinaGPor100g = 13m, HidratosGPor100g = 75m, GorduraGPor100g = 1.5m },
+            new Alimento { Name = "Massa Integral", Description = "Massa feita com farinha integral.", CategoriaAlimentoId = Cat("Massas"), Calories = 348, KcalPor100g = 348, ProteinaGPor100g = 12.5m, HidratosGPor100g = 67m, GorduraGPor100g = 2.5m },
+            new Alimento { Name = "Esparguete", Description = "Massa clássica, usada em pratos do dia-a-dia.", CategoriaAlimentoId = Cat("Massas"), Calories = 158, KcalPor100g = 158, ProteinaGPor100g = 5.8m, HidratosGPor100g = 30.9m, GorduraGPor100g = 0.9m },
+            new Alimento { Name = "Esparguete Integral", Description = "Massa integral com mais fibra.", CategoriaAlimentoId = Cat("Massas"), Calories = 149, KcalPor100g = 149, ProteinaGPor100g = 5.8m, HidratosGPor100g = 29.1m, GorduraGPor100g = 1.1m },
+
+            // Farinhas e Panificação
+            new Alimento { Name = "Farinha de Trigo", Description = "Farinha usada em massas e empadões.", CategoriaAlimentoId = Cat("Farinhas e Panificação"), Calories = 364, KcalPor100g = 364, ProteinaGPor100g = 10m, HidratosGPor100g = 76m, GorduraGPor100g = 1m },
+            new Alimento { Name = "Farinha de Arroz", Description = "Farinha alternativa, naturalmente sem glúten.", CategoriaAlimentoId = Cat("Farinhas e Panificação"), Calories = 366, KcalPor100g = 366, ProteinaGPor100g = 6m, HidratosGPor100g = 80m, GorduraGPor100g = 1m },
+            new Alimento { Name = "Farinha de Milho", Description = "Farinha naturalmente sem glúten para receitas e polenta.", CategoriaAlimentoId = Cat("Farinhas e Panificação"), Calories = 365, KcalPor100g = 365, ProteinaGPor100g = 7.3m, HidratosGPor100g = 76.9m, GorduraGPor100g = 3.9m },
+            new Alimento { Name = "Farinha de Aveia", Description = "Farinha de aveia, usada em panquecas e bolos.", CategoriaAlimentoId = Cat("Farinhas e Panificação"), Calories = 404, KcalPor100g = 404, ProteinaGPor100g = 14m, HidratosGPor100g = 66m, GorduraGPor100g = 9m },
+
+            // Laticínios e Alternativas
+            new Alimento { Name = "Leite", Description = "Líquido rico em cálcio.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 42, KcalPor100g = 42, ProteinaGPor100g = 3.4m, HidratosGPor100g = 5m, GorduraGPor100g = 1m },
+            new Alimento { Name = "Leite de Amêndoa", Description = "Alternativa vegetal ao leite.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 15, KcalPor100g = 15, ProteinaGPor100g = 0.4m, HidratosGPor100g = 0.3m, GorduraGPor100g = 1.1m },
+            new Alimento { Name = "Bebida de Soja", Description = "Bebida vegetal usada como alternativa ao leite.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 33, KcalPor100g = 33, ProteinaGPor100g = 3m, HidratosGPor100g = 1.7m, GorduraGPor100g = 1.9m },
+            new Alimento { Name = "Bebida de Aveia", Description = "Bebida vegetal usada como alternativa ao leite.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 46, KcalPor100g = 46, ProteinaGPor100g = 1m, HidratosGPor100g = 7m, GorduraGPor100g = 1.5m },
+            new Alimento { Name = "Bebida de Arroz", Description = "Bebida vegetal de sabor suave, alternativa ao leite.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 47, KcalPor100g = 47, ProteinaGPor100g = 0.3m, HidratosGPor100g = 9.2m, GorduraGPor100g = 1m },
+            new Alimento { Name = "Iogurte Natural", Description = "Iogurte natural, usado em pequenos-almoços e molhos.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 61, KcalPor100g = 61, ProteinaGPor100g = 3.5m, HidratosGPor100g = 4.7m, GorduraGPor100g = 3.3m },
+            new Alimento { Name = "Iogurte Sem Lactose", Description = "Iogurte sem lactose (alternativa a laticínios).", CategoriaAlimentoId = Cat("Laticínios"), Calories = 60, KcalPor100g = 60, ProteinaGPor100g = 4m, HidratosGPor100g = 6m, GorduraGPor100g = 2m },
+            new Alimento { Name = "Iogurte de Soja", Description = "Iogurte vegetal, alternativa para dietas sem lactose.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 54, KcalPor100g = 54, ProteinaGPor100g = 4m, HidratosGPor100g = 3m, GorduraGPor100g = 2m },
+            new Alimento { Name = "Queijo", Description = "Lácteo fermentado, fonte de cálcio.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 402, KcalPor100g = 402, ProteinaGPor100g = 25m, HidratosGPor100g = 1.3m, GorduraGPor100g = 33m },
+            new Alimento { Name = "Queijo Parmesão", Description = "Queijo curado usado para finalizar pratos.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 431, KcalPor100g = 431, ProteinaGPor100g = 38m, HidratosGPor100g = 4m, GorduraGPor100g = 29m },
+            new Alimento { Name = "Queijo Vegan", Description = "Alternativa vegetal ao queijo.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 280, KcalPor100g = 280, ProteinaGPor100g = 2m, HidratosGPor100g = 6m, GorduraGPor100g = 25m },
+            new Alimento { Name = "Queijo Fresco", Description = "Queijo fresco, usado em saladas e lanches.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 98, KcalPor100g = 98, ProteinaGPor100g = 11m, HidratosGPor100g = 3m, GorduraGPor100g = 4m },
+            new Alimento { Name = "Requeijão", Description = "Lácteo cremoso usado em sanduíches e molhos.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 224, KcalPor100g = 224, ProteinaGPor100g = 8m, HidratosGPor100g = 3m, GorduraGPor100g = 20m },
+            new Alimento { Name = "Kefir", Description = "Bebida fermentada, alternativa ao iogurte.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 41, KcalPor100g = 41, ProteinaGPor100g = 3.3m, HidratosGPor100g = 4.8m, GorduraGPor100g = 1m },
+            new Alimento { Name = "Iogurte Grego", Description = "Iogurte com maior teor proteico e textura cremosa.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 59, KcalPor100g = 59, ProteinaGPor100g = 10m, HidratosGPor100g = 3.6m, GorduraGPor100g = 0.4m },
+            new Alimento { Name = "Leite Condensado", Description = "Produto lácteo adoçado para sobremesas.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 321, KcalPor100g = 321, ProteinaGPor100g = 7.9m, HidratosGPor100g = 55m, GorduraGPor100g = 8.7m },
+            new Alimento { Name = "Leite Condensado Sem Lactose", Description = "Alternativa ao leite condensado tradicional.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 315, KcalPor100g = 315, ProteinaGPor100g = 7.5m, HidratosGPor100g = 54m, GorduraGPor100g = 8m },
+
+            // Açúcares e Adoçantes
+            new Alimento { Name = "Açúcar", Description = "Açúcar branco para confeitaria.", CategoriaAlimentoId = Cat("Açúcares e Adoçantes"), Calories = 387, KcalPor100g = 387, ProteinaGPor100g = 0m, HidratosGPor100g = 100m, GorduraGPor100g = 0m },
+            new Alimento { Name = "Adoçante (Stevia)", Description = "Adoçante com baixo teor calórico.", CategoriaAlimentoId = Cat("Açúcares e Adoçantes"), Calories = 0, KcalPor100g = 0, ProteinaGPor100g = 0m, HidratosGPor100g = 0m, GorduraGPor100g = 0m },
+            new Alimento { Name = "Xilitol", Description = "Adoçante usado como alternativa ao açúcar em algumas receitas.", CategoriaAlimentoId = Cat("Açúcares e Adoçantes"), Calories = 240, KcalPor100g = 240, ProteinaGPor100g = 0m, HidratosGPor100g = 100m, GorduraGPor100g = 0m },
+            new Alimento { Name = "Xarope de Agave", Description = "Adoçante natural líquido, alternativa ao mel.", CategoriaAlimentoId = Cat("Açúcares e Adoçantes"), Calories = 310, KcalPor100g = 310, ProteinaGPor100g = 0m, HidratosGPor100g = 76m, GorduraGPor100g = 0m },
+            new Alimento { Name = "Mel", Description = "Adoçante natural, usado em saladas e bebidas.", CategoriaAlimentoId = Cat("Açúcares e Adoçantes"), Calories = 304, KcalPor100g = 304, ProteinaGPor100g = 0.3m, HidratosGPor100g = 82m, GorduraGPor100g = 0m },
+
+            // Proteínas Vegetais
+            new Alimento { Name = "Tofu", Description = "Produto de soja, boa alternativa proteica.", CategoriaAlimentoId = Cat("Proteínas Vegetais"), Calories = 76, KcalPor100g = 76, ProteinaGPor100g = 8m, HidratosGPor100g = 1.9m, GorduraGPor100g = 4.8m },
+            new Alimento { Name = "Tempeh", Description = "Fermentado de soja, rico em proteína.", CategoriaAlimentoId = Cat("Proteínas Vegetais"), Calories = 193, KcalPor100g = 193, ProteinaGPor100g = 20m, HidratosGPor100g = 9m, GorduraGPor100g = 11m },
+            new Alimento { Name = "Seitan", Description = "Proteína de glúten de trigo, alternativa vegetal à carne.", CategoriaAlimentoId = Cat("Proteínas Vegetais"), Calories = 143, KcalPor100g = 143, ProteinaGPor100g = 25m, HidratosGPor100g = 5m, GorduraGPor100g = 1.9m },
+            new Alimento { Name = "Edamame", Description = "Soja verde, usada como snack ou em saladas.", CategoriaAlimentoId = Cat("Proteínas Vegetais"), Calories = 122, KcalPor100g = 122, ProteinaGPor100g = 11m, HidratosGPor100g = 10m, GorduraGPor100g = 5m },
+
+            // Oleaginosas e Sementes
+            new Alimento { Name = "Amendoim", Description = "Oleaginosa rica em gorduras saudáveis.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 567, KcalPor100g = 567, ProteinaGPor100g = 25.8m, HidratosGPor100g = 16.1m, GorduraGPor100g = 49.2m },
+            new Alimento { Name = "Amêndoa", Description = "Oleaginosa rica em fibras e gorduras saudáveis.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 579, KcalPor100g = 579, ProteinaGPor100g = 21.2m, HidratosGPor100g = 21.7m, GorduraGPor100g = 49.9m },
+            new Alimento { Name = "Noz", Description = "Oleaginosa rica em ômega-3 e antioxidantes.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 654, KcalPor100g = 654, ProteinaGPor100g = 15.2m, HidratosGPor100g = 13.7m, GorduraGPor100g = 65.2m },
+            new Alimento { Name = "Caju", Description = "Oleaginosa usada em snacks e culinária.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 553, KcalPor100g = 553, ProteinaGPor100g = 18.2m, HidratosGPor100g = 30.2m, GorduraGPor100g = 43.9m },
+            new Alimento { Name = "Avelã", Description = "Oleaginosa aromática, usada em snacks e sobremesas.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 628, KcalPor100g = 628, ProteinaGPor100g = 15m, HidratosGPor100g = 16.7m, GorduraGPor100g = 60.8m },
+            new Alimento { Name = "Sementes de Girassol", Description = "Sementes ricas em gorduras saudáveis; alternativa a oleaginosas.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 584, KcalPor100g = 584, ProteinaGPor100g = 20.8m, HidratosGPor100g = 20m, GorduraGPor100g = 51.5m },
+            new Alimento { Name = "Sementes de Abóbora", Description = "Sementes ricas em magnésio; alternativa a oleaginosas.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 559, KcalPor100g = 559, ProteinaGPor100g = 30.2m, HidratosGPor100g = 10.7m, GorduraGPor100g = 49m },
+            new Alimento { Name = "Sementes de Sésamo", Description = "Sementes ricas em gorduras saudáveis, usadas em saladas e panificação.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 573, KcalPor100g = 573, ProteinaGPor100g = 17.7m, HidratosGPor100g = 23.4m, GorduraGPor100g = 49.7m },
+
+            // Carnes (inclui aves e enchidos)
+            new Alimento { Name = "Frango", Description = "Carne branca rica em proteínas.", CategoriaAlimentoId = Cat("Carnes"), Calories = 165, KcalPor100g = 165, ProteinaGPor100g = 31m, HidratosGPor100g = 0m, GorduraGPor100g = 3.6m },
+            new Alimento { Name = "Peru", Description = "Carne magra; alternativa ao frango em várias preparações.", CategoriaAlimentoId = Cat("Carnes"), Calories = 135, KcalPor100g = 135, ProteinaGPor100g = 29m, HidratosGPor100g = 0m, GorduraGPor100g = 1.5m },
+            new Alimento { Name = "Peito de Peru", Description = "Carne processada magra; alternativa ao bacon/chouriço em sanduíches.", CategoriaAlimentoId = Cat("Carnes"), Calories = 104, KcalPor100g = 104, ProteinaGPor100g = 18m, HidratosGPor100g = 2m, GorduraGPor100g = 2m },
+            new Alimento { Name = "Carne de Vaca (Magra)", Description = "Carne magra, alternativa em pratos de proteína.", CategoriaAlimentoId = Cat("Carnes"), Calories = 187, KcalPor100g = 187, ProteinaGPor100g = 26m, HidratosGPor100g = 0m, GorduraGPor100g = 8m },
+            new Alimento { Name = "Chouriço", Description = "Enchido tradicional usado em sopas e feijoadas.", CategoriaAlimentoId = Cat("Carnes"), Calories = 350, KcalPor100g = 350, ProteinaGPor100g = 17m, HidratosGPor100g = 2m, GorduraGPor100g = 30m },
+            new Alimento { Name = "Bacon", Description = "Carne curada, usada como ingrediente em feijoadas.", CategoriaAlimentoId = Cat("Carnes"), Calories = 541, KcalPor100g = 541, ProteinaGPor100g = 37m, HidratosGPor100g = 1.4m, GorduraGPor100g = 42m },
+
+            // Peixes e Mariscos
+            new Alimento { Name = "Salmão", Description = "Peixe gordo, rico em ômega-3.", CategoriaAlimentoId = Cat("Peixes e Mariscos"), Calories = 208, KcalPor100g = 208, ProteinaGPor100g = 20m, HidratosGPor100g = 0m, GorduraGPor100g = 13m },
+            new Alimento { Name = "Bacalhau", Description = "Peixe (bacalhau) usado em pratos tradicionais.", CategoriaAlimentoId = Cat("Peixes e Mariscos"), Calories = 105, KcalPor100g = 105, ProteinaGPor100g = 23m, HidratosGPor100g = 0m, GorduraGPor100g = 0.9m },
+            new Alimento { Name = "Atum", Description = "Peixe versátil, usado em saladas e sanduíches.", CategoriaAlimentoId = Cat("Peixes e Mariscos"), Calories = 132, KcalPor100g = 132, ProteinaGPor100g = 29m, HidratosGPor100g = 0m, GorduraGPor100g = 1m },
+            new Alimento { Name = "Camarão", Description = "Crustáceo (frutos do mar), fonte de proteína.", CategoriaAlimentoId = Cat("Peixes e Mariscos"), Calories = 99, KcalPor100g = 99, ProteinaGPor100g = 24m, HidratosGPor100g = 0.2m, GorduraGPor100g = 0.3m },
+            new Alimento { Name = "Polvo", Description = "Molusco (polvo) usado em pratos tradicionais.", CategoriaAlimentoId = Cat("Peixes e Mariscos"), Calories = 82, KcalPor100g = 82, ProteinaGPor100g = 15m, HidratosGPor100g = 2.2m, GorduraGPor100g = 1m },
+            new Alimento { Name = "Lula", Description = "Molusco usado como alternativa ao polvo e camarão em pratos do mar.", CategoriaAlimentoId = Cat("Peixes e Mariscos"), Calories = 92, KcalPor100g = 92, ProteinaGPor100g = 15.6m, HidratosGPor100g = 3.1m, GorduraGPor100g = 1.4m },
+
+            // Ovos
+            new Alimento { Name = "Ovo", Description = "Ovo de galinha, fonte de proteína.", CategoriaAlimentoId = Cat("Ovos"), Calories = 155, KcalPor100g = 155, ProteinaGPor100g = 13m, HidratosGPor100g = 1.1m, GorduraGPor100g = 11m },
+            new Alimento { Name = "Clara de Ovo", Description = "Parte branca do ovo, quase só proteína.", CategoriaAlimentoId = Cat("Ovos"), Calories = 52, KcalPor100g = 52, ProteinaGPor100g = 11m, HidratosGPor100g = 0.7m, GorduraGPor100g = 0.2m },
+            new Alimento { Name = "Gema de Ovo", Description = "Parte amarela do ovo, rica em gorduras e vitaminas.", CategoriaAlimentoId = Cat("Ovos"), Calories = 322, KcalPor100g = 322, ProteinaGPor100g = 16m, HidratosGPor100g = 3.6m, GorduraGPor100g = 27m },
+        };
+
+        var existentes = context.Alimentos
+            .ToList()
+            .GroupBy(a => a.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+        var changed = false;
+
+        foreach (var seed in seedAlimentos)
+        {
+            if (!existentes.TryGetValue(seed.Name, out var atual))
+            {
+                context.Alimentos.Add(seed);
+                changed = true;
+                continue;
+            }
+
+            if (atual.CategoriaAlimentoId != seed.CategoriaAlimentoId)
+            {
+                atual.CategoriaAlimentoId = seed.CategoriaAlimentoId;
+                changed = true;
+            }
+
+            if (!string.Equals(atual.Description, seed.Description, StringComparison.Ordinal))
+            {
+                atual.Description = seed.Description;
+                changed = true;
+            }
+
+            if (atual.Calories != seed.Calories ||
+                atual.KcalPor100g != seed.KcalPor100g ||
+                atual.ProteinaGPor100g != seed.ProteinaGPor100g ||
+                atual.HidratosGPor100g != seed.HidratosGPor100g ||
+                atual.GorduraGPor100g != seed.GorduraGPor100g)
+            {
+                atual.Calories = seed.Calories;
+                atual.KcalPor100g = seed.KcalPor100g;
+                atual.ProteinaGPor100g = seed.ProteinaGPor100g;
+                atual.HidratosGPor100g = seed.HidratosGPor100g;
+                atual.GorduraGPor100g = seed.GorduraGPor100g;
+                changed = true;
+            }
+        }
+
+        if (!changed)
         {
             return;
         }
-
-        context.Alimentos.AddRange(
-            new Alimento { Name = "Maçã", Description = "Fruta doce e crocante.", CategoriaAlimentoId = 1, Calories = 52, KcalPor100g = 52, ProteinaGPor100g = 0.3m, HidratosGPor100g = 14m, GorduraGPor100g = 0.2m },
-            new Alimento { Name = "Cenoura", Description = "Vegetal rico em vitamina A.", CategoriaAlimentoId = 2, Calories = 41, KcalPor100g = 41, ProteinaGPor100g = 0.9m, HidratosGPor100g = 10m, GorduraGPor100g = 0.2m },
-            new Alimento { Name = "Arroz", Description = "Grão básico na alimentação.", CategoriaAlimentoId = 3, Calories = 130, KcalPor100g = 130, ProteinaGPor100g = 2.7m, HidratosGPor100g = 28m, GorduraGPor100g = 0.3m },
-            new Alimento { Name = "Leite", Description = "Líquido rico em cálcio.", CategoriaAlimentoId = 4, Calories = 42, KcalPor100g = 42, ProteinaGPor100g = 3.4m, HidratosGPor100g = 5m, GorduraGPor100g = 1m },
-            new Alimento { Name = "Frango", Description = "Carne branca rica em proteínas.", CategoriaAlimentoId = 5, Calories = 165, KcalPor100g = 165, ProteinaGPor100g = 31m, HidratosGPor100g = 0m, GorduraGPor100g = 3.6m },
-
-            // Novos alimentos para diversificar (IDs esperados: 6..15)
-            new Alimento { Name = "Banana", Description = "Fruta energética, boa fonte de potássio.", CategoriaAlimentoId = 1, Calories = 89, KcalPor100g = 89, ProteinaGPor100g = 1.1m, HidratosGPor100g = 23m, GorduraGPor100g = 0.3m },
-            new Alimento { Name = "Batata", Description = "Tubérculo versátil.", CategoriaAlimentoId = 3, Calories = 77, KcalPor100g = 77, ProteinaGPor100g = 2m, HidratosGPor100g = 17m, GorduraGPor100g = 0.1m },
-            new Alimento { Name = "Pão", Description = "Fonte de carboidratos, feito geralmente de trigo.", CategoriaAlimentoId = 3, Calories = 265, KcalPor100g = 265, ProteinaGPor100g = 9m, HidratosGPor100g = 49m, GorduraGPor100g = 3.2m },
-            new Alimento { Name = "Tofu", Description = "Produto de soja, boa alternativa proteica.", CategoriaAlimentoId = 4, Calories = 76, KcalPor100g = 76, ProteinaGPor100g = 8m, HidratosGPor100g = 1.9m, GorduraGPor100g = 4.8m },
-            new Alimento { Name = "Leite de Amêndoa", Description = "Alternativa vegetal ao leite.", CategoriaAlimentoId = 4, Calories = 15, KcalPor100g = 15, ProteinaGPor100g = 0.4m, HidratosGPor100g = 0.3m, GorduraGPor100g = 1.1m },
-            new Alimento { Name = "Feijão", Description = "Leguminosa rica em fibras e proteínas.", CategoriaAlimentoId = 3, Calories = 347, KcalPor100g = 347, ProteinaGPor100g = 21m, HidratosGPor100g = 63m, GorduraGPor100g = 1.2m },
-            new Alimento { Name = "Aveia", Description = "Cereal integral, boa fonte de fibras.", CategoriaAlimentoId = 3, Calories = 389, KcalPor100g = 389, ProteinaGPor100g = 17m, HidratosGPor100g = 66m, GorduraGPor100g = 7m },
-            new Alimento { Name = "Queijo", Description = "Lácteo fermentado, fonte de cálcio.", CategoriaAlimentoId = 4, Calories = 402, KcalPor100g = 402, ProteinaGPor100g = 25m, HidratosGPor100g = 1.3m, GorduraGPor100g = 33m },
-            new Alimento { Name = "Salmão", Description = "Peixe gordo, rico em ômega-3.", CategoriaAlimentoId = 5, Calories = 208, KcalPor100g = 208, ProteinaGPor100g = 20m, HidratosGPor100g = 0m, GorduraGPor100g = 13m },
-            new Alimento { Name = "Batata Doce", Description = "Tubérculo rico em betacaroteno e fibras.", CategoriaAlimentoId = 3, Calories = 86, KcalPor100g = 86, ProteinaGPor100g = 1.6m, HidratosGPor100g = 20m, GorduraGPor100g = 0.1m }
-        );
 
         context.SaveChanges();
     }
 
     private static void PopulateAlergias(HealthWellbeingDbContext context)
     {
-        if (context.Alergia.Any())
+        var seedAlergias = new List<Alergia>
+        {
+            new Alergia
+            {
+                Nome = "Alergia ao Amendoim",
+                Descricao = "Reação alérgica a proteínas do amendoim.",
+                Gravidade = GravidadeAlergia.Grave,
+                Sintomas = "Urticária, inchaço (face/garganta), dificuldade para respirar."
+            },
+            new Alergia
+            {
+                Nome = "Alergia ao Leite",
+                Descricao = "Alergia às proteínas do leite .",
+                Gravidade = GravidadeAlergia.Moderada,
+                Sintomas = "Urticária, vómitos, diarreia, congestão nasal."
+            },
+            new Alergia
+            {
+                Nome = "Alergia ao Ovo",
+                Descricao = "Reação imunológica às proteínas do ovo (clara e/ou gema).",
+                Gravidade = GravidadeAlergia.Moderada,
+                Sintomas = "Coceira, urticária, desconforto gastrointestinal."
+            },
+            new Alergia
+            {
+                Nome = "Alergia ao Trigo",
+                Descricao = "Reação às proteínas do trigo (pode envolver glúten).",
+                Gravidade = GravidadeAlergia.Moderada,
+                Sintomas = "Inchaço, urticária, dor abdominal."
+            },
+            new Alergia
+            {
+                Nome = "Alergia a Frutos do Mar",
+                Descricao = "Reação a crustáceos e/ou moluscos.",
+                Gravidade = GravidadeAlergia.Grave,
+                Sintomas = "Inchaço facial, vómitos, anafilaxia."
+            },
+            new Alergia
+            {
+                Nome = "Alergia a Castanhas",
+                Descricao = "Reação a oleaginosas (ex.: amêndoa, noz, caju, avelã).",
+                Gravidade = GravidadeAlergia.Grave,
+                Sintomas = "Prurido, inchaço, risco de anafilaxia."
+            },
+            new Alergia
+            {
+                Nome = "Alergia à Soja",
+                Descricao = "Reação às proteínas da soja e derivados.",
+                Gravidade = GravidadeAlergia.Moderada,
+                Sintomas = "Erupções cutâneas, dor abdominal, tosse."
+            },
+            new Alergia
+            {
+                Nome = "Alergia ao Peixe",
+                Descricao = "Reação imunológica a proteínas de peixes.",
+                Gravidade = GravidadeAlergia.Grave,
+                Sintomas = "Urticária, vómitos, dificuldade respiratória."
+            },
+            new Alergia
+            {
+                Nome = "Alergia ao Frango",
+                Descricao = "Hipersensibilidade rara a proteínas da carne de frango.",
+                Gravidade = GravidadeAlergia.Leve,
+                Sintomas = "Vermelhidão, urticária, irritação cutânea."
+            },
+            new Alergia
+            {
+                Nome = "Alergia ao Glúten",
+                Descricao = "Sensibilidade a proteínas com glúten (não é diagnóstico de celíaca).",
+                Gravidade = GravidadeAlergia.Moderada,
+                Sintomas = "Dores abdominais, náuseas, fadiga."
+            },
+            new Alergia
+            {
+                Nome = "Alergia a Lacticínios",
+                Descricao = "Reação a derivados do leite (ex.: queijos, iogurtes, manteiga).",
+                Gravidade = GravidadeAlergia.Moderada,
+                Sintomas = "Inchaço, diarreia, congestão nasal."
+            },
+            new Alergia
+            {
+                Nome = "Alergia ao Sésamo",
+                Descricao = "Reação a proteínas do sésamo e produtos contendo sésamo.",
+                Gravidade = GravidadeAlergia.Moderada,
+                Sintomas = "Urticária, inchaço, dificuldade respiratória."
+            },
+            new Alergia
+            {
+                Nome = "Alergia à Mostarda",
+                Descricao = "Alergia a condimentos com mostarda (semente/derivados).",
+                Gravidade = GravidadeAlergia.Leve,
+                Sintomas = "Coceira, urticária, irritação oral."
+            }
+        };
+
+        var existentes = context.Alergia
+            .ToList()
+            .GroupBy(a => a.Nome, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+        var changed = false;
+        foreach (var seed in seedAlergias)
+        {
+            if (!existentes.TryGetValue(seed.Nome, out var atual))
+            {
+                context.Alergia.Add(seed);
+                changed = true;
+                continue;
+            }
+
+            if (!string.Equals(atual.Descricao, seed.Descricao, StringComparison.Ordinal))
+            {
+                atual.Descricao = seed.Descricao;
+                changed = true;
+            }
+
+            if (atual.Gravidade != seed.Gravidade)
+            {
+                atual.Gravidade = seed.Gravidade;
+                changed = true;
+            }
+
+            if (!string.Equals(atual.Sintomas, seed.Sintomas, StringComparison.Ordinal))
+            {
+                atual.Sintomas = seed.Sintomas;
+                changed = true;
+            }
+        }
+
+        if (changed)
+        {
+            context.SaveChanges();
+        }
+
+        // Associações N:N (additivas)
+        var alergiasByNome = context.Alergia
+            .AsNoTracking()
+            .ToList()
+            .GroupBy(a => a.Nome, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+        var alimentos = context.Alimentos
+            .AsNoTracking()
+            .ToList();
+
+        if (!alimentos.Any() || !alergiasByNome.Any())
         {
             return;
         }
 
-        var alergias = new List<Alergia>
-    {
-        new Alergia
+        var categoriasByNome = context.CategoriaAlimento
+            .AsNoTracking()
+            .ToList()
+            .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First().CategoriaAlimentoId, StringComparer.OrdinalIgnoreCase);
+
+        int? TryCatId(string nome)
         {
-            Nome = "Alergia ao Amendoim",
-            Descricao = "Reação alérgica grave a proteínas do amendoim.",
-            Gravidade = GravidadeAlergia.Grave,
-            Sintomas = "Urticária, dificuldade para respirar, inchaço na garganta."
-        },
-        new Alergia
-        {
-            Nome = "Alergia ao Leite",
-            Descricao = "Sensibilidade às proteínas do leite de vaca.",
-            Gravidade = GravidadeAlergia.Moderada,
-            Sintomas = "Cólicas, diarreia, erupções cutâneas."
-        },
-        new Alergia
-        {
-            Nome = "Alergia ao Ovo",
-            Descricao = "Reação imunológica às proteínas da clara ou gema do ovo.",
-            Gravidade = GravidadeAlergia.Leve,
-            Sintomas = "Coceira, vermelhidão, desconforto gastrointestinal."
-        },
-        new Alergia
-        {
-            Nome = "Alergia ao Trigo",
-            Descricao = "Reação às proteínas do trigo, incluindo o glúten.",
-            Gravidade = GravidadeAlergia.Moderada,
-            Sintomas = "Inchaço abdominal, erupções cutâneas, fadiga."
-        },
-        new Alergia
-        {
-            Nome = "Alergia a Frutos do Mar",
-            Descricao = "Reação a crustáceos e moluscos.",
-            Gravidade = GravidadeAlergia.Grave,
-            Sintomas = "Inchaço facial, vômitos, anafilaxia."
-        },
-        new Alergia
-        {
-            Nome = "Alergia a Castanhas",
-            Descricao = "Reação a proteínas encontradas em castanhas, nozes e amêndoas.",
-            Gravidade = GravidadeAlergia.Grave,
-            Sintomas = "Prurido, inchaço, risco de anafilaxia."
-        },
-        new Alergia
-        {
-            Nome = "Alergia à Soja",
-            Descricao = "Reação às proteínas encontradas nos grãos de soja.",
-            Gravidade = GravidadeAlergia.Moderada,
-            Sintomas = "Erupções, desconforto abdominal, tosse."
-        },
-        new Alergia
-        {
-            Nome = "Alergia ao Peixe",
-            Descricao = "Reação imunológica a proteínas de peixes diversos.",
-            Gravidade = GravidadeAlergia.Grave,
-            Sintomas = "Inchaço facial, vômitos, dificuldade respiratória."
-        },
-        new Alergia
-        {
-            Nome = "Alergia ao Frango",
-            Descricao = "Hipersensibilidade às proteínas da carne de frango.",
-            Gravidade = GravidadeAlergia.Leve,
-            Sintomas = "Vermelhidão, urticária, irritação na pele."
-        },
-        new Alergia
-        {
-            Nome = "Alergia ao Glúten",
-            Descricao = "Reação não-celíaca às proteínas do glúten.",
-            Gravidade = GravidadeAlergia.Moderada,
-            Sintomas = "Dores abdominais, náuseas, fadiga."
-        },
-        new Alergia
-        {
-            Nome = "Alergia a Lacticínios",
-            Descricao = "Reação a derivados do leite, mesmo quando sem lactose.",
-            Gravidade = GravidadeAlergia.Moderada,
-            Sintomas = "Inchaço, diarréia, irritação nasal."
+            if (!categoriasByNome.TryGetValue(nome, out var id))
+                return null;
+            return id;
         }
-    };
 
-        context.Alergia.AddRange(alergias);
-        context.SaveChanges();
+        int? TryGetAlimentoId(string nome)
+        {
+            return alimentos
+                .FirstOrDefault(a => string.Equals(a.Name, nome, StringComparison.OrdinalIgnoreCase))
+                ?.AlimentoId;
+        }
 
-        // Associa os alimentos existentes às alergias
-        var alimentos = context.Alimentos.ToList();
+        var existingPairs = context.AlergiaAlimento
+            .AsNoTracking()
+            .Select(x => new { x.AlergiaId, x.AlimentoId })
+            .AsEnumerable()
+            .Select(x => (x.AlergiaId, x.AlimentoId))
+            .ToHashSet();
 
-        var alergiaAlimentos = new List<AlergiaAlimento>
-    {
-        new AlergiaAlimento { AlergiaId = alergias[0].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Amendoim")?.AlimentoId ?? 1 },
-        new AlergiaAlimento { AlergiaId = alergias[1].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Leite")?.AlimentoId ?? 4 },
-        new AlergiaAlimento { AlergiaId = alergias[2].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Ovo")?.AlimentoId ?? 2 },
-        new AlergiaAlimento { AlergiaId = alergias[3].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Trigo")?.AlimentoId ?? 3 },
-        new AlergiaAlimento { AlergiaId = alergias[4].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Frango")?.AlimentoId ?? 5 },
+        var novos = new List<AlergiaAlimento>();
 
-        // Associações das novas alergias (usando alimentos existentes)
-        new AlergiaAlimento { AlergiaId = alergias[5].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Amendoim")?.AlimentoId ?? 1 },
-        new AlergiaAlimento { AlergiaId = alergias[6].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Trigo")?.AlimentoId ?? 3 }, // soja associada ao trigo (aproximação)
-        new AlergiaAlimento { AlergiaId = alergias[7].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Frutos do Mar")?.AlimentoId ?? 5 },
-        new AlergiaAlimento { AlergiaId = alergias[8].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Frango")?.AlimentoId ?? 5 },
-        new AlergiaAlimento { AlergiaId = alergias[9].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Trigo")?.AlimentoId ?? 3 },
-        new AlergiaAlimento { AlergiaId = alergias[10].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Leite")?.AlimentoId ?? 4 }
-    };
+        void AddAssociacao(string alergiaNome, int alimentoId)
+        {
+            if (!alergiasByNome.TryGetValue(alergiaNome, out var alergia))
+                return;
 
-        context.AlergiaAlimento.AddRange(alergiaAlimentos);
-        context.SaveChanges();
+            var key = (alergia.AlergiaId, alimentoId);
+            if (!existingPairs.Add(key))
+                return;
+
+            novos.Add(new AlergiaAlimento
+            {
+                AlergiaId = alergia.AlergiaId,
+                AlimentoId = alimentoId
+            });
+        }
+
+        void AddAssociacaoPorNome(string alergiaNome, string alimentoNome)
+        {
+            var alimentoId = TryGetAlimentoId(alimentoNome);
+            if (alimentoId == null) return;
+            AddAssociacao(alergiaNome, alimentoId.Value);
+        }
+
+        void AddAssociacaoPorFiltro(string alergiaNome, Func<Alimento, bool> filtro, int? take = null)
+        {
+            var query = alimentos.Where(filtro);
+            if (take != null)
+                query = query.Take(take.Value);
+
+            foreach (var alimento in query)
+            {
+                AddAssociacao(alergiaNome, alimento.AlimentoId);
+            }
+        }
+
+        // Amendoim
+        AddAssociacaoPorNome("Alergia ao Amendoim", "Amendoim");
+
+        // Castanhas/Oleaginosas
+        AddAssociacaoPorNome("Alergia a Castanhas", "Amêndoa");
+        AddAssociacaoPorNome("Alergia a Castanhas", "Noz");
+        AddAssociacaoPorNome("Alergia a Castanhas", "Caju");
+        AddAssociacaoPorNome("Alergia a Castanhas", "Avelã");
+        var oleaginosasId = TryCatId("Oleaginosas e Sementes");
+        if (oleaginosasId != null)
+        {
+            AddAssociacaoPorFiltro("Alergia a Castanhas", a => a.CategoriaAlimentoId == oleaginosasId.Value, take: 12);
+        }
+
+        // Leite/Lacticínios
+        AddAssociacaoPorNome("Alergia ao Leite", "Leite");
+        AddAssociacaoPorFiltro("Alergia ao Leite", a =>
+            a.Name.Contains("Leite", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Queijo", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Iogurte", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Kefir", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Requeijão", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Manteiga", StringComparison.OrdinalIgnoreCase));
+
+        AddAssociacaoPorNome("Alergia a Lacticínios", "Leite");
+        AddAssociacaoPorNome("Alergia a Lacticínios", "Queijo");
+        AddAssociacaoPorFiltro("Alergia a Lacticínios", a =>
+            a.Name.Contains("Leite", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Queijo", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Iogurte", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Kefir", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Requeijão", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Manteiga", StringComparison.OrdinalIgnoreCase));
+
+        // Ovo
+        AddAssociacaoPorNome("Alergia ao Ovo", "Ovo");
+        var ovosId = TryCatId("Ovos");
+        if (ovosId != null)
+        {
+            AddAssociacaoPorFiltro("Alergia ao Ovo", a => a.CategoriaAlimentoId == ovosId.Value, take: 8);
+        }
+
+        // Soja
+        AddAssociacaoPorNome("Alergia à Soja", "Tofu");
+        AddAssociacaoPorNome("Alergia à Soja", "Tempeh");
+        AddAssociacaoPorNome("Alergia à Soja", "Edamame");
+        AddAssociacaoPorNome("Alergia à Soja", "Molho de Soja");
+        AddAssociacaoPorNome("Alergia à Soja", "Tamari");
+        AddAssociacaoPorNome("Alergia à Soja", "Bebida de Soja");
+        AddAssociacaoPorNome("Alergia à Soja", "Iogurte de Soja");
+        AddAssociacaoPorFiltro("Alergia à Soja", a => a.Name.Contains("Soja", StringComparison.OrdinalIgnoreCase));
+
+        // Trigo / Glúten
+        void AddTrigoGluten(string alergiaNome)
+        {
+            AddAssociacaoPorFiltro(alergiaNome, a =>
+                a.Name.Equals("Trigo", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Farinha de Trigo", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.StartsWith("Pão", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Tortilha de Trigo", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Esparguete", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Lasanha", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Cuscuz", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Cevada", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Seitan", StringComparison.OrdinalIgnoreCase));
+        }
+
+        AddTrigoGluten("Alergia ao Trigo");
+        AddTrigoGluten("Alergia ao Glúten");
+
+        // Peixe
+        AddAssociacaoPorNome("Alergia ao Peixe", "Salmão");
+        AddAssociacaoPorFiltro("Alergia ao Peixe", a =>
+            a.Name.Contains("Salmão", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Atum", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Bacalhau", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Sardinha", StringComparison.OrdinalIgnoreCase));
+
+        // Frutos do mar
+        AddAssociacaoPorNome("Alergia a Frutos do Mar", "Camarão");
+        var peixeMariscoId = TryCatId("Peixes e Mariscos");
+        if (peixeMariscoId != null)
+        {
+            AddAssociacaoPorFiltro("Alergia a Frutos do Mar", a => a.CategoriaAlimentoId == peixeMariscoId.Value, take: 12);
+        }
+
+        // Frango
+        AddAssociacaoPorNome("Alergia ao Frango", "Frango");
+
+        // Sésamo / Mostarda
+        AddAssociacaoPorNome("Alergia ao Sésamo", "Sementes de Sésamo");
+        AddAssociacaoPorNome("Alergia à Mostarda", "Mostarda");
+
+        if (novos.Any())
+        {
+            context.AlergiaAlimento.AddRange(novos);
+            context.SaveChanges();
+        }
     }
 
 
     private static void PopulateRestricoesAlimentares(HealthWellbeingDbContext context)
     {
-        if (context.RestricaoAlimentar.Any())
-        {
-            return;
-        }
-
-        var restricoes = new List<RestricaoAlimentar>
+        var seedRestricoes = new List<RestricaoAlimentar>
         {
             new RestricaoAlimentar 
             { 
@@ -298,11 +833,11 @@ internal class SeedData
                 Descricao = "Restrição total de açúcares refinados e controle de carboidratos." 
             },
             new RestricaoAlimentar 
-            { 
-                Nome = "Vegetariana Estrita", 
-                Tipo = TipoRestricao.Vegetariana, 
-                Gravidade = GravidadeRestricao.Leve, 
-                Descricao = "Dieta sem carne, mas pode incluir laticínios e ovos." 
+            {
+                Nome = "Vegetariana Estrita",
+                Tipo = TipoRestricao.Vegetariana,
+                Gravidade = GravidadeRestricao.Leve,
+                Descricao = "Dieta sem carne e peixe; pode incluir laticínios e ovos."
             },
             new RestricaoAlimentar 
             { 
@@ -312,11 +847,11 @@ internal class SeedData
                 Descricao = "Alergia severa a crustáceos e moluscos." 
             },
             new RestricaoAlimentar 
-            { 
-                Nome = "Restrição Religiosa - Halal", 
-                Tipo = TipoRestricao.Religiosa, 
-                Gravidade = GravidadeRestricao.Moderada, 
-                Descricao = "Alimentação de acordo com preceitos islâmicos." 
+            {
+                Nome = "Restrição Religiosa - Halal",
+                Tipo = TipoRestricao.Religiosa,
+                Gravidade = GravidadeRestricao.Moderada,
+                Descricao = "Alimentação de acordo com preceitos islâmicos (ex.: sem carne de porco)."
             },
             new RestricaoAlimentar 
             { 
@@ -354,11 +889,11 @@ internal class SeedData
                 Descricao = "Dificuldade em digerir frutose presente em frutas e mel." 
             },
             new RestricaoAlimentar 
-            { 
-                Nome = "Dieta Paleolítica", 
-                Tipo = TipoRestricao.Outra, 
-                Gravidade = GravidadeRestricao.Leve, 
-                Descricao = "Baseada em alimentos supostamente disponíveis na era paleolítica." 
+            {
+                Nome = "Dieta Paleolítica",
+                Tipo = TipoRestricao.Outra,
+                Gravidade = GravidadeRestricao.Leve,
+                Descricao = "Evita processados, grãos, leguminosas e laticínios; foca em alimentos simples."
             },
             new RestricaoAlimentar 
             { 
@@ -369,11 +904,48 @@ internal class SeedData
             }
         };
 
-        context.RestricaoAlimentar.AddRange(restricoes);
-        context.SaveChanges();
+        var existentes = context.RestricaoAlimentar
+            .ToList()
+            .GroupBy(r => r.Nome, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
 
-        // Agora cria as associações N:N com alimentos
-        PopulateRestricaoAlimentarAssociacoes(context, restricoes);
+        var changed = false;
+        foreach (var seed in seedRestricoes)
+        {
+            if (!existentes.TryGetValue(seed.Nome, out var atual))
+            {
+                context.RestricaoAlimentar.Add(seed);
+                changed = true;
+                continue;
+            }
+
+            if (atual.Tipo != seed.Tipo)
+            {
+                atual.Tipo = seed.Tipo;
+                changed = true;
+            }
+
+            if (atual.Gravidade != seed.Gravidade)
+            {
+                atual.Gravidade = seed.Gravidade;
+                changed = true;
+            }
+
+            if (!string.Equals(atual.Descricao, seed.Descricao, StringComparison.Ordinal))
+            {
+                atual.Descricao = seed.Descricao;
+                changed = true;
+            }
+        }
+
+        if (changed)
+        {
+            context.SaveChanges();
+        }
+
+        // Agora cria/atualiza as associações N:N com alimentos (additivas)
+        var restricoesDb = context.RestricaoAlimentar.AsNoTracking().ToList();
+        PopulateRestricaoAlimentarAssociacoes(context, restricoesDb);
     }
 
 
@@ -387,279 +959,792 @@ internal class SeedData
         
         if (!alimentos.Any()) return;
 
+        var categoriasByNome = context.CategoriaAlimento
+            .AsNoTracking()
+            .ToList()
+            .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First().CategoriaAlimentoId, StringComparer.OrdinalIgnoreCase);
+
+        int CatId(string nome)
+        {
+            if (!categoriasByNome.TryGetValue(nome, out var id))
+                throw new InvalidOperationException($"CategoriaAlimento não encontrada para associações de restrições: '{nome}'.");
+            return id;
+        }
+
+        var existingPairs = context.RestricaoAlimentarAlimento
+            .AsNoTracking()
+            .Select(x => new { x.RestricaoAlimentarId, x.AlimentoId })
+            .AsEnumerable()
+            .Select(x => (x.RestricaoAlimentarId, x.AlimentoId))
+            .ToHashSet();
+
+        void AddLink(int restricaoId, int alimentoId)
+        {
+            var key = (restricaoId, alimentoId);
+            if (!existingPairs.Add(key))
+                return;
+
+            associacoes.Add(new RestricaoAlimentarAlimento
+            {
+                RestricaoAlimentarId = restricaoId,
+                AlimentoId = alimentoId
+            });
+        }
+
         // Intolerância à Lactose - associa com laticínios
         var lactose = restricoes.First(r => r.Nome == "Intolerância à Lactose");
-        var laticinios = alimentos.Where(a => a.Name.Contains("Leite") || a.Name.Contains("Queijo")).Take(3);
+        var laticinios = alimentos
+            .Where(a =>
+                a.Name.Equals("Leite", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Queijo", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Iogurte", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Kefir", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Requeijão", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Leite Condensado", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Equals("Manteiga", StringComparison.OrdinalIgnoreCase))
+            .Take(12);
         foreach (var alimento in laticinios)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = lactose.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
-            });
+            AddLink(lactose.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
         // Vegana - associa com carnes, ovos, laticínios
         var vegana = restricoes.First(r => r.Nome == "Dieta Vegana");
-        var produtosAnimais = alimentos.Where(a => a.Name.Contains("Frango") || a.Name.Contains("Salmão") || a.Name.Contains("Queijo") || a.Name.Contains("Leite")).Take(4);
+        var catCarnes = CatId("Carnes");
+        var catPeixes = CatId("Peixes e Mariscos");
+        var catOvos = CatId("Ovos");
+
+        static bool IsDairyAnimalProduct(string name)
+            => name.Equals("Leite", StringComparison.OrdinalIgnoreCase) ||
+               name.Contains("Queijo", StringComparison.OrdinalIgnoreCase) ||
+               name.Contains("Iogurte", StringComparison.OrdinalIgnoreCase) ||
+               name.Contains("Kefir", StringComparison.OrdinalIgnoreCase) ||
+               name.Contains("Requeijão", StringComparison.OrdinalIgnoreCase) ||
+               name.Contains("Leite Condensado", StringComparison.OrdinalIgnoreCase) ||
+               name.Equals("Manteiga", StringComparison.OrdinalIgnoreCase);
+
+        var produtosAnimais = alimentos
+            .Where(a => a.CategoriaAlimentoId == catCarnes || a.CategoriaAlimentoId == catPeixes || a.CategoriaAlimentoId == catOvos || IsDairyAnimalProduct(a.Name))
+            .Take(25);
         foreach (var alimento in produtosAnimais)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = vegana.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
-            });
+            AddLink(vegana.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
         // Baixo Sódio - associa com alimentos processados
         var baixoSodio = restricoes.First(r => r.Nome == "Restrição de Sódio");
-        var alimentosProcessados = alimentos.Where(a => a.Name.Contains("Queijo") || a.Name.Contains("Pão")).Take(2);
+        var alimentosProcessados = alimentos
+            .Where(a =>
+                a.Name.Contains("Queijo", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Pão", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Chouriço", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Bacon", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Molho de Soja", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Alcaparras", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Azeitonas", StringComparison.OrdinalIgnoreCase))
+            .Take(10);
         foreach (var alimento in alimentosProcessados)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = baixoSodio.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
-            });
+            AddLink(baixoSodio.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
         // Doença Celíaca - associa com trigo, pão
         var celiaca = restricoes.First(r => r.Nome == "Doença Celíaca");
-        var comGluten = alimentos.Where(a => a.Name.Contains("Pão") || a.Name.Contains("Aveia")).Take(3);
+        var comGluten = alimentos
+            .Where(a =>
+                a.Name.Contains("Trigo", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Farinha de Trigo", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Pão", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Massa", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Esparguete", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Cuscuz", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Cevada", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Tortilha de Trigo", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Seitan", StringComparison.OrdinalIgnoreCase))
+            .Take(15);
         foreach (var alimento in comGluten)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = celiaca.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
-            });
+            AddLink(celiaca.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
         // Diabetes - associa com açúcares e carboidratos
         var diabetes = restricoes.First(r => r.Nome == "Diabetes - Controle de Açúcar");
-        var acucarados = alimentos.Where(a => a.Name.Contains("Banana") || a.Name.Contains("Batata Doce") || a.Name.Contains("Arroz")).Take(3);
+        var acucarados = alimentos
+            .Where(a =>
+                a.Name.Contains("Açúcar", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Mel", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Xarope", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Leite Condensado", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Banana", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Batata", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Arroz", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Granola", StringComparison.OrdinalIgnoreCase))
+            .Take(12);
         foreach (var alimento in acucarados)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = diabetes.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
-            });
+            AddLink(diabetes.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
         // Alergia a Frutos do Mar
         var frutosMar = restricoes.First(r => r.Nome == "Alergia a Frutos do Mar");
-        var frutosMarAlimentos = alimentos.Where(a => a.Name.Contains("Salmão")).Take(1);
+        var frutosMarAlimentos = alimentos
+            .Where(a => a.CategoriaAlimentoId == catPeixes || a.Name.Contains("Camarão", StringComparison.OrdinalIgnoreCase))
+            .Take(10);
         foreach (var alimento in frutosMarAlimentos)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = frutosMar.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
-            });
+            AddLink(frutosMar.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
-        // Alergia a Amendoim (simulada com alimentos existentes)
+        // Alergia a Amendoim
         var amendoim = restricoes.First(r => r.Nome == "Alergia a Amendoim");
-        var amendoimAlimentos = alimentos.Where(a => a.Name.Contains("Feijão") || a.Name.Contains("Aveia")).Take(2);
+        var amendoimAlimentos = alimentos.Where(a => a.Name.Contains("Amendoim")).Take(1);
         foreach (var alimento in amendoimAlimentos)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = amendoim.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
-            });
+            AddLink(amendoim.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
-        // Alergia a Ovos (simulada com alimentos existentes)
+        // Alergia a Ovos
         var ovos = restricoes.First(r => r.Nome == "Alergia a Ovos");
-        var ovosAlimentos = alimentos.Where(a => a.Name.Contains("Maçã") || a.Name.Contains("Banana")).Take(2);
+        var ovosAlimentos = alimentos.Where(a => a.Name.Contains("Ovo")).Take(1);
         foreach (var alimento in ovosAlimentos)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = ovos.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
-            });
+            AddLink(ovos.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
         // Intolerância à Frutose - associa com frutas doces
         var frutose = restricoes.First(r => r.Nome == "Intolerância à Frutose");
-        var frutasDoces = alimentos.Where(a => a.Name.Contains("Maçã") || a.Name.Contains("Banana") || a.Name.Contains("Batata Doce")).Take(3);
+        var frutasDoces = alimentos
+            .Where(a =>
+                a.CategoriaAlimentoId == CatId("Frutas") ||
+                a.Name.Contains("Mel", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Xarope", StringComparison.OrdinalIgnoreCase))
+            .Take(15);
         foreach (var alimento in frutasDoces)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = frutose.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
-            });
+            AddLink(frutose.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
-        // Adiciona algumas associações aleatórias para as restrições restantes
-        var random = new Random();
-        var restricoesSemAssociacao = restricoes.Except(new[] { lactose, vegana, baixoSodio, celiaca, diabetes, frutosMar, amendoim, ovos, frutose });
-
-        foreach (var restricao in restricoesSemAssociacao)
+        // Vegetariana: sem carnes e peixes (mantém laticínios/ovos)
+        var vegetariana = restricoes.First(r => r.Nome == "Vegetariana Estrita");
+        var carnesEPeixes = alimentos
+            .Where(a => a.CategoriaAlimentoId == catCarnes || a.CategoriaAlimentoId == catPeixes)
+            .Take(25);
+        foreach (var alimento in carnesEPeixes)
         {
-            var alimentosAleatorios = alimentos.OrderBy(x => random.Next()).Take(2);
-            foreach (var alimento in alimentosAleatorios)
-            {
-                associacoes.Add(new RestricaoAlimentarAlimento 
-                { 
-                    RestricaoAlimentarId = restricao.RestricaoAlimentarId, 
-                    AlimentoId = alimento.AlimentoId 
-                });
-            }
+            AddLink(vegetariana.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
-        context.RestricaoAlimentarAlimento.AddRange(associacoes);
-        context.SaveChanges();
+        // Sensibilidade ao Glúten: semelhante à celíaca (mesmos marcadores principais)
+        var sensGluten = restricoes.First(r => r.Nome == "Sensibilidade ao Glúten");
+        foreach (var alimento in comGluten)
+        {
+            AddLink(sensGluten.RestricaoAlimentarId, alimento.AlimentoId);
+        }
+
+        // Low Carb: marca principais fontes de hidratos/açúcares
+        var lowCarb = restricoes.First(r => r.Nome == "Dieta Low Carb");
+        var alimentosHighCarb = alimentos
+            .Where(a =>
+                a.CategoriaAlimentoId == CatId("Açúcares e Adoçantes") ||
+                a.CategoriaAlimentoId == CatId("Grãos") ||
+                a.CategoriaAlimentoId == CatId("Massas") ||
+                a.CategoriaAlimentoId == CatId("Pães e Tortilhas") ||
+                a.CategoriaAlimentoId == CatId("Tubérculos") ||
+                a.Name.Contains("Farinha", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Pão", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Massa", StringComparison.OrdinalIgnoreCase))
+            .Take(25);
+        foreach (var alimento in alimentosHighCarb)
+        {
+            AddLink(lowCarb.RestricaoAlimentarId, alimento.AlimentoId);
+        }
+
+        // Halal: sem porco e derivados (simplificação)
+        var halal = restricoes.First(r => r.Nome == "Restrição Religiosa - Halal");
+        var porcoDerivados = alimentos.Where(a =>
+            a.Name.Contains("Bacon", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Chouriço", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Porco", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Presunto", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Fiambre", StringComparison.OrdinalIgnoreCase))
+            .Take(25);
+        foreach (var alimento in porcoDerivados)
+        {
+            AddLink(halal.RestricaoAlimentarId, alimento.AlimentoId);
+        }
+
+        // Kosher: sem porco e sem marisco (simplificação)
+        var kosher = restricoes.First(r => r.Nome == "Restrição Religiosa - Kosher");
+        foreach (var alimento in porcoDerivados)
+        {
+            AddLink(kosher.RestricaoAlimentarId, alimento.AlimentoId);
+        }
+        foreach (var alimento in frutosMarAlimentos)
+        {
+            AddLink(kosher.RestricaoAlimentarId, alimento.AlimentoId);
+        }
+
+        // Paleolítica: evita processados, grãos, leguminosas e laticínios (simplificação)
+        var paleo = restricoes.First(r => r.Nome == "Dieta Paleolítica");
+        var paleoEvitar = alimentos
+            .Where(a =>
+                a.CategoriaAlimentoId == CatId("Grãos") ||
+                a.CategoriaAlimentoId == CatId("Massas") ||
+                a.CategoriaAlimentoId == CatId("Pães e Tortilhas") ||
+                a.CategoriaAlimentoId == CatId("Farinhas e Panificação") ||
+                a.CategoriaAlimentoId == CatId("Leguminosas") ||
+                a.CategoriaAlimentoId == CatId("Laticínios") ||
+                a.CategoriaAlimentoId == CatId("Açúcares e Adoçantes"))
+            .Take(60);
+        foreach (var alimento in paleoEvitar)
+        {
+            AddLink(paleo.RestricaoAlimentarId, alimento.AlimentoId);
+        }
+
+        if (associacoes.Any())
+        {
+            context.RestricaoAlimentarAlimento.AddRange(associacoes);
+            context.SaveChanges();
+        }
     }
 
 
 
     private static void PopulateAlimentoSubstitutos(HealthWellbeingDbContext context)
     {
-        if (context.AlimentoSubstitutos.Any())
+        var alimentos = context.Alimentos
+            .AsNoTracking()
+            .ToList();
+
+        if (!alimentos.Any())
         {
             return;
         }
 
-        context.AlimentoSubstitutos.AddRange(
+        var alimentosByNome = alimentos
+            .GroupBy(a => a.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
 
-            new AlimentoSubstituto { AlimentoOriginalId = 1, AlimentoSubstitutoRefId = 2, Motivo = "Alternativa para alergia.", ProporcaoEquivalente = 1, Observacoes = "Substituição recomendada.", FatorSimilaridade = 0.8 },
-            new AlimentoSubstituto { AlimentoOriginalId = 3, AlimentoSubstitutoRefId = 4, Motivo = "Alternativa para intolerância ao glúten.", ProporcaoEquivalente = 1, Observacoes = "Substituição recomendada.", FatorSimilaridade = 0.9 },
-            new AlimentoSubstituto { AlimentoOriginalId = 5, AlimentoSubstitutoRefId = 1, Motivo = "Alternativa para dieta vegana.", ProporcaoEquivalente = 1, Observacoes = "Substituição recomendada.", FatorSimilaridade = 0.7 },
-            new AlimentoSubstituto { AlimentoOriginalId = 2, AlimentoSubstitutoRefId = 3, Motivo = "Alternativa para restrição alimentar.", ProporcaoEquivalente = 1, Observacoes = "Substituição recomendada.", FatorSimilaridade = 0.85 },
-            new AlimentoSubstituto { AlimentoOriginalId = 4, AlimentoSubstitutoRefId = 5, Motivo = "Alternativa para alergia ao leite.", ProporcaoEquivalente = 1, Observacoes = "Substituição recomendada.", FatorSimilaridade = 0.75 },
+        int GetAlimentoId(string nome)
+        {
+            if (!alimentosByNome.TryGetValue(nome, out var alimento))
+                throw new InvalidOperationException($"Alimento não encontrado para seed de substitutos: '{nome}'.");
+            return alimento.AlimentoId;
+        }
 
+        // Tags (alergias/restrições) por alimento para escolher substitutos mais compatíveis.
+        var alergiaIdsPorAlimento = context.AlergiaAlimento
+            .AsNoTracking()
+            .ToList()
+            .GroupBy(a => a.AlimentoId)
+            .ToDictionary(g => g.Key, g => g.Select(x => x.AlergiaId).ToHashSet());
 
-            // Substitutos para Maçã (1)
-            new AlimentoSubstituto { AlimentoOriginalId = 1, AlimentoSubstitutoRefId = 6, Motivo = "Opção doce e similar em sobremesas.", ProporcaoEquivalente = 1, Observacoes = "Boa troca em vitaminas e bolos.", FatorSimilaridade = 0.78 },
-            new AlimentoSubstituto { AlimentoOriginalId = 1, AlimentoSubstitutoRefId = 8, Motivo = "Substituto em pratos assados.", ProporcaoEquivalente = 1, Observacoes = "Textura diferente, sabor complementar.", FatorSimilaridade = 0.55 },
-            new AlimentoSubstituto { AlimentoOriginalId = 1, AlimentoSubstitutoRefId = 15, Motivo = "Alternativa energética e rica em fibras.", ProporcaoEquivalente = 1, Observacoes = "Usar em purês ou assados.", FatorSimilaridade = 0.6 },
+        var restricaoIdsPorAlimento = context.RestricaoAlimentarAlimento
+            .AsNoTracking()
+            .ToList()
+            .GroupBy(r => r.AlimentoId)
+            .ToDictionary(g => g.Key, g => g.Select(x => x.RestricaoAlimentarId).ToHashSet());
 
-            // Substitutos para Cenoura (2)
-            new AlimentoSubstituto { AlimentoOriginalId = 2, AlimentoSubstitutoRefId = 12, Motivo = "Boa fonte de fibras para sopas.", ProporcaoEquivalente = 1, Observacoes = "Textura semelhante ao cozinhar.", FatorSimilaridade = 0.62 },
-            new AlimentoSubstituto { AlimentoOriginalId = 2, AlimentoSubstitutoRefId = 7, Motivo = "Substituto em purês e assados.", ProporcaoEquivalente = 1, Observacoes = "Ajustar temperos.", FatorSimilaridade = 0.58 },
-            new AlimentoSubstituto { AlimentoOriginalId = 2, AlimentoSubstitutoRefId = 6, Motivo = "Alternativa em saladas e snacks.", ProporcaoEquivalente = 1, Observacoes = "Sabor mais doce.", FatorSimilaridade = 0.45 },
+        bool IsCompatível(int alimentoOriginalId, int candidatoId)
+        {
+            if (alimentoOriginalId == candidatoId)
+                return false;
 
-            // Substitutos para Arroz (3)
-            new AlimentoSubstituto { AlimentoOriginalId = 3, AlimentoSubstitutoRefId = 11, Motivo = "Fonte de proteína e fibras.", ProporcaoEquivalente = 0.9m, Observacoes = "Excelente em pratos orientais.", FatorSimilaridade = 0.7 },
-            new AlimentoSubstituto { AlimentoOriginalId = 3, AlimentoSubstitutoRefId = 8, Motivo = "Carboidrato alternativo em acompanhamentos.", ProporcaoEquivalente = 1, Observacoes = "Usar pão torrado para saladas.", FatorSimilaridade = 0.4 },
-            new AlimentoSubstituto { AlimentoOriginalId = 3, AlimentoSubstitutoRefId = 12, Motivo = "Alternativa integral rica em fibras.", ProporcaoEquivalente = 0.9m, Observacoes = "Bom para versões mais saudáveis.", FatorSimilaridade = 0.6 },
+            if (alergiaIdsPorAlimento.TryGetValue(alimentoOriginalId, out var a1) &&
+                alergiaIdsPorAlimento.TryGetValue(candidatoId, out var a2) &&
+                a1.Overlaps(a2))
+            {
+                return false;
+            }
 
-            // Substitutos para Leite (4)
-            new AlimentoSubstituto { AlimentoOriginalId = 4, AlimentoSubstitutoRefId = 10, Motivo = "Alternativa vegetal para intolerantes.", ProporcaoEquivalente = 1, Observacoes = "Usar em bebidas e cereais.", FatorSimilaridade = 0.5 },
-            new AlimentoSubstituto { AlimentoOriginalId = 4, AlimentoSubstitutoRefId = 13, Motivo = "Alternativa em receitas que pedem cremosidade.", ProporcaoEquivalente = 0.8m, Observacoes = "Ajustar sal e fermento.", FatorSimilaridade = 0.65 },
-            new AlimentoSubstituto { AlimentoOriginalId = 4, AlimentoSubstitutoRefId = 9, Motivo = "Alternativa proteica e sem lactose.", ProporcaoEquivalente = 0.9m, Observacoes = "Usar em molhos e smoothies.", FatorSimilaridade = 0.55 },
+            if (restricaoIdsPorAlimento.TryGetValue(alimentoOriginalId, out var r1) &&
+                restricaoIdsPorAlimento.TryGetValue(candidatoId, out var r2) &&
+                r1.Overlaps(r2))
+            {
+                return false;
+            }
 
-            // Substitutos para Frango (5)
-            new AlimentoSubstituto { AlimentoOriginalId = 5, AlimentoSubstitutoRefId = 9, Motivo = "Opção vegetal rica em proteína.", ProporcaoEquivalente = 1, Observacoes = "Boa para dietas vegetarianas.", FatorSimilaridade = 0.6 },
-            new AlimentoSubstituto { AlimentoOriginalId = 5, AlimentoSubstitutoRefId = 14, Motivo = "Peixe rico em ômega-3 como alternativa.", ProporcaoEquivalente = 1, Observacoes = "Textura diferente, alto valor nutritivo.", FatorSimilaridade = 0.7 },
-            new AlimentoSubstituto { AlimentoOriginalId = 5, AlimentoSubstitutoRefId = 11, Motivo = "Fonte proteica vegetal.", ProporcaoEquivalente = 1, Observacoes = "Ótimo em ensopados e saladas.", FatorSimilaridade = 0.5 },
-            // 6 - Banana
-            new AlimentoSubstituto { AlimentoOriginalId = 6, AlimentoSubstitutoRefId = 1, Motivo = "Fruta similar em sobremesas.", ProporcaoEquivalente = 1, Observacoes = "Troca comum em vitaminas.", FatorSimilaridade = 0.7 },
-            new AlimentoSubstituto { AlimentoOriginalId = 6, AlimentoSubstitutoRefId = 15, Motivo = "Alternativa energética.", ProporcaoEquivalente = 1, Observacoes = "Boa para bolos e purês.", FatorSimilaridade = 0.6 },
+            return true;
+        }
 
-            // 7 - Batata
-            new AlimentoSubstituto { AlimentoOriginalId = 7, AlimentoSubstitutoRefId = 15, Motivo = "Batata doce substitui em assados.", ProporcaoEquivalente = 1, Observacoes = "Mais doce e rica em fibras.", FatorSimilaridade = 0.65 },
-            new AlimentoSubstituto { AlimentoOriginalId = 7, AlimentoSubstitutoRefId = 3, Motivo = "Arroz como acompanhamento alternativo.", ProporcaoEquivalente = 1, Observacoes = "Textura diferente.", FatorSimilaridade = 0.4 },
+        var existentesPairs = context.AlimentoSubstitutos
+            .AsNoTracking()
+            .Select(s => new { s.AlimentoOriginalId, s.AlimentoSubstitutoRefId })
+            .AsEnumerable()
+            .Select(s => (s.AlimentoOriginalId, s.AlimentoSubstitutoRefId))
+            .ToHashSet();
 
-            // 8 - Pão
-            new AlimentoSubstituto { AlimentoOriginalId = 8, AlimentoSubstitutoRefId = 3, Motivo = "Arroz pra saladas frias/companhias.", ProporcaoEquivalente = 1, Observacoes = "Usar torrado para textura.", FatorSimilaridade = 0.35 },
-            new AlimentoSubstituto { AlimentoOriginalId = 8, AlimentoSubstitutoRefId = 11, Motivo = "Feijão em preparos rústicos.", ProporcaoEquivalente = 1, Observacoes = "Troca incomum mas possível.", FatorSimilaridade = 0.25 },
+        var counts = new Dictionary<int, int>();
+        foreach (var (o, _) in existentesPairs)
+        {
+            if (!counts.TryGetValue(o, out var c)) c = 0;
+            counts[o] = c + 1;
+        }
 
-            // 9 - Tofu
-            new AlimentoSubstituto { AlimentoOriginalId = 9, AlimentoSubstitutoRefId = 5, Motivo = "Peito de frango como alternativa proteica.", ProporcaoEquivalente = 1, Observacoes = "Não vegano.", FatorSimilaridade = 0.5 },
-            new AlimentoSubstituto { AlimentoOriginalId = 9, AlimentoSubstitutoRefId = 11, Motivo = "Feijão para proteína vegetal.", ProporcaoEquivalente = 1, Observacoes = "Bom para ensopados.", FatorSimilaridade = 0.55 },
+        var novos = new List<AlimentoSubstituto>();
+        var novosPairs = new HashSet<(int AlimentoOriginalId, int AlimentoSubstitutoRefId)>();
 
-            // 10 - Leite de Amêndoa
-            new AlimentoSubstituto { AlimentoOriginalId = 10, AlimentoSubstitutoRefId = 4, Motivo = "Leite de vaca quando tolerado.", ProporcaoEquivalente = 1, Observacoes = "Não indicado para intolerantes.", FatorSimilaridade = 0.45 },
-            new AlimentoSubstituto { AlimentoOriginalId = 10, AlimentoSubstitutoRefId = 13, Motivo = "Queijo para cremosidade em receitas.", ProporcaoEquivalente = 0.8m, Observacoes = "Requer ajustes.", FatorSimilaridade = 0.4 },
+        var pairsTotal = new HashSet<(int, int)>(existentesPairs);
 
-            // 11 - Feijão
-            new AlimentoSubstituto { AlimentoOriginalId = 11, AlimentoSubstitutoRefId = 3, Motivo = "Arroz como acompanhamento proteico em conjunto.", ProporcaoEquivalente = 1, Observacoes = "Combina em pratos principais.", FatorSimilaridade = 0.3 },
-            new AlimentoSubstituto { AlimentoOriginalId = 11, AlimentoSubstitutoRefId = 12, Motivo = "Aveia em preparos calóricos.", ProporcaoEquivalente = 0.9m, Observacoes = "Uso técnico em receitas.", FatorSimilaridade = 0.25 },
+        void AddSub(
+            string original,
+            string substituto,
+            string motivo,
+            decimal? proporcao = 1m,
+            string? observacoes = null,
+            double? fatorSimilaridade = 0.6)
+        {
+            var originalId = GetAlimentoId(original);
+            var substitutoId = GetAlimentoId(substituto);
 
-            // 12 - Aveia
-            new AlimentoSubstituto { AlimentoOriginalId = 12, AlimentoSubstitutoRefId = 8, Motivo = "Pão integral em substituições de café da manhã.", ProporcaoEquivalente = 1, Observacoes = "Textura diferente.", FatorSimilaridade = 0.5 },
-            new AlimentoSubstituto { AlimentoOriginalId = 12, AlimentoSubstitutoRefId = 6, Motivo = "Banana em vitaminas/purês.", ProporcaoEquivalente = 0.8m, Observacoes = "Ajustar quantidade.", FatorSimilaridade = 0.45 },
+            AddSubById(originalId, substitutoId, motivo, proporcao, observacoes, fatorSimilaridade);
+        }
 
-            // 13 - Queijo
-            new AlimentoSubstituto { AlimentoOriginalId = 13, AlimentoSubstitutoRefId = 4, Motivo = "Leite para cremosidade.", ProporcaoEquivalente = 0.9m, Observacoes = "Alterar consistência.", FatorSimilaridade = 0.5 },
-            new AlimentoSubstituto { AlimentoOriginalId = 13, AlimentoSubstitutoRefId = 10, Motivo = "Leite vegetal em receitas veganas.", ProporcaoEquivalente = 1, Observacoes = "Ajustar sabor.", FatorSimilaridade = 0.35 },
+        void AddSubById(
+            int originalId,
+            int substitutoId,
+            string motivo,
+            decimal? proporcao = 1m,
+            string? observacoes = null,
+            double? fatorSimilaridade = 0.6)
+        {
+            if (originalId == substitutoId)
+                return;
 
-            // 14 - Salmão
-            new AlimentoSubstituto { AlimentoOriginalId = 14, AlimentoSubstitutoRefId = 5, Motivo = "Frango como alternativa de proteína.", ProporcaoEquivalente = 1, Observacoes = "Menos ômega-3.", FatorSimilaridade = 0.5 },
-            new AlimentoSubstituto { AlimentoOriginalId = 14, AlimentoSubstitutoRefId = 11, Motivo = "Feijão como fonte proteica vegetal.", ProporcaoEquivalente = 1, Observacoes = "Mudança de perfil nutricional.", FatorSimilaridade = 0.3 },
+            var key = (originalId, substitutoId);
+            if (pairsTotal.Contains(key) || !novosPairs.Add(key))
+                return;
 
-            // 15 - Batata Doce
-            new AlimentoSubstituto { AlimentoOriginalId = 15, AlimentoSubstitutoRefId = 7, Motivo = "Batata comum como substituto em receitas.", ProporcaoEquivalente = 1, Observacoes = "Menos beta-caroteno.", FatorSimilaridade = 0.6 },
-            new AlimentoSubstituto { AlimentoOriginalId = 15, AlimentoSubstitutoRefId = 3, Motivo = "Arroz como acompanhamento alternativo.", ProporcaoEquivalente = 1, Observacoes = "Uso em guarnições.", FatorSimilaridade = 0.25 }
-        );
+            novos.Add(new AlimentoSubstituto
+            {
+                AlimentoOriginalId = originalId,
+                AlimentoSubstitutoRefId = substitutoId,
+                Motivo = motivo,
+                ProporcaoEquivalente = proporcao,
+                Observacoes = observacoes,
+                FatorSimilaridade = fatorSimilaridade
+            });
 
+            pairsTotal.Add(key);
+            if (!counts.TryGetValue(originalId, out var c)) c = 0;
+            counts[originalId] = c + 1;
+        }
+
+        // --- Substituições realistas (cobertura ampla) ---
+        // Frutas
+        AddSub("Maçã", "Banana", "Fruta equivalente para lanches e sobremesas.", 1m, "Boa em batidos e saladas de fruta.", 0.75);
+        AddSub("Banana", "Maçã", "Alternativa de fruta para lanches.", 1m, "Textura diferente; ajustar a receita se for cozinhada.", 0.65);
+        AddSub("Laranja", "Maçã", "Alternativa de fruta para sobremesa/lanche.", 1m, "Menos sumo; ajustar se for para sumos.", 0.6);
+        AddSub("Limão", "Vinagre de Maçã", "Alternativa ácida para temperos.", 0.5m, "Adicionar aos poucos para não sobre-acidificar.", 0.7);
+        AddSub("Mel", "Xarope de Agave", "Alternativa de adoçante líquido.", 1m, "Sabor mais neutro; bom para iogurte e panquecas.", 0.7);
+        AddSub("Mel", "Açúcar", "Alternativa para adoçar.", 0.8m, "Pode necessitar de um pouco de líquido extra na receita.", 0.55);
+
+        // Vegetais / aromáticos
+        AddSub("Cenoura", "Abóbora", "Alternativa em sopas, purés e assados.", 1m, "Sabor mais doce; ajustar temperos.", 0.65);
+        AddSub("Cebola", "Alho Francês", "Alternativa mais suave para refogados.", 1m, "Cortar fino e cozinhar até ficar macio.", 0.75);
+        AddSub("Alho", "Cebola", "Alternativa aromática (perfil diferente).");
+        AddSub("Tomate", "Pimento Vermelho", "Alternativa em saladas e assados.", 1m, "Menos acidez; pode adicionar vinagre/limão.", 0.55);
+        AddSub("Alface", "Rúcula", "Alternativa de folhas para saladas.", 1m, "Sabor mais intenso.", 0.7);
+        AddSub("Couve", "Espinafres", "Alternativa de folhas verdes para sopas e salteados.", 1m, "Cozedura mais rápida.", 0.75);
+        AddSub("Coentros", "Salsa", "Alternativa de erva aromática.", 1m, "Ajustar quantidade ao gosto.", 0.8);
+        AddSub("Cogumelos", "Beringela", "Alternativa de textura em pratos com molho.", 1m, "Assar ou saltear para reduzir água.", 0.55);
+        AddSub("Azeitonas", "Alcaparras", "Alternativa salgada para saladas e molhos.", 0.5m, "São mais intensas; usar menos.", 0.65);
+        AddSub("Azeite", "Óleo de Girassol", "Alternativa de gordura para cozinhar.", 1m, "Sabor mais neutro; melhor em altas temperaturas.", 0.65);
+        AddSub("Molho de Soja", "Tamari", "Alternativa de tempero tipo shoyu.", 1m, "Boa opção quando se quer um perfil semelhante; verificar rótulo para 'sem glúten'.", 0.8);
+        AddSub("Molho de Soja", "Aminos de Coco", "Alternativa ao shoyu sem soja.", 1m, "Geralmente mais doce e menos salgado; ajustar quantidade.", 0.7);
+        AddSub("Tamari", "Molho de Soja", "Alternativa equivalente para temperar.", 1m, "Sabor próximo; pode ser mais intenso.", 0.75);
+        AddSub("Mostarda", "Vinagre de Maçã", "Alternativa ácida para molhos e temperos.", 0.5m, "Adicionar aos poucos e ajustar com especiarias.", 0.5);
+
+        // Grãos / farináceos
+        AddSub("Arroz", "Quinoa", "Alternativa sem glúten e rica em proteína.", 1m, "Lavar antes de cozinhar para reduzir amargor.", 0.7);
+        AddSub("Cuscuz", "Arroz", "Alternativa de acompanhamento (sem glúten quando o cuscuz é de trigo).");
+        AddSub("Cuscuz", "Quinoa", "Alternativa sem glúten para acompanhamento.", 1m, "Boa em saladas frias e bowls.", 0.65);
+        AddSub("Cevada", "Arroz", "Alternativa de cereal em sopas/acompanhamentos (sem glúten).");
+        AddSub("Batata", "Batata Doce", "Alternativa de hidrato complexo.", 1m, "Mais doce; boa assada.", 0.75);
+        AddSub("Batata Doce", "Batata", "Alternativa de tubérculo.", 1m, "Menos doce; ajustar temperos.", 0.7);
+        AddSub("Batata Palha", "Batata", "Alternativa menos processada.", 1m, "Assar/cortar em palitos como substituição.", 0.5);
+        AddSub("Aveia", "Granola", "Alternativa para pequeno-almoço.", 1m, "Verificar açúcares adicionados.", 0.6);
+        AddSub("Feijão", "Lentilhas", "Alternativa de leguminosa.", 1m, "Cozinham mais rápido.", 0.75);
+        AddSub("Tofu", "Grão-de-bico", "Alternativa proteica vegetal.", 1m, "Bom em saladas, caril e húmus.", 0.55);
+        AddSub("Pão", "Pão Sem Glúten", "Alternativa para intolerância ao glúten.", 1m, "Sabor/textura podem variar.", 0.8);
+        AddSub("Pão Sem Glúten", "Tortilha de Milho", "Alternativa sem glúten para sanduíches/wraps.", 1m, "Aquecer ligeiramente para maior flexibilidade.", 0.75);
+        AddSub("Trigo", "Arroz", "Alternativa de grão sem glúten.", 1m, "Perfil nutricional diferente.", 0.5);
+        AddSub("Farinha de Trigo", "Farinha de Arroz", "Alternativa para receitas sem glúten.", 1m, "Pode precisar de ajuste de líquidos.", 0.7);
+        AddSub("Farinha de Arroz", "Farinha de Milho", "Alternativa sem glúten para panificação.", 1m, "Textura mais granulada; pode misturar com outras farinhas.", 0.6);
+        AddSub("Massa de Lasanha", "Massa Integral", "Alternativa mais rica em fibra.", 1m, "Ajustar tempo de cozedura.", 0.7);
+        AddSub("Esparguete", "Esparguete Integral", "Alternativa com mais fibra.", 1m, "Ajustar tempo de cozedura.", 0.75);
+        AddSub("Esparguete", "Massa Integral", "Alternativa de massa com mais fibra.");
+        AddSub("Seitan", "Tofu", "Alternativa proteica vegetal (sem glúten).", 1m, "Textura diferente; marinar ajuda.", 0.55);
+        AddSub("Seitan", "Grão-de-bico", "Alternativa proteica vegetal sem glúten.", 1m, "Bom em caris e salteados.", 0.5);
+        AddSub("Tempeh", "Tofu", "Alternativa vegetal à base de soja.", 1m, "Textura mais macia.", 0.65);
+
+        // Açúcares / adoçantes
+        AddSub("Açúcar", "Adoçante (Stevia)", "Alternativa com baixo teor calórico.", 0.2m, "Ajustar ao paladar e à receita.", 0.55);
+        AddSub("Adoçante (Stevia)", "Xilitol", "Alternativa para confeitaria.", 1m, "Pode alterar textura; começar com pequenas quantidades.", 0.6);
+
+        // Laticínios e alternativas
+        AddSub("Leite", "Leite de Amêndoa", "Alternativa sem lactose.", 1m, "Boa para bebidas, cereais e algumas receitas.", 0.75);
+        AddSub("Leite", "Bebida de Soja", "Alternativa vegetal.", 1m, "Boa para molhos e smoothies.", 0.7);
+        AddSub("Leite de Amêndoa", "Bebida de Soja", "Alternativa vegetal.", 1m, "Escolher versão sem açúcar para receitas.", 0.7);
+        AddSub("Bebida de Soja", "Leite de Amêndoa", "Alternativa vegetal.", 1m, "Sabor ligeiramente diferente.", 0.7);
+        AddSub("Iogurte Sem Lactose", "Iogurte de Soja", "Alternativa vegetal ao iogurte.", 1m, "Boa em molhos frios e pequenos-almoços.", 0.7);
+        AddSub("Queijo", "Queijo Parmesão", "Alternativa de queijo em finalização.", 0.5m, "Mais intenso; usar menos.", 0.6);
+        AddSub("Queijo Parmesão", "Queijo", "Alternativa de queijo mais suave.", 1m, "Ajustar a quantidade ao gosto.", 0.6);
+        AddSub("Manteiga", "Azeite", "Alternativa sem lactose para cozinhar.", 0.75m, "Usar menos quantidade e ajustar ao gosto.", 0.6);
+        AddSub("Manteiga", "Margarina Vegetal", "Alternativa vegetal.", 1m, "Boa para barrar e algumas receitas.", 0.65);
+        AddSub("Margarina Vegetal", "Azeite", "Alternativa de gordura.", 0.75m, "Boa para cozinhar; não serve para barrar.", 0.55);
+        AddSub("Leite Condensado", "Leite Condensado Sem Lactose", "Alternativa para intolerância à lactose.", 1m, "Perfil semelhante para sobremesas.", 0.85);
+        AddSub("Leite Condensado Sem Lactose", "Leite Condensado", "Alternativa equivalente.", 1m, "Usar conforme disponibilidade.", 0.85);
+
+        // Proteínas / carnes e peixe
+        AddSub("Frango", "Peru", "Alternativa de carne magra.", 1m, "Boa em grelhados e assados.", 0.75);
+        AddSub("Frango", "Tofu", "Alternativa proteica vegetal.", 1m, "Ideal em salteados e pratos com molho.", 0.55);
+        AddSub("Ovo", "Tofu", "Alternativa em mexidos/omelete vegana.", 1m, "Temperar com cúrcuma e sal para cor/sabor.", 0.45);
+        AddSub("Salmão", "Bacalhau", "Alternativa de peixe.", 1m, "Ajustar gordura/temperos.", 0.6);
+        AddSub("Bacalhau", "Salmão", "Alternativa de peixe.", 1m, "Sabor mais gordo; ajustar azeite.", 0.6);
+        AddSub("Camarão", "Lula", "Alternativa de marisco.", 1m, "Tempo de cozedura diferente.", 0.55);
+        AddSub("Polvo", "Lula", "Alternativa de molusco.", 1m, "Cozedura mais rápida.", 0.6);
+        AddSub("Chouriço", "Bacon", "Alternativa em pratos tradicionais.", 1m, "Mais gorduroso; reduzir quantidade.", 0.6);
+        AddSub("Bacon", "Chouriço", "Alternativa em feijoadas e sopas.", 1m, "Mais especiado.", 0.6);
+        AddSub("Chouriço", "Peito de Peru", "Alternativa mais magra.", 1m, "Menos fumo/especiarias; ajustar tempero.", 0.45);
+        AddSub("Bacon", "Peito de Peru", "Alternativa mais magra.", 1m, "Adicionar um pouco de azeite para suculência.", 0.45);
+
+        // Oleaginosas
+        AddSub("Amendoim", "Amêndoa", "Alternativa de oleaginosa.", 1m, "Risco de alergia cruzada em algumas pessoas.", 0.7);
+        AddSub("Amêndoa", "Amendoim", "Alternativa de oleaginosa.", 1m, "Risco de alergia cruzada em algumas pessoas.", 0.7);
+
+        AddSub("Amendoim", "Sementes de Girassol", "Alternativa quando se evita amendoim.", 1m, "Boa em saladas e snacks.", 0.65);
+        AddSub("Amendoim", "Sementes de Abóbora", "Alternativa quando se evita amendoim.", 1m, "Boa em saladas e granolas.", 0.65);
+        AddSub("Amêndoa", "Sementes de Girassol", "Alternativa a oleaginosas.", 1m, "Boa em snacks e saladas.", 0.6);
+        AddSub("Amêndoa", "Sementes de Abóbora", "Alternativa a oleaginosas.", 1m, "Boa em snacks e saladas.", 0.6);
+
+        // Mais alternativas úteis
+        AddSub("Salmão", "Atum", "Alternativa de peixe.", 1m, "Boa em saladas, sanduíches e pratos simples.", 0.7);
+        AddSub("Bacalhau", "Atum", "Alternativa de peixe.", 1m, "Perfil diferente; ajustar sal/temperos.", 0.55);
+        AddSub("Carne de Vaca (Magra)", "Frango", "Alternativa de proteína.", 1m, "Mais leve; ajustar tempo de cozedura.", 0.6);
+        AddSub("Carne de Vaca (Magra)", "Peru", "Alternativa de proteína magra.", 1m, null, 0.6);
+
+        AddSub("Maçã", "Pêra", "Alternativa de fruta para lanches e sobremesas.", 1m, null, 0.75);
+        AddSub("Pêra", "Maçã", "Alternativa de fruta para lanches.", 1m, null, 0.75);
+        AddSub("Banana", "Morangos", "Alternativa de fruta para batidos e iogurtes.", 1m, "Mais ácido; pode adoçar.", 0.55);
+        AddSub("Morangos", "Banana", "Alternativa de fruta mais doce.", 1m, null, 0.55);
+        AddSub("Manga", "Banana", "Alternativa de fruta tropical.", 1m, null, 0.6);
+        AddSub("Banana", "Manga", "Alternativa de fruta tropical.", 1m, null, 0.6);
+
+        AddSub("Leite", "Bebida de Aveia", "Alternativa vegetal ao leite.", 1m, "Boa para café e cereais.", 0.7);
+        AddSub("Leite", "Bebida de Arroz", "Alternativa vegetal ao leite.", 1m, "Sabor suave; bom para bebidas.", 0.65);
+        AddSub("Iogurte Sem Lactose", "Iogurte Natural", "Alternativa quando não há versão sem lactose.", 1m, "Apenas se não houver restrição à lactose.", 0.5);
+        AddSub("Iogurte Natural", "Iogurte Sem Lactose", "Alternativa para intolerância à lactose.", 1m, null, 0.7);
+        AddSub("Queijo", "Queijo Vegan", "Alternativa para dietas sem lactose/veganas.", 1m, "Verificar ingredientes em caso de alergia a castanhas.", 0.55);
+        AddSub("Queijo Vegan", "Tofu", "Alternativa proteica vegetal.", 1m, "Textura diferente; ajustar temperos.", 0.45);
+
+        // --- Garantia: cada alimento tem pelo menos 5 substitutos ---
+        var alimentosOrdenados = alimentos
+            .OrderBy(a => a.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var candidatosPorCategoria = alimentosOrdenados
+            .GroupBy(a => a.CategoriaAlimentoId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        int GetCount(int alimentoId) => counts.TryGetValue(alimentoId, out var c) ? c : 0;
+
+        foreach (var alimento in alimentosOrdenados)
+        {
+            var originalId = alimento.AlimentoId;
+
+            // Primeiro tenta preencher com candidatos da mesma categoria e compatíveis
+            while (GetCount(originalId) < 5)
+            {
+                var candidatosCategoria = candidatosPorCategoria.TryGetValue(alimento.CategoriaAlimentoId, out var list)
+                    ? list
+                    : alimentosOrdenados;
+
+                Alimento? candidato = candidatosCategoria.FirstOrDefault(c =>
+                    c.AlimentoId != originalId &&
+                    !pairsTotal.Contains((originalId, c.AlimentoId)) &&
+                    IsCompatível(originalId, c.AlimentoId));
+
+                // Depois tenta qualquer categoria, ainda compatível
+                candidato ??= alimentosOrdenados.FirstOrDefault(c =>
+                    c.AlimentoId != originalId &&
+                    !pairsTotal.Contains((originalId, c.AlimentoId)) &&
+                    IsCompatível(originalId, c.AlimentoId));
+
+                // Por fim, fallback absoluto para garantir contagem (pode não ser compatível)
+                candidato ??= alimentosOrdenados.FirstOrDefault(c =>
+                    c.AlimentoId != originalId &&
+                    !pairsTotal.Contains((originalId, c.AlimentoId)));
+
+                if (candidato == null)
+                    break;
+
+                var motivo = candidato.CategoriaAlimentoId == alimento.CategoriaAlimentoId
+                    ? "Alternativa na mesma categoria."
+                    : "Alternativa com perfil semelhante (genérico).";
+
+                var obs = IsCompatível(originalId, candidato.AlimentoId)
+                    ? "Escolhido para evitar alergias/restrições quando possível."
+                    : "Fallback para atingir o mínimo de substitutos; pode não ser adequado a todas as restrições.";
+
+                AddSubById(originalId, candidato.AlimentoId, motivo, 1m, obs, IsCompatível(originalId, candidato.AlimentoId) ? 0.45 : 0.25);
+            }
+        }
+
+        if (novos.Count == 0)
+        {
+            return;
+        }
+
+        context.AlimentoSubstitutos.AddRange(novos);
         context.SaveChanges();
     }
 
     private static void PopulateComponentesReceita(HealthWellbeingDbContext context)
     {
-        if (context.ComponenteReceita.Any())
-        {
-            return;
-        }
-
-        var receitas = context.Receita.ToList();
+        var receitas = context.Receita
+            .AsNoTracking()
+            .ToList();
         if (!receitas.Any())
         {
             return;
         }
 
-        var receitaIds = receitas.Select(r => r.ReceitaId).ToArray();
-        var idx = 0;
-        Func<int> nextReceitaId = () =>
+        var alimentos = context.Alimentos
+            .AsNoTracking()
+            .ToList();
+        if (!alimentos.Any())
         {
-            var id = receitaIds[idx % receitaIds.Length];
-            idx++;
-            return id;
+            return;
+        }
+
+        var receitasByNome = receitas
+            .GroupBy(r => r.Nome, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+        var alimentosByNome = alimentos
+            .GroupBy(a => a.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+        int GetReceitaId(string receitaNome)
+        {
+            if (!receitasByNome.TryGetValue(receitaNome, out var receita))
+                throw new InvalidOperationException($"Receita não encontrada para seed: '{receitaNome}'.");
+            return receita.ReceitaId;
+        }
+
+        int GetAlimentoId(string alimentoNome)
+        {
+            if (!alimentosByNome.TryGetValue(alimentoNome, out var alimento))
+                throw new InvalidOperationException($"Alimento não encontrado para seed: '{alimentoNome}'.");
+            return alimento.AlimentoId;
+        }
+
+        var receitaNomesSeed = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Salada de Frutas Tropical",
+            "Vitamina de Banana com Aveia",
+            "Omelete de Legumes",
+            "Sanduíche Natural de Frango",
+            "Sopa de Legumes Caseira",
+            "Arroz Integral com Feijão",
+            "Frango Grelhado com Ervas",
+            "Bacalhau à Brás",
+            "Batata Doce Assada",
+            "Caldo Verde",
+            "Arroz de Frango",
+            "Lasanha de Legumes",
+            "Salmão Assado com Legumes",
+            "Feijoada Completa",
+            "Risotto de Cogumelos",
+            "Empadão de Frango",
+            "Açorda de Marisco",
+            "Pudim de Leite Condensado",
+            "Polvo à Lagareiro",
         };
 
-        context.ComponenteReceita.AddRange(
-            new ComponenteReceita { AlimentoId = 1, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 100, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 2, UnidadeMedida = UnidadeMedidaEnum.Mililitro, Quantidade = 200, IsOpcional = true, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 3, UnidadeMedida = UnidadeMedidaEnum.Xicara, Quantidade = 1, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 4, UnidadeMedida = UnidadeMedidaEnum.ColherDeSopa, Quantidade = 2, IsOpcional = true, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 5, UnidadeMedida = UnidadeMedidaEnum.Unidade, Quantidade = 1, IsOpcional = false, ReceitaId = nextReceitaId() },
+        var novos = new List<ComponenteReceita>();
 
-            new ComponenteReceita { AlimentoId = 6, UnidadeMedida = UnidadeMedidaEnum.Unidade, Quantidade = 1, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 7, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 150, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 8, UnidadeMedida = UnidadeMedidaEnum.Fatia, Quantidade = 2, IsOpcional = true, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 9, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 120, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 10, UnidadeMedida = UnidadeMedidaEnum.Mililitro, Quantidade = 200, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 11, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 100, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 12, UnidadeMedida = UnidadeMedidaEnum.ColherDeSopa, Quantidade = 3, IsOpcional = true, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 13, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 50, IsOpcional = true, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 14, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 120, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 15, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 150, IsOpcional = false, ReceitaId = nextReceitaId() },
+        void Add(string receitaNome, string alimentoNome, UnidadeMedidaEnum unidade, int quantidade, bool opcional = false)
+        {
+            if (!receitaNomesSeed.Contains(receitaNome))
+                return;
 
-            new ComponenteReceita { AlimentoId = 6, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 80, IsOpcional = true, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 11, UnidadeMedida = UnidadeMedidaEnum.Xicara, Quantidade = 1, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 7, UnidadeMedida = UnidadeMedidaEnum.Unidade, Quantidade = 1, IsOpcional = true, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 10, UnidadeMedida = UnidadeMedidaEnum.ColherDeSopa, Quantidade = 4, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 12, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 40, IsOpcional = true, ReceitaId = nextReceitaId() }
-        );
+            novos.Add(new ComponenteReceita
+            {
+                ReceitaId = GetReceitaId(receitaNome),
+                AlimentoId = GetAlimentoId(alimentoNome),
+                UnidadeMedida = unidade,
+                Quantidade = quantidade,
+                IsOpcional = opcional
+            });
+        }
 
+        // Salada de Frutas Tropical
+        Add("Salada de Frutas Tropical", "Maçã", UnidadeMedidaEnum.Grama, 150);
+        Add("Salada de Frutas Tropical", "Banana", UnidadeMedidaEnum.Unidade, 1);
+        Add("Salada de Frutas Tropical", "Laranja", UnidadeMedidaEnum.Unidade, 1, opcional: true);
+        Add("Salada de Frutas Tropical", "Mel", UnidadeMedidaEnum.ColherDeSopa, 1, opcional: true);
+
+        // Vitamina de Banana com Aveia
+        Add("Vitamina de Banana com Aveia", "Banana", UnidadeMedidaEnum.Unidade, 1);
+        Add("Vitamina de Banana com Aveia", "Leite", UnidadeMedidaEnum.Mililitro, 250);
+        Add("Vitamina de Banana com Aveia", "Aveia", UnidadeMedidaEnum.ColherDeSopa, 3);
+        Add("Vitamina de Banana com Aveia", "Mel", UnidadeMedidaEnum.ColherDeSopa, 1, opcional: true);
+
+        // Omelete de Legumes
+        Add("Omelete de Legumes", "Ovo", UnidadeMedidaEnum.Unidade, 2);
+        Add("Omelete de Legumes", "Cenoura", UnidadeMedidaEnum.Grama, 50);
+        Add("Omelete de Legumes", "Cebola", UnidadeMedidaEnum.Grama, 30, opcional: true);
+        Add("Omelete de Legumes", "Azeite", UnidadeMedidaEnum.ColherDeCha, 1, opcional: true);
+
+        // Sanduíche Natural de Frango
+        Add("Sanduíche Natural de Frango", "Frango", UnidadeMedidaEnum.Grama, 120);
+        Add("Sanduíche Natural de Frango", "Pão", UnidadeMedidaEnum.Fatia, 2);
+        Add("Sanduíche Natural de Frango", "Alface", UnidadeMedidaEnum.Grama, 30, opcional: true);
+        Add("Sanduíche Natural de Frango", "Tomate", UnidadeMedidaEnum.Grama, 60, opcional: true);
+
+        // Sopa de Legumes Caseira
+        Add("Sopa de Legumes Caseira", "Batata", UnidadeMedidaEnum.Grama, 200);
+        Add("Sopa de Legumes Caseira", "Cenoura", UnidadeMedidaEnum.Grama, 100);
+        Add("Sopa de Legumes Caseira", "Cebola", UnidadeMedidaEnum.Grama, 60);
+        Add("Sopa de Legumes Caseira", "Alho", UnidadeMedidaEnum.Unidade, 2, opcional: true);
+        Add("Sopa de Legumes Caseira", "Azeite", UnidadeMedidaEnum.ColherDeSopa, 1, opcional: true);
+
+        // Arroz Integral com Feijão
+        Add("Arroz Integral com Feijão", "Arroz", UnidadeMedidaEnum.Xicara, 1);
+        Add("Arroz Integral com Feijão", "Feijão", UnidadeMedidaEnum.Xicara, 1);
+        Add("Arroz Integral com Feijão", "Cebola", UnidadeMedidaEnum.Grama, 50, opcional: true);
+        Add("Arroz Integral com Feijão", "Alho", UnidadeMedidaEnum.Unidade, 2, opcional: true);
+
+        // Frango Grelhado com Ervas
+        Add("Frango Grelhado com Ervas", "Frango", UnidadeMedidaEnum.Grama, 200);
+        Add("Frango Grelhado com Ervas", "Alho", UnidadeMedidaEnum.Unidade, 2, opcional: true);
+        Add("Frango Grelhado com Ervas", "Azeite", UnidadeMedidaEnum.ColherDeSopa, 1, opcional: true);
+        Add("Frango Grelhado com Ervas", "Limão", UnidadeMedidaEnum.Unidade, 1, opcional: true);
+
+        // Bacalhau à Brás
+        Add("Bacalhau à Brás", "Bacalhau", UnidadeMedidaEnum.Grama, 300);
+        Add("Bacalhau à Brás", "Batata Palha", UnidadeMedidaEnum.Grama, 200);
+        Add("Bacalhau à Brás", "Ovo", UnidadeMedidaEnum.Unidade, 4);
+        Add("Bacalhau à Brás", "Cebola", UnidadeMedidaEnum.Grama, 120);
+        Add("Bacalhau à Brás", "Alho", UnidadeMedidaEnum.Unidade, 2, opcional: true);
+        Add("Bacalhau à Brás", "Azeitonas", UnidadeMedidaEnum.Grama, 30, opcional: true);
+        Add("Bacalhau à Brás", "Azeite", UnidadeMedidaEnum.ColherDeSopa, 2, opcional: true);
+
+        // Batata Doce Assada
+        Add("Batata Doce Assada", "Batata Doce", UnidadeMedidaEnum.Grama, 300);
+        Add("Batata Doce Assada", "Azeite", UnidadeMedidaEnum.ColherDeSopa, 1, opcional: true);
+
+        // Caldo Verde
+        Add("Caldo Verde", "Batata", UnidadeMedidaEnum.Grama, 400);
+        Add("Caldo Verde", "Couve", UnidadeMedidaEnum.Grama, 200);
+        Add("Caldo Verde", "Chouriço", UnidadeMedidaEnum.Grama, 80, opcional: true);
+        Add("Caldo Verde", "Azeite", UnidadeMedidaEnum.ColherDeSopa, 1, opcional: true);
+
+        // Arroz de Frango
+        Add("Arroz de Frango", "Arroz", UnidadeMedidaEnum.Xicara, 2);
+        Add("Arroz de Frango", "Frango", UnidadeMedidaEnum.Grama, 300);
+        Add("Arroz de Frango", "Tomate", UnidadeMedidaEnum.Grama, 200, opcional: true);
+        Add("Arroz de Frango", "Cebola", UnidadeMedidaEnum.Grama, 100, opcional: true);
+        Add("Arroz de Frango", "Alho", UnidadeMedidaEnum.Unidade, 2, opcional: true);
+
+        // Lasanha de Legumes
+        Add("Lasanha de Legumes", "Massa de Lasanha", UnidadeMedidaEnum.Grama, 250);
+        Add("Lasanha de Legumes", "Tomate", UnidadeMedidaEnum.Grama, 300);
+        Add("Lasanha de Legumes", "Cenoura", UnidadeMedidaEnum.Grama, 150, opcional: true);
+        Add("Lasanha de Legumes", "Cogumelos", UnidadeMedidaEnum.Grama, 200, opcional: true);
+        Add("Lasanha de Legumes", "Queijo", UnidadeMedidaEnum.Grama, 200, opcional: true);
+
+        // Salmão Assado com Legumes
+        Add("Salmão Assado com Legumes", "Salmão", UnidadeMedidaEnum.Grama, 250);
+        Add("Salmão Assado com Legumes", "Batata", UnidadeMedidaEnum.Grama, 200, opcional: true);
+        Add("Salmão Assado com Legumes", "Cenoura", UnidadeMedidaEnum.Grama, 100, opcional: true);
+        Add("Salmão Assado com Legumes", "Limão", UnidadeMedidaEnum.Unidade, 1, opcional: true);
+        Add("Salmão Assado com Legumes", "Azeite", UnidadeMedidaEnum.ColherDeSopa, 1, opcional: true);
+
+        // Feijoada Completa
+        Add("Feijoada Completa", "Feijão", UnidadeMedidaEnum.Xicara, 2);
+        Add("Feijoada Completa", "Arroz", UnidadeMedidaEnum.Xicara, 2, opcional: true);
+        Add("Feijoada Completa", "Bacon", UnidadeMedidaEnum.Grama, 150, opcional: true);
+        Add("Feijoada Completa", "Chouriço", UnidadeMedidaEnum.Grama, 200, opcional: true);
+        Add("Feijoada Completa", "Couve", UnidadeMedidaEnum.Grama, 200, opcional: true);
+        Add("Feijoada Completa", "Laranja", UnidadeMedidaEnum.Unidade, 1, opcional: true);
+
+        // Risotto de Cogumelos
+        Add("Risotto de Cogumelos", "Arroz", UnidadeMedidaEnum.Xicara, 2);
+        Add("Risotto de Cogumelos", "Cogumelos", UnidadeMedidaEnum.Grama, 300);
+        Add("Risotto de Cogumelos", "Cebola", UnidadeMedidaEnum.Grama, 80, opcional: true);
+        Add("Risotto de Cogumelos", "Manteiga", UnidadeMedidaEnum.Grama, 30, opcional: true);
+        Add("Risotto de Cogumelos", "Queijo Parmesão", UnidadeMedidaEnum.Grama, 50, opcional: true);
+
+        // Empadão de Frango
+        Add("Empadão de Frango", "Frango", UnidadeMedidaEnum.Grama, 300);
+        Add("Empadão de Frango", "Farinha de Trigo", UnidadeMedidaEnum.Grama, 300);
+        Add("Empadão de Frango", "Manteiga", UnidadeMedidaEnum.Grama, 150, opcional: true);
+        Add("Empadão de Frango", "Ovo", UnidadeMedidaEnum.Unidade, 2);
+        Add("Empadão de Frango", "Azeitonas", UnidadeMedidaEnum.Grama, 50, opcional: true);
+
+        // Açorda de Marisco
+        Add("Açorda de Marisco", "Pão", UnidadeMedidaEnum.Grama, 200);
+        Add("Açorda de Marisco", "Camarão", UnidadeMedidaEnum.Grama, 300);
+        Add("Açorda de Marisco", "Alho", UnidadeMedidaEnum.Unidade, 2, opcional: true);
+        Add("Açorda de Marisco", "Coentros", UnidadeMedidaEnum.Grama, 10, opcional: true);
+        Add("Açorda de Marisco", "Azeite", UnidadeMedidaEnum.ColherDeSopa, 2, opcional: true);
+        Add("Açorda de Marisco", "Ovo", UnidadeMedidaEnum.Unidade, 2, opcional: true);
+
+        // Pudim de Leite Condensado
+        Add("Pudim de Leite Condensado", "Leite Condensado", UnidadeMedidaEnum.Grama, 395);
+        Add("Pudim de Leite Condensado", "Leite", UnidadeMedidaEnum.Mililitro, 500);
+        Add("Pudim de Leite Condensado", "Ovo", UnidadeMedidaEnum.Unidade, 4);
+        Add("Pudim de Leite Condensado", "Açúcar", UnidadeMedidaEnum.Grama, 120, opcional: true);
+
+        // Polvo à Lagareiro
+        Add("Polvo à Lagareiro", "Polvo", UnidadeMedidaEnum.Grama, 800);
+        Add("Polvo à Lagareiro", "Batata", UnidadeMedidaEnum.Grama, 500);
+        Add("Polvo à Lagareiro", "Alho", UnidadeMedidaEnum.Unidade, 4, opcional: true);
+        Add("Polvo à Lagareiro", "Azeite", UnidadeMedidaEnum.ColherDeSopa, 4, opcional: true);
+
+        if (novos.Count == 0)
+        {
+            return;
+        }
+
+        var receitaIdsSeed = novos
+            .Select(c => c.ReceitaId)
+            .ToHashSet();
+
+        var existentes = context.ComponenteReceita
+            .Where(c => receitaIdsSeed.Contains(c.ReceitaId))
+            .ToList();
+
+        var desiredSet = novos
+            .Select(c => (c.ReceitaId, c.AlimentoId, c.UnidadeMedida, c.Quantidade, c.IsOpcional))
+            .ToHashSet();
+
+        var existingSet = existentes
+            .Select(c => (c.ReceitaId, c.AlimentoId, c.UnidadeMedida, c.Quantidade, c.IsOpcional))
+            .ToHashSet();
+
+        if (existingSet.SetEquals(desiredSet))
+        {
+            return;
+        }
+
+        if (existentes.Count > 0)
+        {
+            context.ComponenteReceita.RemoveRange(existentes);
+        }
+
+        context.ComponenteReceita.AddRange(novos);
         context.SaveChanges();
     }
 
     private static void PopulateReceitas(HealthWellbeingDbContext context)
     {
-        if (context.Receita.Any())
+        var receitasSeed = new List<Receita>
         {
-            return;
-        }
-
-        context.Receita.AddRange(
             // Receitas Rápidas (5-15 minutos)
             new Receita
             {
@@ -895,8 +1980,22 @@ internal class SeedData
                 HidratosCarbono = 25,
                 Gorduras = 14
             }
-        );
+        };
 
+        var existentes = new HashSet<string>(
+            context.Receita.Select(r => r.Nome),
+            StringComparer.OrdinalIgnoreCase);
+
+        var paraAdicionar = receitasSeed
+            .Where(r => !existentes.Contains(r.Nome))
+            .ToList();
+
+        if (paraAdicionar.Count == 0)
+        {
+            return;
+        }
+
+        context.Receita.AddRange(paraAdicionar);
         context.SaveChanges();
     }
 
@@ -1955,13 +3054,10 @@ internal class SeedData
         dbContext.SaveChanges();
     }
 
-    private static List<Client> PopulateClients(HealthWellbeingDbContext dbContext)
+    private static List<Client>? PopulateClients(HealthWellbeingDbContext dbContext)
     {
-        // Verifica se já existem clientes para não duplicar
-        if (dbContext.Client.Any())
-        {
-            return dbContext.Client.ToList();
-        }
+        if (dbContext.Client.Any()) return null;
+
 
         // Lista com 25 clientes
         var clients = new List<Client>()
@@ -2253,25 +3349,235 @@ internal class SeedData
         return clients;
     }
 
-    private static void PopulateMember(HealthWellbeingDbContext dbContext, List<Client> clients)
+    private static void PopulateMetas(HealthWellbeingDbContext dbContext)
     {
-        if (dbContext.Member.Any()) return;
-
-        var clientNamesToMakeMembers = new List<string> { "Alice Wonderland", "Charlie Brown", "David Copperfield" };
-
-        var members = clients
-            .Where(c => clientNamesToMakeMembers.Contains(c.Name))
-            .Select(c => new Member
-            {
-                ClientId = c.ClientId,
-            })
+        var clients = dbContext.Client
+            .AsNoTracking()
+            .OrderBy(c => c.Email)
             .ToList();
 
-        if (members.Any())
+        if (clients.Count == 0) return;
+
+        var existingClientIds = new HashSet<string>(
+            dbContext.Meta.AsNoTracking().Select(m => m.ClientId));
+
+        var templates = new (string desc, int kcal, int protein, int fat, int carbs, int vitamins)[]
         {
-            dbContext.Member.AddRange(members);
-            dbContext.SaveChanges();
+            ("Perda de peso (défice calórico)", 1800, 140, 60, 160, 100),
+            ("Manutenção (equilibrado)", 2200, 130, 70, 230, 110),
+            ("Ganho de massa (superávit)", 2800, 170, 80, 320, 120),
+            ("Baixo carboidrato (low-carb)", 2000, 160, 90, 100, 100),
+            ("Vegetariano (equilibrado)", 2100, 120, 70, 250, 120),
+            ("Performance / resistência", 2600, 150, 75, 330, 130),
+        };
+
+        var metasToAdd = new List<Meta>();
+
+        for (var i = 0; i < clients.Count; i++)
+        {
+            var client = clients[i];
+            if (existingClientIds.Contains(client.ClientId))
+                continue;
+
+            // Leave some clients without any goal/meta.
+            if (i % 5 == 0)
+                continue;
+
+            var t = templates[i % templates.Length];
+
+            metasToAdd.Add(new Meta
+            {
+                ClientId = client.ClientId,
+                MetaDescription = t.desc,
+                DailyCalories = t.kcal,
+                DailyProtein = t.protein,
+                DailyFat = t.fat,
+                DailyHydrates = t.carbs,
+                DailyVitamins = t.vitamins,
+            });
         }
+
+        if (metasToAdd.Count == 0) return;
+
+        dbContext.Meta.AddRange(metasToAdd);
+        dbContext.SaveChanges();
+    }
+
+    private static void PopulatePlanosAlimentares(HealthWellbeingDbContext dbContext)
+    {
+        var clients = dbContext.Client
+            .AsNoTracking()
+            .OrderBy(c => c.Email)
+            .ToList();
+
+        if (clients.Count == 0) return;
+
+        var metasByClientId = dbContext.Meta
+            .AsNoTracking()
+            .GroupBy(m => m.ClientId)
+            .ToDictionary(g => g.Key, g => g.OrderBy(m => m.MetaId).First());
+
+        if (metasByClientId.Count == 0) return;
+
+        var existingPlansClientIds = new HashSet<string>(
+            dbContext.PlanoAlimentar.AsNoTracking().Select(p => p.ClientId));
+
+        var toAdd = new List<PlanoAlimentar>();
+
+        for (var i = 0; i < clients.Count; i++)
+        {
+            var client = clients[i];
+            if (!metasByClientId.TryGetValue(client.ClientId, out var meta))
+                continue;
+
+            if (existingPlansClientIds.Contains(client.ClientId))
+                continue;
+
+            // Not every client needs a food plan.
+            if (i % 3 == 0)
+                continue;
+
+            toAdd.Add(new PlanoAlimentar
+            {
+                ClientId = client.ClientId,
+                MetaId = meta.MetaId
+            });
+        }
+
+        if (toAdd.Count == 0) return;
+
+        dbContext.PlanoAlimentar.AddRange(toAdd);
+        dbContext.SaveChanges();
+    }
+
+    private static void PopulateClientAlergias(HealthWellbeingDbContext dbContext)
+    {
+        var clients = dbContext.Client.AsNoTracking().OrderBy(c => c.Email).ToList();
+        var alergias = dbContext.Alergia.AsNoTracking().OrderBy(a => a.AlergiaId).ToList();
+
+        if (clients.Count == 0 || alergias.Count == 0) return;
+
+        var existing = new HashSet<(string clientId, int alergiaId)>(
+            dbContext.ClientAlergia.AsNoTracking().Select(ca => new ValueTuple<string, int>(ca.ClientId, ca.AlergiaId)));
+
+        var toAdd = new List<ClientAlergia>();
+
+        for (var i = 0; i < clients.Count; i++)
+        {
+            var client = clients[i];
+
+            // Some clients have no allergies.
+            if (i % 4 == 0)
+                continue;
+
+            var a1 = alergias[i % alergias.Count].AlergiaId;
+            if (!existing.Contains((client.ClientId, a1)))
+            {
+                toAdd.Add(new ClientAlergia { ClientId = client.ClientId, AlergiaId = a1 });
+                existing.Add((client.ClientId, a1));
+            }
+
+            // A few clients have 2 allergies.
+            if (i % 9 == 0)
+            {
+                var a2 = alergias[(i + 3) % alergias.Count].AlergiaId;
+                if (a2 != a1 && !existing.Contains((client.ClientId, a2)))
+                {
+                    toAdd.Add(new ClientAlergia { ClientId = client.ClientId, AlergiaId = a2 });
+                    existing.Add((client.ClientId, a2));
+                }
+            }
+        }
+
+        if (toAdd.Count == 0) return;
+        dbContext.ClientAlergia.AddRange(toAdd);
+        dbContext.SaveChanges();
+    }
+
+    private static void PopulateClientRestricoes(HealthWellbeingDbContext dbContext)
+    {
+        var clients = dbContext.Client.AsNoTracking().OrderBy(c => c.Email).ToList();
+        var restricoes = dbContext.RestricaoAlimentar.AsNoTracking().OrderBy(r => r.RestricaoAlimentarId).ToList();
+
+        if (clients.Count == 0 || restricoes.Count == 0) return;
+
+        var existing = new HashSet<(string clientId, int restricaoId)>(
+            dbContext.ClientRestricao.AsNoTracking().Select(cr => new ValueTuple<string, int>(cr.ClientId, cr.RestricaoAlimentarId)));
+
+        var toAdd = new List<ClientRestricao>();
+
+        for (var i = 0; i < clients.Count; i++)
+        {
+            var client = clients[i];
+
+            // Some clients have no restrictions.
+            if (i % 5 == 0)
+                continue;
+
+            var r1 = restricoes[i % restricoes.Count].RestricaoAlimentarId;
+            if (!existing.Contains((client.ClientId, r1)))
+            {
+                toAdd.Add(new ClientRestricao { ClientId = client.ClientId, RestricaoAlimentarId = r1 });
+                existing.Add((client.ClientId, r1));
+            }
+
+            // A few clients have 2 restrictions.
+            if (i % 7 == 0)
+            {
+                var r2 = restricoes[(i + 2) % restricoes.Count].RestricaoAlimentarId;
+                if (r2 != r1 && !existing.Contains((client.ClientId, r2)))
+                {
+                    toAdd.Add(new ClientRestricao { ClientId = client.ClientId, RestricaoAlimentarId = r2 });
+                    existing.Add((client.ClientId, r2));
+                }
+            }
+        }
+
+        if (toAdd.Count == 0) return;
+        dbContext.ClientRestricao.AddRange(toAdd);
+        dbContext.SaveChanges();
+    }
+
+    private static void PopulateReceitasParaPlanosAlimentares(HealthWellbeingDbContext dbContext)
+    {
+        var planos = dbContext.PlanoAlimentar.AsNoTracking().OrderBy(p => p.PlanoAlimentarId).ToList();
+        var receitas = dbContext.Receita.AsNoTracking().OrderBy(r => r.ReceitaId).ToList();
+
+        if (planos.Count == 0 || receitas.Count == 0) return;
+
+        var existing = new HashSet<(int planoId, int receitaId)>(
+            dbContext.ReceitasParaPlanosAlimentares
+                .AsNoTracking()
+                .Select(x => new ValueTuple<int, int>(x.PlanoAlimentarId, x.ReceitaId)));
+
+        var toAdd = new List<ReceitasParaPlanosAlimentares>();
+
+        for (var i = 0; i < planos.Count; i++)
+        {
+            var plano = planos[i];
+            var start = (plano.PlanoAlimentarId * 3) % receitas.Count;
+            var count = 4 + (i % 4); // 4..7 recipes per plan
+
+            for (var j = 0; j < count; j++)
+            {
+                var receita = receitas[(start + j) % receitas.Count];
+                var key = (plano.PlanoAlimentarId, receita.ReceitaId);
+
+                if (existing.Contains(key))
+                    continue;
+
+                toAdd.Add(new ReceitasParaPlanosAlimentares
+                {
+                    PlanoAlimentarId = plano.PlanoAlimentarId,
+                    ReceitaId = receita.ReceitaId
+                });
+                existing.Add(key);
+            }
+        }
+
+        if (toAdd.Count == 0) return;
+        dbContext.ReceitasParaPlanosAlimentares.AddRange(toAdd);
+        dbContext.SaveChanges();
     }
 
     private static void PopulateTrainingType(HealthWellbeingDbContext dbContext)

@@ -1,0 +1,123 @@
+@model HealthWellbeing.Models.MetaCorporal
+
+@{
+    ViewData["Title"] = "Editar Meta Corporal";
+}
+
+<h1>Editar Meta Corporal</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="MetaCorporalId" />
+            <input type="hidden" asp-for="CriadoEm" />
+            <input type="hidden" asp-for="CriadoPor" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>Informações do Cliente</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-group mb-3">
+                        <label asp-for="ClientId" class="control-label">Cliente</label>
+                        <select asp-for="ClientId" class="form-select" asp-items="ViewBag.ClientId">
+                            <option value="">-- Selecione um Cliente --</option>
+                        </select>
+                        <span asp-validation-for="ClientId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>Objetivos Corporais</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="PesoObjetivo" class="control-label"></label>
+                            <input asp-for="PesoObjetivo" class="form-control" placeholder="Ex: 75.5" />
+                            <span asp-validation-for="PesoObjetivo" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="GorduraCorporalObjetivo" class="control-label"></label>
+                            <input asp-for="GorduraCorporalObjetivo" class="form-control" placeholder="Ex: 18.5" />
+                            <span asp-validation-for="GorduraCorporalObjetivo" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="IMCObjetivo" class="control-label"></label>
+                            <input asp-for="IMCObjetivo" class="form-control" placeholder="Ex: 23.5" />
+                            <span asp-validation-for="IMCObjetivo" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ColesterolObjetivo" class="control-label"></label>
+                            <input asp-for="ColesterolObjetivo" class="form-control" placeholder="Ex: 180" />
+                            <span asp-validation-for="ColesterolObjetivo" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="MassaMuscularObjetivo" class="control-label"></label>
+                            <input asp-for="MassaMuscularObjetivo" class="form-control" placeholder="Ex: 35.0" />
+                            <span asp-validation-for="MassaMuscularObjetivo" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>Timeline e Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="DataInicio" class="control-label"></label>
+                            <input asp-for="DataInicio" class="form-control" type="date" />
+                            <span asp-validation-for="DataInicio" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="DataObjetivo" class="control-label"></label>
+                            <input asp-for="DataObjetivo" class="form-control" type="date" />
+                            <span asp-validation-for="DataObjetivo" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <div class="form-check">
+                                <input asp-for="Ativo" class="form-check-input" type="checkbox" />
+                                <label asp-for="Ativo" class="form-check-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>Notas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-group mb-3">
+                        <label asp-for="Notas" class="control-label"></label>
+                        <textarea asp-for="Notas" class="form-control" rows="4" placeholder="Observações sobre os objetivos..."></textarea>
+                        <span asp-validation-for="Notas" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Guardar" class="btn btn-success" />
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

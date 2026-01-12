@@ -1,0 +1,74 @@
+@model HealthWellbeing.ViewModels.MetaEditViewModel
+
+@{
+    ViewData["Title"] = "Apagar Meta";
+}
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <div>
+            <h1 class="h3 mb-1">Apagar Meta</h1>
+            <p class="text-muted mb-0">Confirme que pretende apagar esta meta.</p>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Model.ClientId))
+        {
+            <a asp-action="GerirPerfilAlimentar" asp-route-clientId="@Model.ClientId" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar ao cliente
+            </a>
+        }
+        else
+        {
+            <a asp-action="MeuPerfilAlimentar" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar ao perfil
+            </a>
+        }
+    </div>
+
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle"></i> Esta ação não pode ser desfeita.
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-4">Descrição</dt>
+                <dd class="col-sm-8">@Model.MetaDescription</dd>
+
+                <dt class="col-sm-4">Calorias</dt>
+                <dd class="col-sm-8">@Model.DailyCalories kcal</dd>
+
+                <dt class="col-sm-4">Proteína</dt>
+                <dd class="col-sm-8">@Model.DailyProtein</dd>
+
+                <dt class="col-sm-4">Gordura</dt>
+                <dd class="col-sm-8">@Model.DailyFat</dd>
+
+                <dt class="col-sm-4">Hidratos</dt>
+                <dd class="col-sm-8">@Model.DailyHydrates</dd>
+
+                <dt class="col-sm-4">Vitaminas</dt>
+                <dd class="col-sm-8">@Model.DailyVitamins</dd>
+            </dl>
+
+            <form asp-action="ApagarMetaConfirmado" method="post" class="mt-4">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="MetaId" />
+                @if (!string.IsNullOrWhiteSpace(Model.ClientId))
+                {
+                    <input type="hidden" asp-for="ClientId" />
+                }
+                <div class="d-flex justify-content-end gap-2">
+                    @if (!string.IsNullOrWhiteSpace(Model.ClientId))
+                    {
+                        <a asp-action="GerirPerfilAlimentar" asp-route-clientId="@Model.ClientId" class="btn btn-outline-secondary">Cancelar</a>
+                    }
+                    else
+                    {
+                        <a asp-action="MeuPerfilAlimentar" class="btn btn-outline-secondary">Cancelar</a>
+                    }
+                    <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Apagar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

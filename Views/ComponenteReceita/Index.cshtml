@@ -28,7 +28,10 @@
             aria-expanded="false" aria-controls="searchPanel">
             Pesquisar
         </a>
-        <a class="btn btn-primary" asp-action="Create">Novo</a>
+        @if (User.IsInRole("Nutricionista"))
+        {
+            <a class="btn btn-primary" asp-action="Create">Novo</a>
+        }
     </div>
 </div>
 
@@ -110,10 +113,13 @@
                     <div class="btn-group" role="group">
                         <a asp-action="Details" asp-route-id="@item.ComponenteReceitaId"
                             class="btn btn-sm btn-secondary ms-1">Ver</a>
-                        <a asp-action="Edit" asp-route-id="@item.ComponenteReceitaId"
-                            class="btn btn-sm btn-warning ms-1">Editar</a>
-                        <a asp-action="Delete" asp-route-id="@item.ComponenteReceitaId"
-                            class="btn btn-sm btn-danger ms-1">Apagar</a>
+                        @if (User.IsInRole("Nutricionista"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.ComponenteReceitaId"
+                                class="btn btn-sm btn-warning ms-1">Editar</a>
+                            <a asp-action="Delete" asp-route-id="@item.ComponenteReceitaId"
+                                class="btn btn-sm btn-danger ms-1">Apagar</a>
+                        }
                     </div>
             </td>
         </tr>

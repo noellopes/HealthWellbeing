@@ -1,0 +1,183 @@
+@model HealthWellbeing.ViewModels.MetaCorporalIndexViewModel
+
+@{
+    ViewData["Title"] = "Metas Corporais";
+}
+
+<h1>Metas Corporais</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- Search and Filter Form -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Pesquisar Cliente</label>
+                <input type="text" name="searchString" class="form-control" placeholder="Nome do cliente..." value="@ViewData["CurrentSearch"]" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Filtrar</label>
+                <select name="apenasAtivos" class="form-select">
+                    <option value="">Todas</option>
+                    <option value="true" selected="@(ViewData["ApenasAtivos"]?.ToString() == "True" ? "selected" : null)">Apenas Ativas</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">Filtrar</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Limpar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (User.IsInRole("Nutricionista"))
+{
+    <p>
+        <a asp-action="Create" class="btn btn-success"><i class="bi bi-plus-circle"></i> Nova Meta Corporal</a>
+    </p>
+}
+
+@if (Model.Metas.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Cliente</th>
+                    <th>Peso (kg)</th>
+                    <th>Gordura (%)</th>
+                    <th>IMC</th>
+                    <th>Colesterol</th>
+                    <th>Massa Muscular</th>
+                    <th>Data Objetivo</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Metas)
+                {
+                    <tr>
+                        <td>@item.Client?.Name</td>
+                        <td>@(item.PesoObjetivo?.ToString("F1") ?? "-")</td>
+                        <td>@(item.GorduraCorporalObjetivo?.ToString("F1") ?? "-")</td>
+                        <td>@(item.IMCObjetivo?.ToString("F1") ?? "-")</td>
+                        <td>@(item.ColesterolObjetivo?.ToString("F0") ?? "-")</td>
+                        <td>@(item.MassaMuscularObjetivo?.ToString("F1") ?? "-")</td>
+                        <td>@(item.DataObjetivo?.ToShortDateString() ?? "-")</td>
+                        <td>
+                            @if (item.Ativo)
+                            {
+                                <span class="badge bg-success">Ativa</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inativa</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a asp-action="Details" asp-route-id="@item.MetaCorporalId" class="btn btn-info" title="Detalhes">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                @if (User.IsInRole("Nutricionista"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.MetaCorporalId" class="btn btn-primary" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.MetaCorporalId" class="btn btn-danger" title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Navegação de páginas">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <span class="text-muted">
+                    Mostrando @((Model.PageIndex - 1) * Model.PageSize + 1) a @(Math.Min(Model.PageIndex * Model.PageSize, Model.TotalCount)) de @Model.TotalCount metas
+                </span>
+            </div>
+            <ul class="pagination mb-0">
+                @if (Model.HasPreviousPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-page="1" asp-route-searchString="@ViewData["CurrentSearch"]" asp-route-apenasAtivos="@ViewData["ApenasAtivos"]">
+                            &laquo; Primeira
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-page="@(Model.PageIndex - 1)" asp-route-searchString="@ViewData["CurrentSearch"]" asp-route-apenasAtivos="@ViewData["ApenasAtivos"]">
+                            Anterior
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">&laquo; Primeira</span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">Anterior</span>
+                    </li>
+                }
+
+                @for (int i = Math.Max(1, Model.PageIndex - 2); i <= Math.Min(Model.TotalPages, Model.PageIndex + 2); i++)
+                {
+                    <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-searchString="@ViewData["CurrentSearch"]" asp-route-apenasAtivos="@ViewData["ApenasAtivos"]">@i</a>
+                    </li>
+                }
+
+                @if (Model.HasNextPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-page="@(Model.PageIndex + 1)" asp-route-searchString="@ViewData["CurrentSearch"]" asp-route-apenasAtivos="@ViewData["ApenasAtivos"]">
+                            Próxima
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages" asp-route-searchString="@ViewData["CurrentSearch"]" asp-route-apenasAtivos="@ViewData["ApenasAtivos"]">
+                            Última &raquo;
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">Próxima</span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">Última &raquo;</span>
+                    </li>
+                }
+            </ul>
+        </div>
+    </nav>
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> Nenhuma meta corporal encontrada.
+    </div>
+}
+
+<div class="mt-4">
+    <a asp-controller="ReceitasParaPlanosAlimentares" asp-action="ReceitasParaPlanosAlimentares" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar ao Menu
+    </a>
+</div>

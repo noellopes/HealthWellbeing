@@ -53,5 +53,6 @@ namespace HealthWellbeing.Models
 
         // Relação opcional com substitutos
         public ICollection<AlimentoSubstituto>? Substitutos { get; set; }
+        public ICollection<ClientRestricao>? ClientesAssociados { get; set; }
     }
 }

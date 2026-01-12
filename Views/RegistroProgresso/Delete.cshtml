@@ -1,0 +1,36 @@
+@model HealthWellbeing.Models.ProgressRecord
+
+@{
+    ViewData["Title"] = "Eliminar Registo";
+}
+
+<h1>Eliminar Registo</h1>
+
+<h3 class="text-danger">Tem a certeza que pretende eliminar este registo?</h3>
+
+<div class="card mt-3">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Cliente</dt>
+            <dd class="col-sm-9">@Model.Client?.Name</dd>
+
+            <dt class="col-sm-3">Data do Registo</dt>
+            <dd class="col-sm-9">@Model.RecordDate.ToShortDateString()</dd>
+
+            <dt class="col-sm-3">Peso</dt>
+            <dd class="col-sm-9">@(Model.Weight?.ToString("F1") ?? "-") kg</dd>
+
+            <dt class="col-sm-3">Gordura Corporal</dt>
+            <dd class="col-sm-9">@(Model.BodyFatPercentage?.ToString("F1") ?? "-") %</dd>
+
+            <dt class="col-sm-3">Notas</dt>
+            <dd class="col-sm-9">@(Model.Notes ?? "-")</dd>
+        </dl>
+    </div>
+</div>
+
+<form asp-action="Delete" class="mt-3">
+    <input type="hidden" asp-for="ProgressRecordId" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+</form>

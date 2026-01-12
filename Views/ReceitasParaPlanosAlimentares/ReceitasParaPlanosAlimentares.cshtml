@@ -1,52 +1,133 @@
 ﻿@{
     ViewData["Title"] = "Receitas Para Planos Alimentares";
+    var accessDenied = ViewData["AccessDenied"] as bool? ?? false;
 }
 
-<h1 class="text-center mt-4">Gerenciar Receitas e Dados Relacionados</h1>
+@if (accessDenied)
+{
+    <h1 class="text-center mt-4 text-danger">Acesso Negado</h1>
+    <p class="text-center">Você não tem permissão para acessar esta página.</p>
+}
+else
+{
+    <h1 class="text-center mt-4">Gerenciar Receitas e Dados Relacionados</h1>
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="row g-4 text-center">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="row g-4 text-center">
 
-                <div class="col-md-4">
-                    <a href="@Url.Action("Index", "Alergias")" class="btn btn-outline-primary w-100 p-4 shadow-sm rounded-3">
-                        <h4>Alergias</h4>
-                        <p>Gerenciar registros de alergias alimentares</p>
-                    </a>
+                    @if (User.IsInRole("Cliente"))
+                    {
+                        <div class="col-md-4">
+                            <a href="@Url.Action("MinhasReceitas", "ReceitasParaPlanosAlimentares")"
+                               class="btn btn-outline-primary w-100 p-4 shadow-sm rounded-3">
+                                <h4>As Minhas Receitas</h4>
+                                <p>Ver receitas associadas ao meu plano alimentar</p>
+                            </a>
+                        </div>
+
+                        <div class="col-md-4">
+                            <a href="@Url.Action("Calculate", "Nutrition")"
+                               class="btn btn-outline-info w-100 p-4 shadow-sm rounded-3">
+                                <h4>Minhas Necessidades Nutricionais</h4>
+                                <p>Ver calorias e macronutrientes recomendados</p>
+                            </a>
+                        </div>
+
+                        <div class="col-md-4">
+                            <a href="@Url.Action("CompareWithGoal", "Nutrition")"
+                               class="btn btn-outline-success w-100 p-4 shadow-sm rounded-3">
+                                <h4>Comparar com Minha Meta</h4>
+                                <p>Ver o quanto estou próximo dos meus objetivos</p>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-md-4">
+                            <a href="@Url.Action("Index", "Alergias")" class="btn btn-outline-primary w-100 p-4 shadow-sm rounded-3">
+                                <h4>Alergias</h4>
+                                <p>Gerenciar registros de alergias alimentares</p>
+                            </a>
+                        </div>
+
+                        <div class="col-md-4">
+                            <a href="@Url.Action("Index", "AlimentoSubstituto")" class="btn btn-outline-success w-100 p-4 shadow-sm rounded-3">
+                                <h4>Alimentos Substitutos</h4>
+                                <p>Definir alimentos alternativos em planos</p>
+                            </a>
+                        </div>
+
+                        <div class="col-md-4">
+                            <a href="@Url.Action("Index", "Receita")"
+                               class="btn btn-outline-warning w-100 p-4 shadow-sm rounded-3">
+                                <h4>Receitas</h4>
+                                <p>Cadastrar e editar receitas disponíveis</p>
+                            </a>
+                        </div>
+
+                        <div class="col-md-4">
+                            <a href="@Url.Action("Index", "RestricaoAlimentar")" class="btn btn-outline-danger w-100 p-4 shadow-sm rounded-3">
+                                <h4>Restrições Alimentares</h4>
+                                <p>Gerenciar restrições de pacientes e planos</p>
+                            </a>
+                        </div>
+
+                        <div class="col-md-4">
+                            <a href="@Url.Action("Index", "ComponenteReceita")"
+                               class="btn btn-outline-info w-100 p-4 shadow-sm rounded-3">
+                                <h4>Componentes da Receita</h4>
+                                <p>Gerenciar ingredientes e proporções das receitas</p>
+                            </a>
+                        </div>
+
+                        @if (User.IsInRole("Nutricionista"))
+                        {
+                            <div class="col-md-4">
+                                <a href="@Url.Action("Associar", "ReceitasParaPlanosAlimentares")"
+                                   class="btn btn-outline-secondary w-100 p-4 shadow-sm rounded-3">
+                                    <h4>Associar Receitas ao Plano Alimentar dos Clientes</h4>
+                                    <p>Definir receitas que pertencem ao plano alimentar</p>
+                                </a>
+                            </div>
+
+                            <div class="col-md-4">
+                                <a href="@Url.Action("ClientesPerfilAlimentar", "ReceitasParaPlanosAlimentares")"
+                                   class="btn btn-outline-success w-100 p-4 shadow-sm rounded-3">
+                                    <h4>Perfil Alimentar — Clientes</h4>
+                                    <p>Gerir alergias, restrições e metas por cliente</p>
+                                </a>
+                            </div>
+
+                            <div class="col-md-4">
+                                <a href="@Url.Action("ListAll", "Nutrition")"
+                                   class="btn btn-outline-warning w-100 p-4 shadow-sm rounded-3">
+                                    <h4>Análise Nutricional de Clientes</h4>
+                                    <p>Calcular necessidades e comparar com metas</p>
+                                </a>
+                            </div>
+                        }
+                    }
+
+                    <div class="col-md-4">
+                        <a href="@Url.Action("Index", "RegistroProgresso")"
+                           class="btn btn-outline-secondary w-100 p-4 shadow-sm rounded-3">
+                            <h4>Registos de Progresso</h4>
+                            <p>Acompanhar evolução de saúde dos clientes</p>
+                        </a>
+                    </div>
+
+                    <div class="col-md-4">
+                        <a href="@Url.Action("Index", "MetaCorporal")"
+                           class="btn btn-outline-primary w-100 p-4 shadow-sm rounded-3">
+                            <h4>Metas Corporais</h4>
+                            <p>@(User.IsInRole("Cliente") ? "Ver as minhas metas de saúde" : "Gerir objetivos corporais dos clientes")</p>
+                        </a>
+                    </div>
+
                 </div>
-
-                <div class="col-md-4">
-                    <a href="@Url.Action("Index", "AlimentoSubstituto")" class="btn btn-outline-success w-100 p-4 shadow-sm rounded-3">
-                        <h4>Alimentos Substitutos</h4>
-                        <p>Definir alimentos alternativos em planos</p>
-                    </a>
-                </div>
-
-                <div class="col-md-4">
-                    <a href="@Url.Action("Index", "Receita")"
-                        class="btn btn-outline-warning w-100 p-4 shadow-sm rounded-3">
-                        <h4>Receitas</h4>
-                        <p>Cadastrar e editar receitas disponíveis</p>
-                    </a>
-                </div>
-
-                <div class="col-md-4">
-                    <a href="@Url.Action("Index", "RestricaoAlimentar")" class="btn btn-outline-danger w-100 p-4 shadow-sm rounded-3">
-                        <h4>Restrições Alimentares</h4>
-                        <p>Gerenciar restrições de pacientes e planos</p>
-                    </a>
-                </div>
-
-                <div class="col-md-4">
-                    <a href="@Url.Action("Index", "ComponenteReceita")"
-                        class="btn btn-outline-info w-100 p-4 shadow-sm rounded-3">
-                        <h4>Componentes da Receita</h4>
-                        <p>Gerenciar ingredientes e proporções das receitas</p>
-                    </a>
-                </div>
-
             </div>
         </div>
     </div>
-</div>
+}

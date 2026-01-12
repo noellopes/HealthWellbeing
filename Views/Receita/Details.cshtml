@@ -1,14 +1,16 @@
-﻿@model HealthWellbeing.Models.Receita
+﻿@model HealthWellbeing.ViewModels.ReceitaComparacaoDetailsViewModel
 
 @{
     ViewData["Title"] = "Detalhes da Receita";
+    var receita = Model.Receita;
+    var adaptada = Model.ReceitaAdaptada;
 }
 
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-12">
             <h2 class="mb-4">
-                <i class="bi bi-eye"></i> @Model.Nome
+                <i class="bi bi-eye"></i> @receita.Nome
             </h2>
             <hr />
         </div>
@@ -22,11 +24,11 @@
                     <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informações da Receita</h5>
                 </div>
                 <div class="card-body">
-                    @if (!string.IsNullOrEmpty(Model.Descricao))
+                    @if (!string.IsNullOrEmpty(receita.Descricao))
                     {
                         <div class="mb-3">
                             <h6 class="text-muted">Descrição:</h6>
-                            <p>@Model.Descricao</p>
+                            <p>@receita.Descricao</p>
                         </div>
                     }
 
@@ -35,13 +37,13 @@
                             <h6 class="text-muted">
                                 <i class="bi bi-clock"></i> Tempo de Preparo:
                             </h6>
-                            <p class="fs-5"><strong>@Model.TempoPreparo minutos</strong></p>
+                            <p class="fs-5"><strong>@receita.TempoPreparo minutos</strong></p>
                         </div>
                         <div class="col-md-6">
                             <h6 class="text-muted">
                                 <i class="bi bi-people"></i> Porções:
                             </h6>
-                            <p class="fs-5"><strong>@Model.Porcoes porções</strong></p>
+                            <p class="fs-5"><strong>@receita.Porcoes porções</strong></p>
                         </div>
                     </div>
 
@@ -50,7 +52,7 @@
                             <i class="bi bi-list-ol"></i> Modo de Preparo:
                         </h6>
                         <div class="border rounded p-3 bg-light">
-                            <p style="white-space: pre-line;">@Model.ModoPreparo</p>
+                            <p style="white-space: pre-line;">@receita.ModoPreparo</p>
                         </div>
                     </div>
                 </div>
@@ -99,7 +101,7 @@
                     </div>
                 </div>
             }
-            else if (Model.Componentes != null && Model.Componentes.Any())
+            else if (receita.Componentes != null && receita.Componentes.Any())
             {
                 <div class="card mb-4">
                     <div class="card-header bg-warning">
@@ -111,50 +113,210 @@
                 </div>
             }
 
-            <!-- Restrições -->
-            @if (ViewBag.RestricoesDetalhadas != null && ((List<dynamic>)ViewBag.RestricoesDetalhadas).Any())
+            <!-- Versão adaptada (Cliente / Nutricionista) -->
+            @if (User.IsInRole("Cliente") || User.IsInRole("Nutricionista"))
             {
+                var collapseId = "adaptacaoReceita";
+
                 <div class="card mb-4">
-                    <div class="card-header bg-danger text-white">
-                        <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Restrições Alimentares</h5>
-                    </div>
-                    <div class="card-body">
-                        @foreach (var rest in (List<dynamic>)ViewBag.RestricoesDetalhadas)
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h5 class="mb-0"><i class="bi bi-sliders"></i> Versão adaptada</h5>
+                            <small class="text-muted">Geração dinâmica com base no perfil alimentar.</small>
+                        </div>
+
+                        @if (User.IsInRole("Cliente"))
                         {
-                            var badgeClass = rest.Gravidade == "Grave" ? "bg-danger" : 
-                                           rest.Gravidade == "Moderada" ? "bg-warning" : "bg-info";
-                            
-                            <div class="alert alert-warning mb-3" role="alert">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h6 class="alert-heading">
-                                            <i class="bi bi-shield-exclamation"></i> @rest.Nome
-                                        </h6>
-                                        @if (!string.IsNullOrEmpty(rest.Descricao))
+                            <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                                <i class="bi bi-columns-gap"></i> Comparar versões
+                            </button>
+                        }
+                    </div>
+
+                    <div class="card-body">
+                        @if (User.IsInRole("Nutricionista"))
+                        {
+                            <form method="get" class="row g-2 align-items-end">
+                                <div class="col-12 col-md-8">
+                                    <label class="form-label">Cliente</label>
+                                    <select name="clientId" class="form-select" onchange="this.form.submit()">
+                                        <option value="">Selecionar cliente…</option>
+                                        @foreach (var c in Model.ClientesDisponiveis)
                                         {
-                                            <p class="mb-2"><small>@rest.Descricao</small></p>
+                                            <option value="@c.ClientId" selected="@(c.ClientId == Model.ClientIdSelecionado)">
+                                                @c.Display</option>
                                         }
-                                        <div class="mb-0">
-                                            <span class="badge bg-secondary">@rest.Tipo</span>
-                                            <span class="badge @badgeClass">@rest.Gravidade</span>
-                                        </div>
-                                    </div>
+                                    </select>
+                                    <div class="form-text">Apenas são listados clientes com esta receita atribuída.</div>
                                 </div>
+                                <div class="col-12 col-md-4">
+                                    <noscript>
+                                        <button class="btn btn-primary w-100" type="submit">Aplicar</button>
+                                    </noscript>
+                                </div>
+                            </form>
+                            <hr />
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(Model.AvisoAdaptacao))
+                        {
+                            <div class="alert alert-info mb-0">
+                                <i class="bi bi-info-circle"></i> @Model.AvisoAdaptacao
                             </div>
                         }
                     </div>
+
+                    <div id="@collapseId" class="collapse @(User.IsInRole("Nutricionista") ? "show" : "")">
+                        <div class="card-body pt-0">
+                            @if (adaptada == null)
+                            {
+                                <p class="text-muted mb-0">Selecione um cliente para visualizar a versão adaptada.</p>
+                            }
+                            else
+                            {
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    <span class="badge bg-primary">Personalizada</span>
+                                    @if (adaptada.TemAjustes)
+                                    {
+                                        <span class="badge bg-warning text-dark">Ajustes automáticos</span>
+                                    }
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-12 col-md-6">
+                                        <div class="border rounded p-3 bg-light h-100">
+                                            <div class="text-muted small">Porções</div>
+                                            <div class="fs-5 fw-semibold">@adaptada.PorcoesOriginal</div>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="border rounded p-3 bg-light h-100">
+                                            <div class="text-muted small">Resumo nutricional (por porção)</div>
+                                            <div class="d-flex flex-wrap gap-2 mt-1">
+                                                <span class="badge bg-success">@adaptada.CaloriasPorPorcaoFinal kcal</span>
+                                                <span class="badge bg-secondary">Proteínas: @adaptada.ProteinasPorPorcaoFinal
+                                                    g</span>
+                                                <span class="badge bg-secondary">Carboidratos: @adaptada.HidratosPorPorcaoFinal
+                                                    g</span>
+                                                <span class="badge bg-secondary">Gorduras: @adaptada.GordurasPorPorcaoFinal
+                                                    g</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @if (adaptada.Notas != null && adaptada.Notas.Count > 0)
+                                {
+                                    <div class="mb-3">
+                                        <div class="fw-semibold mb-2">Ajustes realizados</div>
+                                        <ul class="list-group list-group-flush">
+                                            @foreach (var n in adaptada.Notas)
+                                            {
+                                                <li class="list-group-item px-0 py-2">
+                                                    <span class="badge bg-warning text-dark me-2">@n.Tipo</span>
+                                                    <span>@n.Mensagem</span>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+
+                                @if (adaptada.Ingredientes != null && adaptada.Ingredientes.Count > 0)
+                                {
+                                    var removidos = adaptada.Ingredientes.Where(i => !i.IncluidoNoResultado).ToList();
+                                    var finais = adaptada.Ingredientes.Where(i => i.IncluidoNoResultado).ToList();
+
+                                    <div>
+                                        <div class="fw-semibold mb-2">Ingredientes (adaptados)</div>
+                                        <ul class="list-group">
+                                            @foreach (var i in finais)
+                                            {
+                                                var foiSubstituido = string.Equals(i.TipoAjuste, "Substituido",
+                                                System.StringComparison.OrdinalIgnoreCase);
+                                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                    <div class="me-auto">
+                                                        <div
+                                                            class="fw-bold @(foiSubstituido ? "border-start border-3 border-warning ps-2" : "")">
+                                                            <i class="bi bi-dot"></i> @i.AlimentoFinalNome
+                                                        </div>
+                                                        @if (foiSubstituido && !string.IsNullOrWhiteSpace(i.AlimentoOriginalNome))
+                                                        {
+                                                            <small class="text-muted">Substitui: @i.AlimentoOriginalNome</small>
+                                                        }
+                                                    </div>
+                                                    <div class="text-nowrap">
+                                                        <span class="badge bg-light text-dark border">@i.QuantidadeFinal
+                                                            @i.UnidadeMedida</span>
+                                                    </div>
+                                                </li>
+                                            }
+                                        </ul>
+
+                                        @if (removidos.Count > 0)
+                                        {
+                                            <div class="alert alert-warning mt-2 mb-0">
+                                                <div class="fw-semibold mb-1">Ingredientes removidos (sem substituto disponível)</div>
+                                                <div class="small">@string.Join(", ", removidos.Select(x => x.AlimentoOriginalNome))
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
                 </div>
             }
-            else if (Model.RestricoesAlimentarId != null && Model.RestricoesAlimentarId.Any())
+
+            @if (User.IsInRole("Nutricionista"))
             {
-                <div class="card mb-4">
-                    <div class="card-header bg-danger text-white">
-                        <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Restrições Alimentares</h5>
+                <!-- Restrições -->
+                @if (ViewBag.RestricoesDetalhadas != null && ((List<dynamic>)ViewBag.RestricoesDetalhadas).Any())
+                {
+                    <div class="card mb-4">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Restrições Alimentares</h5>
+                        </div>
+                        <div class="card-body">
+                            @foreach (var rest in (List<dynamic>)ViewBag.RestricoesDetalhadas)
+                            {
+                                var badgeClass = rest.Gravidade == "Grave" ? "bg-danger" :
+                                rest.Gravidade == "Moderada" ? "bg-warning" : "bg-info";
+
+                                <div class="alert alert-warning mb-3" role="alert">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="alert-heading">
+                                                <i class="bi bi-shield-exclamation"></i> @rest.Nome
+                                            </h6>
+                                            @if (!string.IsNullOrEmpty(rest.Descricao))
+                                            {
+                                                <p class="mb-2"><small>@rest.Descricao</small></p>
+                                            }
+                                            <div class="mb-0">
+                                                <span class="badge bg-secondary">@rest.Tipo</span>
+                                                <span class="badge @badgeClass">@rest.Gravidade</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <p class="text-muted">Restrições (IDs): @string.Join(", ", Model.RestricoesAlimentarId)</p>
+                }
+                else if (receita.RestricoesAlimentarId != null && receita.RestricoesAlimentarId.Any())
+                {
+                    <div class="card mb-4">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Restrições Alimentares</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Restrições (IDs): @string.Join(", ", receita.RestricoesAlimentarId)</p>
+                        </div>
                     </div>
-                </div>
+                }
             }
         </div>
 
@@ -172,7 +334,7 @@
                                 <h6 class="text-muted mb-0">Calorias</h6>
                             </div>
                             <div class="text-end">
-                                <h4 class="mb-0 text-primary">@Model.Calorias</h4>
+                                <h4 class="mb-0 text-primary">@receita.Calorias</h4>
                                 <small class="text-muted">kcal</small>
                             </div>
                         </div>
@@ -180,30 +342,33 @@
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-1">
                                 <span class="text-muted">Proteínas</span>
-                                <strong>@Model.Proteinas g</strong>
+                                <strong>@receita.Proteinas g</strong>
                             </div>
                             <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-info" role="progressbar" style="width: @((Model.Proteinas / 100) * 100)%"></div>
+                                <div class="progress-bar bg-info" role="progressbar"
+                                    style="width: @((receita.Proteinas / 100) * 100)%"></div>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-1">
                                 <span class="text-muted">Carboidratos</span>
-                                <strong>@Model.HidratosCarbono g</strong>
+                                <strong>@receita.HidratosCarbono g</strong>
                             </div>
                             <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-warning" role="progressbar" style="width: @((Model.HidratosCarbono / 100) * 100)%"></div>
+                                <div class="progress-bar bg-warning" role="progressbar"
+                                    style="width: @((receita.HidratosCarbono / 100) * 100)%"></div>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-1">
                                 <span class="text-muted">Gorduras</span>
-                                <strong>@Model.Gorduras g</strong>
+                                <strong>@receita.Gorduras g</strong>
                             </div>
                             <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-danger" role="progressbar" style="width: @((Model.Gorduras / 100) * 100)%"></div>
+                                <div class="progress-bar bg-danger" role="progressbar"
+                                    style="width: @((receita.Gorduras / 100) * 100)%"></div>
                             </div>
                         </div>
                     </div>
@@ -215,19 +380,20 @@
     <!-- Botões de Ação -->
     <div class="row">
         <div class="col-md-12">
-            <div class="d-flex justify-content-between">
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> Voltar para Lista
-                </a>
-                <div>
-                    <a asp-action="Edit" asp-route-id="@Model.ReceitaId" class="btn btn-warning">
-                        <i class="bi bi-pencil"></i> Editar
-                    </a>
-                    <a asp-action="Delete" asp-route-id="@Model.ReceitaId" class="btn btn-danger">
-                        <i class="bi bi-trash"></i> Excluir
-                    </a>
+            @if (User.IsInRole("Nutricionista"))
+            {
+                <div class="d-flex justify-content-end mt-4">
+                    <a asp-action="Edit" asp-route-id="@receita.ReceitaId" class="btn btn-warning me-2">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@receita.ReceitaId" class="btn btn-danger me-2">Excluir</a>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Voltar</a>
                 </div>
-            </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    Apenas usuários com a role <strong>Nutricionista</strong> podem editar ou excluir esta receita.
+                </div>
+            }
         </div>
     </div>
 </div>

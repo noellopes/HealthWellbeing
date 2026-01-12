@@ -1,0 +1,188 @@
+@model HealthWellbeing.ViewModels.AssociarReceitasPlanoViewModel
+
+@{
+    ViewData["Title"] = "Associar Receitas ao Plano Alimentar";
+}
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <div>
+            <h1 class="h3 mb-1">Associar Receitas ao Plano Alimentar</h1>
+            <p class="text-muted mb-0">Selecione um cliente e marque as receitas que devem ficar associadas ao plano.
+            </p>
+        </div>
+        <a asp-action="ReceitasParaPlanosAlimentares" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    @if (TempData["AlertMessage"] != null)
+    {
+        var alertType = TempData["AlertType"]?.ToString() ?? "info";
+        <div class="alert alert-@alertType alert-dismissible fade show" role="alert">
+            @TempData["AlertMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-person-check"></i> Seleção de Cliente</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Associar" method="get">
+                        <label class="form-label">Cliente</label>
+                        <select name="clientId" class="form-select" required>
+                            <option value="">-- Selecione --</option>
+                            @foreach (var c in Model.Clientes)
+                            {
+                                <option value="@c.ClientId" selected="@(Model.ClientId == c.ClientId ? "selected" : null)">
+                                    @c.Display</option>
+                            }
+                        </select>
+                        <div class="d-grid mt-3">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-search"></i> Carregar plano
+                            </button>
+                        </div>
+                    </form>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Aviso))
+                    {
+                        <div class="alert alert-warning mt-3 mb-0">
+                            <i class="bi bi-info-circle"></i> @Model.Aviso
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.ClientId) && Model.PlanoAlimentarId.HasValue)
+                    {
+                        <div class="mt-3">
+                            <div class="small text-muted">Plano Alimentar</div>
+                            <div class="fw-semibold">#@Model.PlanoAlimentarId</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-journal-check"></i> Receitas do Plano</h5>
+                </div>
+                <div class="card-body">
+                    @if (string.IsNullOrWhiteSpace(Model.ClientId) || !Model.PlanoAlimentarId.HasValue)
+                    {
+                        <div class="text-muted">
+                            Selecione um cliente para ver e atualizar as receitas.
+                        </div>
+                    }
+                    else
+                    {
+                        <form asp-action="Associar" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="ClientId" value="@Model.ClientId" />
+
+                            <p class="text-muted small mb-3">
+                                Marque/desmarque receitas e clique em <strong>Guardar</strong>.
+                            </p>
+
+                            <style>
+                                /* container do scroll */
+                                .receitas-scroll {
+                                    max-height: 420px;
+                                    overflow-y: auto;
+                                    border: 1px solid #ddd;
+                                    border-radius: 8px;
+                                    padding: 0;
+                                    /* importante: o list-group já tem espaçamento */
+                                    background: #fff;
+                                }
+
+                                /* item clicável/alinhado */
+                                .receita-item {
+                                    display: flex;
+                                    align-items: flex-start;
+                                    gap: .75rem;
+                                    padding: .75rem 1rem;
+                                    border-bottom: 1px solid #eee;
+                                }
+
+                                .receita-item:last-child {
+                                    border-bottom: 0;
+                                }
+
+                                .receita-item:hover {
+                                    background: #f8f9fa;
+                                }
+
+                                .receita-item.is-selected {
+                                    background: #f4fff7;
+                                    outline: 1px solid rgba(25, 135, 84, .35);
+                                    outline-offset: -1px;
+                                }
+
+                                /* checkbox sempre alinhado */
+                                .receita-item .form-check-input {
+                                    margin-top: .25rem;
+                                    flex: 0 0 auto;
+                                }
+
+                                /* texto + badge sem quebrar layout */
+                                .receita-item .receita-content {
+                                    flex: 1 1 auto;
+                                    min-width: 0;
+                                }
+
+                                .receita-item .receita-title {
+                                    font-weight: 600;
+                                    display: block;
+                                    line-height: 1.2;
+                                    word-break: break-word;
+                                }
+                            </style>
+
+                            <div class="receitas-scroll">
+                                @{
+                                    var selected = (Model.ReceitaIdsSelecionadas ?? new List<int>()).ToHashSet();
+                                }
+
+                                @foreach (var r in Model.Receitas)
+                                {
+                                    var isChecked = selected.Contains(r.ReceitaId);
+
+                                    <label class="receita-item @(isChecked ? "is-selected" : "")" for="rec_@r.ReceitaId">
+                                        <input class="form-check-input" type="checkbox" name="ReceitaIdsSelecionadas"
+                                            value="@r.ReceitaId" id="rec_@r.ReceitaId" @(isChecked ? "checked" : "") />
+
+                                        <div class="receita-content">
+                                            <span class="receita-title">@r.Display</span>
+
+                                            @if (isChecked)
+                                            {
+                                                <span class="badge bg-success mt-2">Selecionada</span>
+                                            }
+                                        </div>
+                                    </label>
+                                }
+                            </div>
+
+
+                            <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+                                <a asp-action="Associar" asp-route-clientId="@Model.ClientId"
+                                    class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-repeat"></i> Recarregar
+                                </a>
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="bi bi-save"></i> Guardar
+                                </button>
+                            </div>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,83 @@
+@model List<HealthWellbeing.Controllers.DietSuggestion>
+
+@{
+    ViewData["Title"] = "Sugestões de Plano Alimentar";
+    var clientName = ViewData["ClientName"] as string ?? "Cliente";
+    var clientId = ViewData["ClientId"] as string;
+}
+
+<h1>Sugestões de Plano Alimentar</h1>
+<h5 class="text-muted mb-4">Cliente: @clientName</h5>
+
+<div class="alert alert-info mb-4">
+    <i class="bi bi-info-circle"></i>
+    <strong>Sugestões baseadas em metas corporais definidas.</strong> Estas recomendações comparam os registos atuais com os objetivos estabelecidos no perfil MetaCorporal do cliente.
+    Consulte sempre um profissional de saúde antes de fazer alterações significativas ao plano alimentar.
+</div>
+
+<div class="row">
+    @foreach (var suggestion in Model)
+    {
+        <div class="col-12 mb-3">
+            <div class="card border-@suggestion.PriorityClass">
+                <div class="card-header bg-@suggestion.PriorityClass text-white d-flex justify-content-between align-items-center">
+                    <span>
+                        <span class="fs-5 me-2">@suggestion.Icon</span>
+                        <strong>@suggestion.Category:</strong> @suggestion.Title
+                    </span>
+                    <span class="badge bg-light text-dark">Prioridade: @suggestion.Priority</span>
+                </div>
+                <div class="card-body">
+                    <p class="card-text"><strong>Análise:</strong> @suggestion.Description</p>
+                    <hr />
+                    <p class="card-text">
+                        <strong><i class="bi bi-clipboard-check"></i> Recomendação:</strong><br />
+                        @suggestion.Recommendation
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<hr class="my-4" />
+
+<h4>Resumo das Recomendações</h4>
+<div class="row">
+    <div class="col-md-4">
+        <div class="card text-center mb-3">
+            <div class="card-body">
+                <h5 class="card-title text-danger">@Model.Count(s => s.PriorityClass == "danger")</h5>
+                <p class="card-text">Alta Prioridade</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center mb-3">
+            <div class="card-body">
+                <h5 class="card-title text-warning">@Model.Count(s => s.PriorityClass == "warning")</h5>
+                <p class="card-text">Média Prioridade</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center mb-3">
+            <div class="card-body">
+                <h5 class="card-title text-success">@Model.Count(s => s.PriorityClass == "success" || s.PriorityClass == "info")</h5>
+                <p class="card-text">Positivas / Informativas</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-action="History" asp-route-id="@clientId" class="btn btn-secondary">
+        <i class="bi bi-clock-history"></i> Ver Histórico Completo
+    </a>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar à Lista
+    </a>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Novo Registo
+    </a>
+</div>
