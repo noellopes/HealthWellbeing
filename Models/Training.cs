@@ -51,10 +51,5 @@ namespace HealthWellbeing.Models
         [Display(Name = "Start Time")]
         [DataType(DataType.Time)]
         public TimeSpan StartTime { get; set; }
-
-        [Required(ErrorMessage = "Maximum participants is required.")]
-        [Range(1, 50, ErrorMessage = "Capacity must be between 1 and 50.")]
-        [Display(Name = "Maximum Participants")]
-        public int MaxParticipants { get; set; } = 10;
     }
 }

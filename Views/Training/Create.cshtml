@@ -27,6 +27,7 @@
                 </div>
 
                 <div class="row g-3">
+                    <!-- Trainer -->
                     <div class="col-md-6 mb-3">
                         <label asp-for="TrainerId" class="form-label fw-bold"></label>
                         <select asp-for="TrainerId"
@@ -37,6 +38,7 @@
                         <span asp-validation-for="TrainerId" class="invalid-feedback"></span>
                     </div>
 
+                    <!-- Training Type -->
                     <div class="col-md-6 mb-3">
                         <label asp-for="TrainingTypeId" class="form-label fw-bold"></label>
                         <select asp-for="TrainingTypeId"
@@ -47,6 +49,7 @@
                         <span asp-validation-for="TrainingTypeId" class="invalid-feedback"></span>
                     </div>
 
+                    <!-- Name -->
                     <div class="col-md-12 mb-3">
                         <label asp-for="Name" class="form-label fw-bold"></label>
                         <input asp-for="Name"
@@ -55,6 +58,7 @@
                         <span asp-validation-for="Name" class="invalid-feedback"></span>
                     </div>
 
+                    <!-- Description -->
                     <div class="col-md-12 mb-3">
                         <label asp-for="Description" class="form-label fw-bold"></label>
                         <textarea asp-for="Description"
@@ -64,6 +68,7 @@
                         <span asp-validation-for="Description" class="invalid-feedback"></span>
                     </div>
 
+                    <!-- Day -->
                     <div class="col-md-4 mb-3">
                         <label asp-for="DayOfWeek" class="form-label fw-bold"></label>
                         <select asp-for="DayOfWeek"
@@ -74,6 +79,7 @@
                         <span asp-validation-for="DayOfWeek" class="invalid-feedback"></span>
                     </div>
 
+                    <!-- Start Time -->
                     <div class="col-md-4 mb-3">
                         <label asp-for="StartTime" class="form-label fw-bold"></label>
                         <input asp-for="StartTime"
@@ -82,6 +88,7 @@
                         <span asp-validation-for="StartTime" class="invalid-feedback"></span>
                     </div>
 
+                    <!-- Duration -->
                     <div class="col-md-4 mb-3">
                         <label asp-for="Duration" class="form-label fw-bold"></label>
                         <input asp-for="Duration"
@@ -91,16 +98,6 @@
                                class="form-control shadow-sm"
                                placeholder="Minutes" />
                         <span asp-validation-for="Duration" class="invalid-feedback"></span>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="MaxParticipants" class="form-label fw-bold"></label>
-                        <input asp-for="MaxParticipants"
-                               type="number"
-                               min="1"
-                               max="50"
-                               class="form-control shadow-sm" />
-                        <span asp-validation-for="MaxParticipants" class="invalid-feedback"></span>
                     </div>
                 </div>
 

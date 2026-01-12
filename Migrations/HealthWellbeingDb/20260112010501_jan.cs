@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace HealthWellbeing.Migrations
+namespace HealthWellbeing.Migrations.HealthWellbeingDb
 {
     /// <inheritdoc />
-    public partial class b11 : Migration
+    public partial class jan : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

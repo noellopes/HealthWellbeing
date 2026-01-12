@@ -32,28 +32,16 @@ namespace HealthWellbeing.Controllers
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchName))
-            {
-                trainingsQuery = trainingsQuery.Where(t =>
-                    t.Name.Contains(searchName));
-            }
+                trainingsQuery = trainingsQuery.Where(t => t.Name.Contains(searchName));
 
             if (searchTrainerId.HasValue)
-            {
-                trainingsQuery = trainingsQuery.Where(t =>
-                    t.TrainerId == searchTrainerId.Value);
-            }
+                trainingsQuery = trainingsQuery.Where(t => t.TrainerId == searchTrainerId.Value);
 
             if (searchTrainingTypesId.HasValue)
-            {
-                trainingsQuery = trainingsQuery.Where(t =>
-                    t.TrainingTypeId == searchTrainingTypesId.Value);
-            }
+                trainingsQuery = trainingsQuery.Where(t => t.TrainingTypeId == searchTrainingTypesId.Value);
 
             if (searchDuration.HasValue)
-            {
-                trainingsQuery = trainingsQuery.Where(t =>
-                    t.Duration == searchDuration.Value);
-            }
+                trainingsQuery = trainingsQuery.Where(t => t.Duration == searchDuration.Value);
 
             ViewBag.SearchName = searchName;
             ViewBag.SearchTrainerId = searchTrainerId;
@@ -121,20 +109,13 @@ namespace HealthWellbeing.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("TrainerId,TrainingTypeId,Name,Description,Duration,DayOfWeek,StartTime,MaxParticipants")]
+            [Bind("TrainerId,TrainingTypeId,Name,Description,Duration,DayOfWeek,StartTime")]
             Training training)
         {
-            // 🔐 Validações de negócio (como o professor exige)
             if (training.Duration <= 0)
             {
                 ModelState.AddModelError(nameof(training.Duration),
                     "A duração do treino deve ser superior a 0 minutos.");
-            }
-
-            if (training.MaxParticipants <= 0)
-            {
-                ModelState.AddModelError(nameof(training.MaxParticipants),
-                    "O número máximo de participantes deve ser superior a 0.");
             }
 
             if (ModelState.IsValid)
@@ -189,7 +170,7 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             int id,
-            [Bind("TrainingId,TrainerId,TrainingTypeId,Name,Description,Duration,DayOfWeek,StartTime,MaxParticipants")]
+            [Bind("TrainingId,TrainerId,TrainingTypeId,Name,Description,Duration,DayOfWeek,StartTime")]
             Training training)
         {
             if (id != training.TrainingId) return NotFound();

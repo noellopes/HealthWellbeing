@@ -65,7 +65,7 @@
                 <div class="col-md-1">
                     <button type="submit"
                             class="btn btn-primary w-100 shadow-sm fw-bold">
-                        <i class="bi bi-search"></i> Search
+                        <i class="bi bi-search"></i>
                     </button>
                 </div>
             </form>
@@ -100,13 +100,16 @@
                                     <td class="fw-bold ps-3">
                                         @item.Name
                                         <div class="small text-muted">
-                                            @item.Duration min · Max @item.MaxParticipants
+                                            @item.Duration min ·
+                                            Max @item.TrainingType?.MaxParticipants
                                         </div>
                                     </td>
 
                                     <td>
                                         @item.Trainer?.Name
-                                        <div class="small text-muted">@item.Trainer?.Email</div>
+                                        <div class="small text-muted">
+                                            @item.Trainer?.Email
+                                        </div>
                                     </td>
 
                                     <td>
