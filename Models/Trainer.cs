@@ -37,7 +37,7 @@ namespace HealthWellbeing.Models
         public string Gender { get; set; } = default!;
 
         [Display(Name = "Active Status")]
-        public bool IsActive { get; set; } = true; // Por defeito, novos treinadores estão ativos
+        public bool IsActive { get; set; } = true; 
 
     }
 }

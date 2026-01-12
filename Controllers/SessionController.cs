@@ -12,12 +12,12 @@ using Microsoft.AspNetCore.Identity;
 namespace HealthWellbeing.Controllers
 {
     [Authorize]
-    public class SessionsController : Controller
+    public class SessionController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public SessionsController(HealthWellbeingDbContext context, UserManager<IdentityUser> userManager)
+        public SessionController(HealthWellbeingDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
             _userManager = userManager;
@@ -37,53 +37,51 @@ namespace HealthWellbeing.Controllers
             return View(await sessions.ToListAsync());
         }
 
-        // GET: Sessions/Book
+        // GET: Sessions/Create?trainingId=5
         public async Task<IActionResult> Create(int? trainingId)
         {
-            if (trainingId == null) return NotFound();
+            if (trainingId == null)
+            {
+                TempData["Error"] = "No training selected.";
+                return RedirectToAction("Index", "Training");
+            }
+
             var training = await _context.Training
-                .Include(t => t.TrainingType).Include(t => t.Trainer)
+                .Include(t => t.Trainer)
+                .Include(t => t.TrainingType)
                 .FirstOrDefaultAsync(m => m.TrainingId == trainingId);
+
             if (training == null) return NotFound();
 
-            DayOfWeek targetDay = (DayOfWeek)training.DayOfWeek;
-            DateTime nextDate = GetNextWeekday(DateTime.Today, targetDay);
-
-            ViewBag.SuggestedDate = nextDate.ToString("yyyy-MM-dd");
-            ViewBag.DayName = training.DayOfWeek.ToString();
+            // Passamos o treino para a View para mostrar os detalhes (nome, hora, etc)
             return View(training);
         }
 
         // POST: Sessions/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int TrainingId, DateTime SessionDate)
+        public async Task<IActionResult> CreateConfirmed(int TrainingId, DateTime SessionDate)
         {
             var member = await GetCurrentMemberAsync();
-            if (member == null) return Forbid();
-
-            var training = await _context.Training
-                .Include(t => t.TrainingType) // Importante para MaxParticipants
-                .FirstOrDefaultAsync(t => t.TrainingId == TrainingId);
-            if (training == null) return NotFound();
-
-            bool alreadyBooked = await _context.Session
-                .AnyAsync(s => s.TrainingId == TrainingId && s.SessionDate.Date == SessionDate.Date && s.MemberId == member.MemberId);
-            if (alreadyBooked) { TempData["Error"] = "Already booked."; return RedirectToAction(nameof(Index)); }
-
-            int currentParticipants = await _context.Session
-                .CountAsync(s => s.TrainingId == TrainingId && s.SessionDate.Date == SessionDate.Date);
-
-            // CORREÇÃO: Usar TrainingType.MaxParticipants
-            if (currentParticipants >= training.TrainingType.MaxParticipants)
+            if (member == null)
             {
-                TempData["Error"] = "Class is full.";
-                return RedirectToAction("Index", "Training");
+                TempData["Error"] = "You must be a member to book a session.";
+                return RedirectToAction("PublicIndex", "Plan");
             }
 
-            var session = new Session { TrainingId = TrainingId, MemberId = member.MemberId, SessionDate = SessionDate, Rating = null };
+            // Criar o agendamento
+            var session = new Session
+            {
+                TrainingId = TrainingId,
+                MemberId = member.MemberId,
+                SessionDate = SessionDate,
+                Rating = null
+            };
+
             _context.Add(session);
             await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Session booked successfully!";
             return RedirectToAction(nameof(Index));
         }
 

@@ -1,0 +1,37 @@
+﻿@model HealthWellbeing.Models.Training
+
+@{
+    ViewData["Title"] = "Confirm Booking";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white text-center py-3">
+                    <h4 class="mb-0">Confirm Your Session</h4>
+                </div>
+                <div class="card-body p-4">
+                    <h5 class="text-secondary">Class Details:</h5>
+                    <hr />
+                    <p><strong>Class:</strong> @Model.Name</p>
+                    <p><strong>Type:</strong> @Model.TrainingType?.Name</p>
+                    <p><strong>Trainer:</strong> @Model.Trainer?.Name</p>
+                    <p><strong>Schedule:</strong> @Model.DayOfWeek at @Model.StartTime.ToString(@"hh\:mm")</p>
+
+                    <form asp-action="CreateConfirmed" method="post" class="mt-4">
+                        <input type="hidden" name="TrainingId" value="@Model.TrainingId" />
+                        <input type="hidden" name="SessionDate" value="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-check-circle me-2"></i>Confirm Booking
+                            </button>
+                            <a asp-controller="Training" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

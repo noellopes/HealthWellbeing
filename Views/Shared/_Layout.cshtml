@@ -41,7 +41,7 @@
                                     <i class="bi bi-person-workspace me-1"></i>My Area
                                 </a>
                                 <ul class="dropdown-menu shadow border-0">
-                                    <li><a class="dropdown-item" asp-controller="Sessions" asp-action="Index"><i class="bi bi-calendar-check me-2"></i>My Schedule</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Session" asp-action="Index"><i class="bi bi-calendar-check me-2"></i>My Schedule</a></li>
                                     <li><a class="dropdown-item" asp-controller="Training" asp-action="Index"><i class="bi bi-plus-circle me-2"></i>Book a Class</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" asp-controller="Account" asp-action="MyProfile">My Profile</a></li>
@@ -66,8 +66,8 @@
                                     <li class="dropdown-header text-uppercase small text-muted">Training</li>
                                     <li><a class="dropdown-item" asp-controller="Training" asp-action="Index"><i class="bi bi-calendar3 me-2"></i>Class Schedule</a></li>
                                     <li><a class="dropdown-item" asp-controller="TrainingType" asp-action="Index"><i class="bi bi-collection me-2"></i>Training Types</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Exercises" asp-action="Index"><i class="bi bi-bicycle me-2"></i>Exercise Library</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Sessions" asp-action="Index"><i class="bi bi-list-check me-2"></i>All Bookings</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Exercise" asp-action="Index"><i class="bi bi-bicycle me-2"></i>Exercise Library</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Session" asp-action="Index"><i class="bi bi-list-check me-2"></i>All Bookings</a></li>
 
                                     @if (User.IsInRole("Administrator"))
                                     {

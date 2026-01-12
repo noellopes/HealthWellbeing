@@ -1,19 +1,18 @@
-﻿using HealthWellbeing.Data;
-using HealthWellbeing.Models;
-using HealthWellbeing.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels; // Necessário para PaginationInfo
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace HealthWellbeing.Controllers
 {
-    // Acesso geral para Staff. Clientes só entram na action MyEvolution.
     [Authorize]
     public class PhysicalAssessmentController : Controller
     {
@@ -27,49 +26,59 @@ namespace HealthWellbeing.Controllers
         }
 
         // =============================================================
-        // ÁREA DO CLIENTE: Minha Evolução
+        // ÁREA DO CLIENTE: O Meu Progresso (Gráficos e Histórico)
         // =============================================================
         public async Task<IActionResult> MyEvolution()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
 
-            // Procura o membro associado ao email do utilizador logado
             var member = await _context.Member
                 .Include(m => m.Client)
                 .FirstOrDefaultAsync(m => m.Client.Email == user.Email);
 
             if (member == null)
             {
-                TempData["Error"] = "Member profile not found.";
+                TempData["Error"] = "Perfil de membro não encontrado.";
                 return RedirectToAction("Index", "Home");
             }
 
-            // Vai buscar todas as avaliações deste membro, da mais recente para a mais antiga
+            // Busca histórico ordenado por data para os gráficos
             var assessments = await _context.PhysicalAssessment
                 .Include(p => p.Trainer)
                 .Where(p => p.MemberId == member.MemberId)
-                .OrderByDescending(p => p.AssessmentDate)
+                .OrderBy(p => p.AssessmentDate)
                 .ToListAsync();
 
             return View(assessments);
         }
 
         // =============================================================
-        // ÁREA DE GESTÃO (STAFF APENAS)
+        // ÁREA DE GESTÃO (STAFF): CRUD Completo
         // =============================================================
 
-        // GET: PhysicalAssessment
+        // GET: PhysicalAssessment (Lista Paginada)
         [Authorize(Roles = "Administrator,Trainer")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var assessments = _context.PhysicalAssessment
-                .Include(p => p.Member)
-                    .ThenInclude(m => m.Client)
-                .Include(p => p.Trainer);
+            var query = _context.PhysicalAssessment
+                .Include(p => p.Member).ThenInclude(m => m.Client)
+                .Include(p => p.Trainer)
+                .OrderByDescending(p => p.AssessmentDate);
 
-            // Retorna uma lista simples para evitar o erro de Paginação (PaginationInfo)
-            return View(await assessments.ToListAsync());
+            // 1. Contar Total
+            int total = await query.CountAsync();
+
+            // 2. Criar Objeto de Paginação
+            var pagination = new PaginationInfo<PhysicalAssessment>(page, total, 10);
+
+            // 3. Obter itens da página atual
+            pagination.Items = await query
+                .Skip(pagination.ItemsToSkip)
+                .Take(pagination.ItemsPerPage)
+                .ToListAsync();
+
+            return View(pagination);
         }
 
         // GET: PhysicalAssessment/Details/5
@@ -79,8 +88,7 @@ namespace HealthWellbeing.Controllers
             if (id == null) return NotFound();
 
             var physicalAssessment = await _context.PhysicalAssessment
-                .Include(p => p.Member)
-                    .ThenInclude(m => m.Client)
+                .Include(p => p.Member).ThenInclude(m => m.Client)
                 .Include(p => p.Trainer)
                 .FirstOrDefaultAsync(m => m.PhysicalAssessmentId == id);
 
@@ -93,11 +101,13 @@ namespace HealthWellbeing.Controllers
         [Authorize(Roles = "Administrator,Trainer")]
         public IActionResult Create()
         {
+            // Carrega as listas dropdown
             ViewData["MemberId"] = new SelectList(_context.Member.Include(m => m.Client), "MemberId", "Client.Name");
             ViewData["TrainerId"] = new SelectList(_context.Trainer, "TrainerId", "Name");
             return View();
         }
 
+        // POST: PhysicalAssessment/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator,Trainer")]
@@ -107,10 +117,9 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(physicalAssessment);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "Assessment created successfully!";
                 return RedirectToAction(nameof(Index));
             }
-            // Repreenche as listas se houver erro
+            // Se falhar, recarrega as listas
             ViewData["MemberId"] = new SelectList(_context.Member.Include(m => m.Client), "MemberId", "Client.Name", physicalAssessment.MemberId);
             ViewData["TrainerId"] = new SelectList(_context.Trainer, "TrainerId", "Name", physicalAssessment.TrainerId);
             return View(physicalAssessment);
@@ -130,6 +139,7 @@ namespace HealthWellbeing.Controllers
             return View(physicalAssessment);
         }
 
+        // POST: PhysicalAssessment/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator,Trainer")]
@@ -151,6 +161,8 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["MemberId"] = new SelectList(_context.Member.Include(m => m.Client), "MemberId", "Client.Name", physicalAssessment.MemberId);
+            ViewData["TrainerId"] = new SelectList(_context.Trainer, "TrainerId", "Name", physicalAssessment.TrainerId);
             return View(physicalAssessment);
         }
 
@@ -170,6 +182,7 @@ namespace HealthWellbeing.Controllers
             return View(physicalAssessment);
         }
 
+        // POST: PhysicalAssessment/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator,Trainer")]

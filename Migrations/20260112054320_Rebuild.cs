@@ -5,7 +5,7 @@
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class RebuildAll : Migration
+    public partial class Rebuild : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
