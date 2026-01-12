@@ -1,0 +1,60 @@
+﻿@model IEnumerable<HealthWellbeing.Models.Training>
+
+@{
+    ViewData["Title"] = "Available Classes";
+}
+
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="display-5 text-primary">Book a Class</h1>
+        <p class="lead text-muted">
+            Based on your plan: <strong>@ViewBag.PlanName</strong>
+        </p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning text-center">
+            No classes available for your current plan.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm hover-shadow transition">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <span class="badge bg-info text-dark">@item.TrainingType.Name</span>
+                                <span class="text-muted small"><i class="bi bi-clock"></i> @item.Duration min</span>
+                            </div>
+
+                            <h4 class="card-title fw-bold">@item.Name</h4>
+
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li class="mb-2 text-muted">
+                                    <i class="bi bi-person-badge me-2 text-primary"></i> @item.Trainer.Name
+                                </li>
+                                <li class="mb-2 text-muted">
+                                    <i class="bi bi-calendar-day me-2 text-primary"></i> @item.DayOfWeek
+                                </li>
+                                <li class="text-muted">
+                                    <i class="bi bi-alarm me-2 text-primary"></i> @item.StartTime.ToString(@"hh\:mm")
+                                </li>
+                            </ul>
+
+                            <div class="d-grid">
+                                <a asp-controller="Sessions" asp-action="Create" asp-route-trainingId="@item.TrainingId"
+                                   class="btn btn-outline-primary fw-bold">
+                                    Book Now <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
