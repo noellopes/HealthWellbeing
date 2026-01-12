@@ -1,178 +1,187 @@
 ﻿@model HealthWellBeing.Models.Exame
 
 @{
-    ViewData["Title"] = "Marcar Novo Exame";
+    ViewData["Title"] = "Nova Marcação de Exame";
+
+    var materiaisAtivos = new HashSet<string>(
+        (Model.RegistoMateriais ?? new List<HealthWellbeing.ViewModels.RegistoMateriais>())
+        .Select(rm => (rm.Nome ?? "") + (rm.Tamanho ?? ""))
+    );
+
+    int linhasExtras = ViewBag.LinhasAdicionais ?? 1;
 }
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h3 text-secondary">Nova Marcação</h1>
-        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-left me-1"></i> Voltar à Lista
-        </a>
+        <h1 class="h3 text-secondary">Nova Marcação de Exame</h1>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Voltar à Lista</a>
     </div>
 
-    <div class="card shadow-sm border-0 rounded-3">
-        <div class="card-header bg-success text-white py-3 rounded-top-3">
-            <h5 class="card-title mb-0"><i class="bi bi-plus-circle me-2"></i> Dados do Exame</h5>
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-success text-white py-3">
+            <h5 class="card-title mb-0"><i class="bi bi-plus-circle me-2"></i> Registar Novo Exame</h5>
         </div>
-        <div class="card-body p-4">
-            <form asp-action="Create" method="post">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-                <div class="row g-4">
-                    @* --- COLUNA DA ESQUERDA: Dados Principais --- *@
-                    <div class="col-md-6 border-end-md">
-                        <h6 class="text-muted text-uppercase small mb-3">Informação Base</h6>
+        <div class="card-body p-4">
+            <form asp-action="Create" method="post" id="mainForm">
+                @* Campos ocultos para manter o estado no Refresh *@
+                <input type="hidden" name="actionType" id="actionType" value="Save" />
+                <input type="hidden" name="novoExameTipoId" id="novoExameTipoId" value="" />
+                <input type="hidden" name="adicionarLinhas" id="adicionarLinhas" value="@linhasExtras" />
+
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <div class="row">
+                    <div class="col-md-5 border-end">
+                        <h6 class="text-muted text-uppercase small mb-3 border-bottom pb-2">Informação Base</h6>
 
                         <div class="mb-3">
                             <label asp-for="UtenteId" class="form-label fw-bold">Utente</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
-                                <select asp-for="UtenteId" class="form-select" asp-items="@(ViewData["UtenteId"] as SelectList)">
-                                    <option value="">-- Selecione o Utente --</option>
-                                </select>
-                            </div>
-                            <span asp-validation-for="UtenteId" class="text-danger small"></span>
+                            <select asp-for="UtenteId" class="form-select" asp-items="ViewBag.UtenteId">
+                                <option value="">-- Selecione o Utente --</option>
+                            </select>
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="DataHoraMarcacao" class="form-label fw-bold">Data e Hora</label>
-                            <input asp-for="DataHoraMarcacao" class="form-control" type="datetime-local" />
-                            <span asp-validation-for="DataHoraMarcacao" class="text-danger small"></span>
+                            <input asp-for="DataHoraMarcacao" type="datetime-local" class="form-control" />
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Estado" class="form-label fw-bold">Estado</label>
+                            <label asp-for="Estado" class="form-label fw-bold">Estado do Exame</label>
                             <select asp-for="Estado" class="form-select">
-                                <option value="">-- Selecionar Estado --</option>
-                                @foreach (var opcao in HealthWellBeing.Models.Exame.OpcoesEstado)
+                                @foreach (var op in HealthWellBeing.Models.Exame.OpcoesEstado)
                                 {
-                                    <option value="@opcao">@opcao</option>
+                                    <option value="@op">@op</option>
                                 }
                             </select>
-                            <span asp-validation-for="Estado" class="text-danger small"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="Notas" class="form-label fw-bold">Notas / Observações</label>
-                            <textarea asp-for="Notas" class="form-control" rows="4" placeholder="Alguma observação importante sobre o paciente ou exame..."></textarea>
-                            <span asp-validation-for="Notas" class="text-danger small"></span>
-                        </div>
-                    </div>
-
-                    @* --- COLUNA DA DIREITA: Recursos e Médicos --- *@
-                    <div class="col-md-6">
-                        <h6 class="text-muted text-uppercase small mb-3">Recursos Clínicos</h6>
-
-                        <div class="mb-3">
-                            <label asp-for="ExameTipoId" class="form-label fw-bold">Tipo de Exame</label>
-                            <select asp-for="ExameTipoId" id="ExameTipoId" class="form-select" asp-items="@(ViewData["ExameTipoId"] as SelectList)">
-                                <option value="">-- Selecione o Tipo --</option>
+                        <div class="mb-4 bg-light p-3 border rounded shadow-sm">
+                            <label asp-for="ExameTipoId" class="form-label fw-bold text-primary">Tipo de Exame</label>
+                            <select asp-for="ExameTipoId" class="form-select border-primary"
+                                    asp-items="ViewBag.ExameTipoId"
+                                    onchange="document.getElementById('actionType').value='Refresh'; document.getElementById('novoExameTipoId').value=this.value; this.form.submit();">
+                                <option value="">-- selecione para carregar receita --</option>
                             </select>
-                            <span asp-validation-for="ExameTipoId" class="text-danger small"></span>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="MedicoSolicitanteId" class="form-label fw-bold">Médico Solicitante</label>
-                                <select asp-for="MedicoSolicitanteId" class="form-select" asp-items="@(ViewData["MedicoSolicitanteId"] as SelectList)">
-                                    <option value="">-- Médico --</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="ProfissionalExecutanteId" class="form-label fw-bold">Prof. Executante</label>
-                                <select asp-for="ProfissionalExecutanteId" class="form-select" asp-items="@(ViewData["ProfissionalExecutanteId"] as SelectList)">
-                                    <option value="">-- Profissional --</option>
-                                </select>
-                            </div>
+                        <div class="mb-3">
+                            <label asp-for="MedicoSolicitanteId" class="form-label fw-bold small">Médico Solicitante</label>
+                            <select asp-for="MedicoSolicitanteId" class="form-select" asp-items="ViewBag.MedicoSolicitanteId"></select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ProfissionalExecutanteId" class="form-label fw-bold small">Executante</label>
+                            <select asp-for="ProfissionalExecutanteId" class="form-select" asp-items="ViewBag.ProfissionalExecutanteId"></select>
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="SalaDeExameId" class="form-label fw-bold">Sala</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="bi bi-door-open"></i></span>
-                                <select asp-for="SalaDeExameId" class="form-select" asp-items="@(ViewData["SalaDeExameId"] as SelectList)">
-                                    <option value="">-- Selecione a Sala --</option>
-                                </select>
-                            </div>
-                            <span asp-validation-for="SalaDeExameId" class="text-danger small"></span>
+                            <select asp-for="SalaDeExameId" class="form-select" asp-items="ViewBag.SalaDeExameId"></select>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="MaterialEquipamentoAssociadoId" class="form-label fw-bold">Equipamento</label>
-                            <select asp-for="MaterialEquipamentoAssociadoId" id="MaterialEquipamentoAssociadoId" class="form-select" asp-items="@(ViewData["MaterialEquipamentoAssociadoId"] as SelectList)">
-                                <option value="">-- Selecione o Equipamento --</option>
-                            </select>
-                            <span asp-validation-for="MaterialEquipamentoAssociadoId" class="text-danger small"></span>
+                            <label asp-for="Notas" class="form-label fw-bold">Notas</label>
+                            <textarea asp-for="Notas" class="form-control" rows="3" placeholder="Observações..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="col-md-7">
+                        <h6 class="text-muted text-uppercase small mb-3 border-bottom pb-2">Materiais do Catálogo</h6>
+
+                        <div class="border rounded bg-white" style="max-height:480px; overflow-y:auto;">
+                            <table class="table table-sm table-hover align-middle mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width:40px;"></th>
+                                        <th>Material</th>
+                                        <th style="width:80px;">Qtd</th>
+                                        <th>Estado do Material</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in (List<HealthWellbeing.Models.MaterialEquipamentoAssociado>)ViewBag.DicionarioCompleto)
+                                    {
+                                        var chaveItem = (item.NomeEquipamento ?? "") + (item.Tamanho ?? "");
+                                        var regReceita = Model.RegistoMateriais?.FirstOrDefault(r => r.Nome == item.NomeEquipamento && r.Tamanho == item.Tamanho);
+                                        bool isChecked = materiaisAtivos.Contains(chaveItem);
+
+                                        <tr>
+                                            <td class="text-center">
+                                                <input type="checkbox" name="selecionadosIds" value="@item.MaterialEquipamentoAssociadoId" @(isChecked ? "checked" : "") />
+                                            </td>
+                                            <td>
+                                                <strong>@item.NomeEquipamento</strong><br />
+                                                <small class="text-muted">@(item.Tamanho ?? "N/A")</small>
+                                            </td>
+                                            <td>
+                                                <input type="number" name="quantidades" class="form-control form-control-sm"
+                                                       value="@(isChecked? regReceita.Quantidade: 1)" min="1" />
+                                            </td>
+                                            <td>
+                                                <select name="estadosIds" class="form-select form-select-sm">
+                                                    @foreach (var est in (ViewBag.ListaEstadosMateriais as SelectList))
+                                                    {
+                                                        @* CORREÇÃO: Força a seleção do ID 9 (Reservado) para novos itens ou carregados da receita *@
+                                                        bool isSelected = (isChecked && regReceita.MaterialStatusId.ToString() == est.Value)
+                                                        || (!isChecked && est.Value == "9");
+
+                                                        <option value="@est.Value" selected="@(isSelected ? "selected" : null)">@est.Text</option>
+                                                    }
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-4 p-3 border rounded bg-light shadow-sm">
+                            <h6 class="fw-bold text-success mb-3"><i class="bi bi-plus-square-fill me-1"></i> Novos Materiais (Opção B)</h6>
+
+                            @for (int i = 0; i < linhasExtras; i++)
+                            {
+                                <div class="row g-2 mb-2">
+                                    <input type="hidden" name="selecionadosIds" value="0" />
+                                    <div class="col-5">
+                                        <input type="text" name="nomesNovos" class="form-control form-control-sm" placeholder="Nome" />
+                                    </div>
+                                    <div class="col-3">
+                                        <input type="text" name="tamanhosNovos" class="form-control form-control-sm" placeholder="Ex: 5ml" />
+                                    </div>
+                                    <div class="col-2">
+                                        <input type="number" name="quantidades" value="1" class="form-control form-control-sm" />
+                                    </div>
+                                    <div class="col-2">
+                                        <select name="estadosIds" class="form-select form-select-sm">
+                                            @foreach (var est in (ViewBag.ListaEstadosMateriais as SelectList))
+                                            {
+                                                @* CORREÇÃO: Garante que novas linhas também iniciam como "Reservado" (ID 9) *@
+                                                <option value="@est.Value" selected="@(est.Value == "9" ? "selected" : null)">@est.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            }
+
+                            <div class="text-center mt-3">
+                                <button type="submit" name="actionType" value="Refresh"
+                                        onclick="document.getElementById('adicionarLinhas').value = @(linhasExtras + 1);"
+                                        class="btn btn-outline-success btn-sm">
+                                    <i class="bi bi-plus-circle me-1"></i> Adicionar mais uma linha
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                    <button type="submit" class="btn btn-success px-4 py-2">
-                        <i class="bi bi-check-lg me-1"></i> Confirmar Marcação
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4 pt-3 border-top">
+                    <button type="submit" name="actionType" value="Save" class="btn btn-success btn-lg px-5 shadow">
+                        <i class="bi bi-check-lg me-1"></i> Finalizar Marcação
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const dropdownTipo = document.getElementById("ExameTipoId");
-            const dropdownMaterial = document.getElementById("MaterialEquipamentoAssociadoId");
-
-            function carregarMateriais() {
-                const tipoId = dropdownTipo.value;
-                dropdownMaterial.innerHTML = '<option value="">A verificar...</option>';
-                dropdownMaterial.disabled = true;
-
-                if (tipoId) {
-                    fetch(`/Exames/GetMateriaisPorTipo?id=${tipoId}`)
-                        .then(response => response.json())
-                        .then(resultado => {
-                            dropdownMaterial.innerHTML = '';
-
-                            if (!resultado.isFallback && resultado.data.length === 1) {
-                                const item = resultado.data[0];
-                                const option = document.createElement("option");
-                                option.value = item.value;
-                                option.text = item.text;
-                                option.selected = true; // Seleção Automática
-                                dropdownMaterial.add(option);
-                            } else {
-                                const defaultOption = document.createElement("option");
-                                defaultOption.value = "";
-                                defaultOption.text = resultado.isFallback ? "-- Selecione (Todos Disponíveis) --" : "-- Selecione (Recomendados) --";
-                                dropdownMaterial.add(defaultOption);
-
-                                resultado.data.forEach(item => {
-                                    const option = document.createElement("option");
-                                    option.value = item.value;
-                                    option.text = item.text;
-                                    dropdownMaterial.add(option);
-                                });
-                            }
-                            dropdownMaterial.disabled = false;
-                        })
-                        .catch(error => {
-                            console.error(error);
-                            dropdownMaterial.innerHTML = '<option value="">Erro ao carregar</option>';
-                        });
-                } else {
-                    dropdownMaterial.innerHTML = '<option value="">-- Selecione primeiro o Tipo --</option>';
-                    dropdownMaterial.disabled = true;
-                }
-            }
-
-            dropdownTipo.addEventListener("change", carregarMateriais);
-        });
-    </script>
-}

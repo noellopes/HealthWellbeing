@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
+using HealthWellBeing.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellBeing.Models;
-using HealthWellbeing.Data;
-using HealthWellbeing.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 
 namespace HealthWellbeing.Controllers
 {
@@ -23,55 +24,37 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // GET: Exames
-        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-        public async Task<IActionResult> Index(int pagina = 1, string pesquisaUtente = "", DateTime? pesquisaData = null)
+        // ==========================================
+        // INDEX (Com Filtros e Paginação)
+        // ==========================================
+        public async Task<IActionResult> Index(string pesquisaUtente, DateTime? pesquisaData, int pagina = 1)
         {
-            string sessaoKey = "FiltroInicialRealizado";
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString(sessaoKey)) && !pesquisaData.HasValue && !Request.Query.ContainsKey("pesquisaData"))
-            {
-                pesquisaData = DateTime.Today;
-                HttpContext.Session.SetString(sessaoKey, "true");
-            }
-
-            ViewBag.PesquisaUtente = pesquisaUtente;
-            ViewBag.PesquisaData = pesquisaData;
-
             var examesQuery = _context.Exames
                 .Include(e => e.ExameTipo)
-                .Include(e => e.MaterialEquipamentoAssociado)
-                .Include(e => e.MedicoSolicitante)
+                .Include(e => e.Utente)
                 .Include(e => e.ProfissionalExecutante)
                 .Include(e => e.SalaDeExame)
-                .Include(e => e.Utente)
                 .AsQueryable();
 
-            // Filtros por Role
-            var userEmail = User.Identity?.Name;
-
-            if (User.IsInRole("Tecnico") && !User.IsInRole("Admin") && !User.IsInRole("Gestor"))
-            {
-                examesQuery = examesQuery.Where(e => e.ProfissionalExecutante.Email == userEmail);
-            }
-
-            if (User.IsInRole("Utente") && !User.IsInRole("Admin") && !User.IsInRole("Gestor"))
-            {
-                examesQuery = examesQuery.Where(e => e.Utente.Email == userEmail);
-            }
-
-            if (!string.IsNullOrEmpty(pesquisaUtente))
+            // Filtro por Nome de Utente
+            if (!string.IsNullOrWhiteSpace(pesquisaUtente))
             {
                 examesQuery = examesQuery.Where(e => e.Utente.Nome.Contains(pesquisaUtente));
             }
 
+            // Filtro por Data (Compara apenas o dia)
             if (pesquisaData.HasValue)
             {
                 examesQuery = examesQuery.Where(e => e.DataHoraMarcacao.Date == pesquisaData.Value.Date);
             }
 
             int totalExames = await examesQuery.CountAsync();
-            var paginationInfo = new PaginationInfo<Exame>(pagina, totalExames, itemsPerPage: 10);
 
+            // Passar filtros de volta para a View manter os inputs preenchidos
+            ViewBag.PesquisaUtente = pesquisaUtente;
+            ViewBag.PesquisaData = pesquisaData;
+
+            var paginationInfo = new PaginationInfo<Exame>(pagina, totalExames, 10);
             paginationInfo.Items = await examesQuery
                 .OrderByDescending(e => e.DataHoraMarcacao)
                 .Skip(paginationInfo.ItemsToSkip)
@@ -81,180 +64,227 @@ namespace HealthWellbeing.Controllers
             return View(paginationInfo);
         }
 
-        // GET: Exames/Details/5
+        // ==========================================
+        // DETAILS
+        // ==========================================
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
 
             var exame = await _context.Exames
-                .Include(e => e.Utente)
                 .Include(e => e.ExameTipo)
-                .Include(e => e.SalaDeExame)
+                .Include(e => e.Utente)
                 .Include(e => e.MedicoSolicitante)
                 .Include(e => e.ProfissionalExecutante)
-                .Include(e => e.MaterialEquipamentoAssociado)
+                .Include(e => e.SalaDeExame)
+                .Include(e => e.RegistoMateriais) // Carrega materiais para a View
                 .FirstOrDefaultAsync(m => m.ExameId == id);
 
             if (exame == null) return NotFound();
-
-            var userEmail = User.Identity?.Name;
-            if (User.IsInRole("Tecnico") && !User.IsInRole("Admin") && !User.IsInRole("Gestor") && exame.ProfissionalExecutante?.Email != userEmail)
-                return Forbid();
-
-            if (User.IsInRole("Utente") && !User.IsInRole("Admin") && !User.IsInRole("Gestor") && exame.Utente?.Email != userEmail)
-                return Forbid();
-
             return View(exame);
         }
 
-        // GET: Exames/Create
-        [Authorize(Roles = "Admin,Gestor,Medico")]
-        public IActionResult Create()
+        // ==========================================
+        // CREATE
+        // ==========================================
+        public async Task<IActionResult> Create(int? novoExameTipoId, int adicionarLinhas = 1)
         {
-            CarregarViewBagDropdowns();
-            return View();
+            var exame = new Exame { DataHoraMarcacao = DateTime.Now, RegistoMateriais = new List<RegistoMateriais>() };
+            if (novoExameTipoId.HasValue) await CarregarReceitaEmMemoria(exame, novoExameTipoId.Value);
+
+            ViewBag.LinhasAdicionais = adicionarLinhas;
+            CarregarViewBagDropdowns(exame);
+            return View(exame);
         }
 
-        // POST: Exames/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,Gestor,Medico")]
-        public async Task<IActionResult> Create([Bind("ExameId,DataHoraMarcacao,Estado,Notas,UtenteId,ExameTipoId,MedicoSolicitanteId,ProfissionalExecutanteId,SalaDeExameId,MaterialEquipamentoAssociadoId")] Exame exame)
+        public async Task<IActionResult> Create(Exame exame, int[] selecionadosIds, int[] quantidades, int[] estadosIds, string[] nomesNovos, string[] tamanhosNovos, string actionType, int? novoExameTipoId, int adicionarLinhas = 1)
         {
-            bool salaOcupada = await _context.Exames.AnyAsync(e =>
-                e.SalaDeExameId == exame.SalaDeExameId &&
-                e.DataHoraMarcacao == exame.DataHoraMarcacao);
-
-            if (salaOcupada)
-                ModelState.AddModelError("DataHoraMarcacao", "A sala selecionada já está ocupada neste horário.");
+            if (actionType == "Refresh")
+            {
+                await TratarRefresh(exame, selecionadosIds, novoExameTipoId);
+                ViewBag.LinhasAdicionais = adicionarLinhas;
+                CarregarViewBagDropdowns(exame);
+                return View(exame);
+            }
 
             if (ModelState.IsValid)
             {
-                _context.Add(exame);
+                // Hack para evitar SqlException de NULL na coluna legada da BD
+                exame.MaterialEquipamentoAssociadoId = (selecionadosIds != null && selecionadosIds.Any(id => id > 0))
+                    ? selecionadosIds.First(id => id > 0) : 1;
+
+                _context.Exames.Add(exame);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Exame marcado com sucesso!";
+
+                await ProcessarRegistoMateriais(exame.ExameId, selecionadosIds, quantidades, estadosIds, nomesNovos, tamanhosNovos, exame.Estado);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-
             CarregarViewBagDropdowns(exame);
             return View(exame);
         }
 
-        // GET: Exames/Edit/5
-        [Authorize(Roles = "Admin,Gestor,Rececionista,Medico,Tecnico,Supervisor Tecnico")]
-        public async Task<IActionResult> Edit(int? id)
+        // ==========================================
+        // EDIT
+        // ==========================================
+        public async Task<IActionResult> Edit(int? id, int? novoExameTipoId, int adicionarLinhas = 1)
         {
             if (id == null) return NotFound();
-
-            var exame = await _context.Exames.FindAsync(id);
+            var exame = await _context.Exames.Include(e => e.RegistoMateriais).FirstOrDefaultAsync(e => e.ExameId == id);
             if (exame == null) return NotFound();
 
+            if (novoExameTipoId.HasValue && novoExameTipoId != exame.ExameTipoId)
+            {
+                exame.RegistoMateriais.Clear();
+                await CarregarReceitaEmMemoria(exame, novoExameTipoId.Value);
+                exame.ExameTipoId = novoExameTipoId.Value;
+            }
+
+            ViewBag.LinhasAdicionais = adicionarLinhas;
             CarregarViewBagDropdowns(exame);
             return View(exame);
         }
 
-        // POST: Exames/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,Gestor,Rececionista,Medico,Tecnico,Supervisor Tecnico")]
-        public async Task<IActionResult> Edit(int id, [Bind("ExameId,DataHoraMarcacao,Estado,Notas,UtenteId,ExameTipoId,MedicoSolicitanteId,ProfissionalExecutanteId,SalaDeExameId,MaterialEquipamentoAssociadoId")] Exame exame)
+        public async Task<IActionResult> Edit(int id, Exame exame, int[] selecionadosIds, int[] quantidades, int[] estadosIds, string[] nomesNovos, string[] tamanhosNovos, string actionType, int? novoExameTipoId, int adicionarLinhas = 1)
         {
             if (id != exame.ExameId) return NotFound();
 
-            bool salaOcupadaOutro = await _context.Exames.AnyAsync(e =>
-                e.SalaDeExameId == exame.SalaDeExameId &&
-                e.DataHoraMarcacao == exame.DataHoraMarcacao &&
-                e.ExameId != id);
-
-            if (salaOcupadaOutro)
-                ModelState.AddModelError("DataHoraMarcacao", "A sala selecionada já está ocupada neste horário.");
+            if (actionType == "Refresh")
+            {
+                await TratarRefresh(exame, selecionadosIds, novoExameTipoId);
+                ViewBag.LinhasAdicionais = adicionarLinhas;
+                CarregarViewBagDropdowns(exame);
+                return View(exame);
+            }
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(exame);
-                    await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Exame atualizado com sucesso!";
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_context.Exames.Any(e => e.ExameId == exame.ExameId)) return NotFound();
-                    else throw;
-                }
-            }
+                if (exame.MaterialEquipamentoAssociadoId == 0) exame.MaterialEquipamentoAssociadoId = 1;
+                _context.Update(exame);
 
+                var materiaisAtuais = _context.RegistoMateriais.Where(rm => rm.ExameId == id);
+                _context.RegistoMateriais.RemoveRange(materiaisAtuais);
+                await _context.SaveChangesAsync();
+
+                await ProcessarRegistoMateriais(id, selecionadosIds, quantidades, estadosIds, nomesNovos, tamanhosNovos, exame.Estado);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
             CarregarViewBagDropdowns(exame);
             return View(exame);
         }
 
-        // GET: Exames/Delete/5
-        [Authorize(Roles = "Admin,Gestor,Rececionista,Medico")]
+        // ==========================================
+        // DELETE
+        // ==========================================
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
             var exame = await _context.Exames
-                .Include(e => e.ExameTipo)
                 .Include(e => e.Utente)
-                .Include(e => e.MedicoSolicitante)
-                .Include(e => e.SalaDeExame)
+                .Include(e => e.ExameTipo)
+                .Include(e => e.RegistoMateriais)
                 .FirstOrDefaultAsync(m => m.ExameId == id);
 
             if (exame == null) return NotFound();
             return View(exame);
         }
 
-        // POST: Exames/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,Gestor,Rececionista,Medico")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var exame = await _context.Exames.FindAsync(id);
             if (exame != null)
             {
-                if (exame.Estado == "Realizado")
-                {
-                    TempData["ErrorMessage"] = "Não é possível apagar um exame já realizado.";
-                    return RedirectToAction(nameof(Index));
-                }
-
+                var materiais = _context.RegistoMateriais.Where(rm => rm.ExameId == id);
+                _context.RegistoMateriais.RemoveRange(materiais);
                 _context.Exames.Remove(exame);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Exame eliminado com sucesso!";
             }
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = "Admin,Gestor,Rececionista,Medico,Tecnico,Supervisor Tecnico")]
-        public async Task<JsonResult> GetMateriaisPorTipo(int id)
+        // ==========================================
+        // MÉTODOS AUXILIARES
+        // ==========================================
+
+        private async Task TratarRefresh(Exame exame, int[] selecionadosIds, int? novoExameTipoId)
         {
-            var materiaisEspecificos = await _context.ExameTipoRecursos
-                .Where(x => x.ExameTipoId == id)
-                .Include(x => x.Recurso)
-                .Select(x => new { value = x.MaterialEquipamentoAssociadoId, text = x.Recurso.NomeEquipamento })
-                .ToListAsync();
+            exame.RegistoMateriais = new List<RegistoMateriais>();
+            if (novoExameTipoId.HasValue)
+                await CarregarReceitaEmMemoria(exame, novoExameTipoId.Value);
+            else if (selecionadosIds != null)
+            {
+                foreach (var sId in selecionadosIds.Where(id => id > 0))
+                {
+                    var mat = await _context.MaterialEquipamentoAssociado.FindAsync(sId);
+                    if (mat != null) exame.RegistoMateriais.Add(new RegistoMateriais { Nome = mat.NomeEquipamento, Tamanho = mat.Tamanho });
+                }
+            }
+        }
 
-            if (materiaisEspecificos.Any())
-                return Json(new { isFallback = false, data = materiaisEspecificos });
+        private async Task CarregarReceitaEmMemoria(Exame exame, int tipoId)
+        {
+            var receita = await _context.ExameTipoRecursos.Where(x => x.ExameTipoId == tipoId).Include(x => x.Recurso).ToListAsync();
+            foreach (var r in receita)
+                exame.RegistoMateriais.Add(new RegistoMateriais { Nome = r.Recurso.NomeEquipamento, Tamanho = r.Recurso.Tamanho, Quantidade = r.QuantidadeNecessaria, MaterialStatusId = 9 });
+        }
 
-            var todosMateriais = await _context.MaterialEquipamentoAssociado
-                .Select(x => new { value = x.MaterialEquipamentoAssociadoId, text = x.NomeEquipamento })
-                .ToListAsync();
+        private async Task ProcessarRegistoMateriais(int exameId, int[] selecionadosIds, int[] quantidades, int[] estadosIds, string[] nomesNovos, string[] tamanhosNovos, string estadoExame)
+        {
+            int ID_PADRAO = 9;
+            int estadoAuto = estadoExame switch
+            {
+                "Marcado" => 9,
+                "Remarcado" => 9,
+                "Cancelado" => 14,
+                "Realizado" => 13,
+                _ => 9
+            }; //
 
-            return Json(new { isFallback = true, data = todosMateriais });
+            int idxNovo = 0;
+            if (selecionadosIds == null) return;
+
+            for (int i = 0; i < selecionadosIds.Length; i++)
+            {
+                string nome = ""; string tam = "";
+                if (selecionadosIds[i] == 0) // Criar novo no dicionário
+                {
+                    if (nomesNovos != null && idxNovo < nomesNovos.Length && !string.IsNullOrWhiteSpace(nomesNovos[idxNovo]))
+                    {
+                        var nMat = new MaterialEquipamentoAssociado { NomeEquipamento = nomesNovos[idxNovo], Tamanho = tamanhosNovos?[idxNovo] };
+                        _context.MaterialEquipamentoAssociado.Add(nMat); await _context.SaveChangesAsync();
+                        nome = nMat.NomeEquipamento; tam = nMat.Tamanho; idxNovo++;
+                    }
+                    else { idxNovo++; continue; }
+                }
+                else // Usar existente
+                {
+                    var m = await _context.MaterialEquipamentoAssociado.FindAsync(selecionadosIds[i]);
+                    if (m == null) continue;
+                    nome = m.NomeEquipamento; tam = m.Tamanho;
+                }
+
+                int estFinal = (estadosIds != null && i < estadosIds.Length && estadosIds[i] != ID_PADRAO) ? estadosIds[i] : estadoAuto;
+                _context.RegistoMateriais.Add(new RegistoMateriais { ExameId = exameId, Nome = nome, Tamanho = tam, Quantidade = (quantidades != null && i < quantidades.Length) ? quantidades[i] : 1, MaterialStatusId = estFinal });
+            }
         }
 
         private void CarregarViewBagDropdowns(Exame exame = null)
         {
-            ViewData["ExameTipoId"] = new SelectList(_context.ExameTipo, "ExameTipoId", "Nome", exame?.ExameTipoId);
-            ViewData["MaterialEquipamentoAssociadoId"] = new SelectList(_context.MaterialEquipamentoAssociado, "MaterialEquipamentoAssociadoId", "NomeEquipamento", exame?.MaterialEquipamentoAssociadoId);
-            ViewData["MedicoSolicitanteId"] = new SelectList(_context.Medicos, "Id", "Nome", exame?.MedicoSolicitanteId);
-            ViewData["ProfissionalExecutanteId"] = new SelectList(_context.ProfissionalExecutante, "ProfissionalExecutanteId", "Nome", exame?.ProfissionalExecutanteId);
-            ViewData["SalaDeExameId"] = new SelectList(_context.SalaDeExame, "SalaId", "TipoSala", exame?.SalaDeExameId);
-            ViewData["UtenteId"] = new SelectList(_context.Utentes, "UtenteId", "Nome", exame?.UtenteId);
+            ViewData["ExameTipoId"] = new SelectList(_context.ExameTipo.OrderBy(e => e.Nome), "ExameTipoId", "Nome", exame?.ExameTipoId);
+            ViewData["UtenteId"] = new SelectList(_context.Utentes.OrderBy(u => u.Nome), "UtenteId", "Nome", exame?.UtenteId);
+            ViewData["MedicoSolicitanteId"] = new SelectList(_context.Medicos.OrderBy(m => m.Nome), "Id", "Nome", exame?.MedicoSolicitanteId);
+            ViewData["ProfissionalExecutanteId"] = new SelectList(_context.ProfissionalExecutante.OrderBy(p => p.Nome), "ProfissionalExecutanteId", "Nome", exame?.ProfissionalExecutanteId);
+            ViewData["SalaDeExameId"] = new SelectList(_context.SalaDeExame.OrderBy(s => s.TipoSala), "SalaId", "TipoSala", exame?.SalaDeExameId);
+            ViewBag.DicionarioCompleto = _context.MaterialEquipamentoAssociado.OrderBy(m => m.NomeEquipamento).ToList();
+            ViewBag.ListaEstadosMateriais = new SelectList(_context.Set<EstadoMaterial>().OrderBy(e => e.Nome), "MaterialStatusId", "Nome");
         }
     }
 }

@@ -61,7 +61,7 @@
         </div>
 
         @* Apenas Admin ou Rececionista (se existisse) criariam novos exames *@
-        @if (User.IsInRole("Admin") || User.IsInRole("Medico"))
+        @if (User.IsInRole("Admin") || User.IsInRole("Medico") || User.IsInRole("Rececionista"))
         {
             <a asp-action="Create" class="btn btn-success shadow-sm">
                 <i class="bi bi-plus-lg me-1"></i> Nova Marcação
@@ -90,7 +90,7 @@
                     <button type="submit" class="btn btn-primary flex-grow-1 fw-bold">
                         <i class="bi bi-funnel me-1"></i> Filtrar
                     </button>
-                    <a asp-action="Index" asp-route-pesquisaData="" class="btn btn-outline-secondary px-3" title="Limpar Filtros">
+                    <a asp-action="Index" class="btn btn-outline-secondary px-3" title="Limpar Filtros">
                         <i class="bi bi-x-lg me-1"></i> Limpar
                     </a>
                 </div>

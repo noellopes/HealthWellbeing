@@ -2,12 +2,12 @@
 
 @{
     ViewData["Title"] = "Detalhes do Exame";
-    string? successMessage = ViewBag.SuccessMessage as string;
+    string? successMessage = TempData["SuccessMessage"] as string;
 }
 
 <div class="container mt-4">
 
-    @* --- Mensagem de Sucesso --- *@
+    @* --- Mensagens de Notificação --- *@
     @if (!string.IsNullOrEmpty(successMessage))
     {
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
@@ -26,38 +26,40 @@
 
     @* --- Cartão Principal --- *@
     <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
-        <div class="card-header bg-info text-white py-3">
+        <div class="card-header bg-info py-3">
             <h5 class="card-title mb-0 text-white">
-                <i class="bi bi-info-circle-fill me-2"></i> Informação Detalhada
+                <i class="bi bi-info-circle-fill me-2"></i> Informação Detalhada do Exame
             </h5>
         </div>
 
         <div class="card-body p-4">
 
-            @* Lógica para a cor do Badge do Estado *@
+            @* Lógica para a cor do Badge do Estado do Exame *@
             @{
                 var badgeClass = Model.Estado switch
                 {
                     "Realizado" => "bg-success",
                     "Marcado" => "bg-primary",
                     "Cancelado" => "bg-danger",
-                    "Pendente" => "bg-warning text-dark",
+                    "Remarcado" => "bg-info text-dark",
                     _ => "bg-secondary"
                 };
             }
 
             <div class="row g-5">
-                @* --- COLUNA ESQUERDA: Dados Principais --- *@
-                <div class="col-md-6 border-end-md">
+                @* --- COLUNA ESQUERDA: Dados do Utente e Tempo --- *@
+                <div class="col-md-6 border-end">
                     <h6 class="text-uppercase text-muted small fw-bold mb-4 border-bottom pb-2">Dados da Marcação</h6>
 
                     <div class="mb-4">
                         <label class="text-muted small text-uppercase fw-bold d-block">Utente</label>
                         <div class="fs-5 fw-normal text-dark d-flex align-items-center">
                             <i class="bi bi-person-circle text-secondary me-2"></i>
-                            @Html.DisplayFor(model => model.Utente!.Nome)
+                            @Model.Utente?.Nome
                         </div>
-                        <small class="text-muted ms-4">SNS: @Model.Utente?.UtenteSNS</small>
+                        <small class="text-muted d-block mt-1">
+                            <i class="bi bi-card-text me-1"></i> SNS: @(Model.Utente?.UtenteSNS != null ? Model.Utente.UtenteSNS.ToString() : "N/A")
+                        </small>
                     </div>
 
                     <div class="mb-4">
@@ -72,89 +74,135 @@
 
                     <div class="mb-4">
                         <label class="text-muted small text-uppercase fw-bold d-block">Tipo de Exame</label>
-                        <div class="fs-5 text-dark">
+                        <div class="fs-5 text-dark font-monospace">
                             <i class="bi bi-activity text-secondary me-2"></i>
-                            @Html.DisplayFor(model => model.ExameTipo!.Nome)
+                            @Model.ExameTipo?.Nome
                         </div>
                     </div>
 
                     <div class="mb-4">
-                        <label class="text-muted small text-uppercase fw-bold d-block mb-1">Estado Atual</label>
+                        <label class="text-muted small text-uppercase fw-bold d-block mb-1">Estado Atual do Exame</label>
                         <span class="badge @badgeClass rounded-pill px-3 py-2 fs-6">
-                            @Html.DisplayFor(model => model.Estado)
+                            @Model.Estado
                         </span>
                     </div>
                 </div>
 
-                @* --- COLUNA DIREITA: Recursos Clínicos --- *@
+                @* --- COLUNA DIREITA: Recursos e Materiais --- *@
                 <div class="col-md-6">
-                    <h6 class="text-uppercase text-muted small fw-bold mb-4 border-bottom pb-2">Recursos Clínicos</h6>
+                    <h6 class="text-uppercase text-muted small fw-bold mb-4 border-bottom pb-2">Recursos e Logística</h6>
 
-                    <div class="row mb-4">
-                        <div class="col-12 mb-3">
-                            <label class="text-muted small text-uppercase fw-bold d-block">Médico Solicitante</label>
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-heart-pulse text-secondary me-2"></i>
-                                <span class="fw-medium">@Html.DisplayFor(model => model.MedicoSolicitante!.Nome)</span>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <label class="text-muted small text-uppercase fw-bold d-block">Profissional Executante</label>
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-person-badge text-secondary me-2"></i>
-                                <span class="fw-medium">@Html.DisplayFor(model => model.ProfissionalExecutante!.Nome)</span>
-                            </div>
+                    <div class="mb-4">
+                        <label class="text-muted small text-uppercase fw-bold d-block">Equipa e Localização</label>
+                        <div class="mt-2 small">
+                            <div class="mb-1"><i class="bi bi-heart-pulse me-2 text-primary"></i><strong>Médico:</strong> @(Model.MedicoSolicitante?.Nome ?? "N/A")</div>
+                            <div class="mb-1"><i class="bi bi-person-badge me-2 text-primary"></i><strong>Técnico:</strong> @(Model.ProfissionalExecutante?.Nome ?? "N/A")</div>
+                            <div class=""><i class="bi bi-geo-alt me-2 text-danger"></i><strong>Sala:</strong> @(Model.SalaDeExame?.TipoSala ?? "N/A")</div>
                         </div>
                     </div>
 
                     <div class="mb-4">
-                        <label class="text-muted small text-uppercase fw-bold d-block">Localização (Sala)</label>
-                        <div class="d-flex align-items-start">
-                            <i class="bi bi-geo-alt-fill text-danger me-2 mt-1"></i>
-                            <div>
-                                <div class="fw-bold">@Html.DisplayFor(model => model.SalaDeExame!.TipoSala)</div>
-                                <div class="small text-muted">@Html.DisplayFor(model => model.SalaDeExame!.Laboratorio)</div>
-                            </div>
-                        </div>
-                    </div>
+                        <label class="text-muted small text-uppercase fw-bold d-block mb-2">Materiais Registados e Consumos</label>
+                        @if (Model.RegistoMateriais != null && Model.RegistoMateriais.Any())
+                        {
+                            <div class="table-responsive rounded border">
+                                <table class="table table-sm table-hover mb-0 align-middle">
+                                    <thead class="table-light">
+                                        <tr class="small text-uppercase text-muted">
+                                            <th>Qtd</th>
+                                            <th>Material / Tamanho</th>
+                                            <th>Estado Item</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.RegistoMateriais)
+                                        {
+                                            @* Lógica de cor para o estado individual do material (IDs 9 a 14) *@
+                                            var materialBadge = item.MaterialStatusId switch
+                                            {
+                                                13 => "badge bg-success", // Usado
+                                                9 => "badge bg-primary", // Reservado
+                                                14 => "badge bg-danger",  // Cancelado
+                                                11 => "badge bg-warning text-dark", // Danificado
+                                                _ => "badge bg-secondary"
+                                            };
 
-                    <div class="mb-4">
-                        <label class="text-muted small text-uppercase fw-bold d-block">Equipamento Associado</label>
-                        <div class="d-flex align-items-center">
-                            <i class="bi bi-tools text-secondary me-2"></i>
-                            <span>@Html.DisplayFor(model => model.MaterialEquipamentoAssociado!.NomeEquipamento)</span>
-                        </div>
+                                            <tr>
+                                                <td class="fw-bold">@item.Quantidade x</td>
+                                                <td>
+                                                    <div class="fw-medium">@item.Nome</div>
+                                                    <div class="text-muted extra-small">@(item.Tamanho ?? "N/A")</div>
+                                                </td>
+                                                <td>
+                                                    <span class="@materialBadge" style="font-size: 0.75rem;">
+                                                        @* Mostra o nome do estado se a navegação estiver carregada, senão tenta deduzir pelo ID *@
+                                                        @(item.Estado?.Nome ?? (item.MaterialStatusId == 13 ? "Usado" : item.MaterialStatusId == 9 ? "Reservado" : "Registado"))
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="p-3 bg-light rounded text-center border-dashed">
+                                <i class="bi bi-box-seam text-muted d-block fs-4 mb-2"></i>
+                                <span class="text-muted small">Nenhum material associado a este exame.</span>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
 
-            @* --- Secção de Notas (Fundo cinza para destacar) --- *@
-            <div class="bg-light p-3 rounded-3 mt-2 border border-light-subtle">
-                <label class="text-muted small text-uppercase fw-bold mb-2">
-                    <i class="bi bi-journal-text me-1"></i> Notas e Observações
+            @* --- Secção de Notas --- *@
+            <div class="bg-light p-3 rounded-3 mt-4 border border-light-subtle shadow-sm">
+                <label class="text-muted small text-uppercase fw-bold mb-2 d-block">
+                    <i class="bi bi-journal-text me-1 text-primary"></i> Notas e Observações
                 </label>
-                <p class="mb-0 text-dark fst-italic">
+                <div class="p-3 bg-white rounded border" style="min-height: 60px;">
                     @if (!string.IsNullOrWhiteSpace(Model.Notas))
                     {
-                        @Model.Notas
+                        <p class="mb-0 text-dark">@Model.Notas</p>
                     }
                     else
                     {
-                        <span class="text-muted">Nenhuma nota registada para este exame.</span>
+                        <span class="text-muted fst-italic">Sem observações registadas.</span>
                     }
-                </p>
+                </div>
             </div>
 
         </div>
 
-        @* --- Rodapé com Botões --- *@
-        <div class="card-footer bg-white p-3 d-flex justify-content-end gap-2 border-top-0">
-            <a asp-action="Edit" asp-route-id="@Model.ExameId" class="btn btn-primary px-4">
+        @* --- Rodapé com Ações --- *@
+        <div class="card-footer bg-white p-4 d-flex justify-content-end gap-2 border-top">
+            <a asp-action="Edit" asp-route-id="@Model.ExameId" class="btn btn-primary px-4 shadow-sm">
                 <i class="bi bi-pencil-square me-1"></i> Editar
             </a>
-            <a asp-action="Delete" asp-route-id="@Model.ExameId" class="btn btn-danger px-4">
-                <i class="bi bi-trash me-1"></i> Eliminar
-            </a>
+
+            @if (Model.Estado != "Realizado")
+            {
+                <a asp-action="Delete" asp-route-id="@Model.ExameId" class="btn btn-outline-danger px-4">
+                    <i class="bi bi-trash me-1"></i> Eliminar
+                </a>
+            }
         </div>
     </div>
 </div>
+
+<style>
+    .extra-small {
+        font-size: 0.75rem;
+    }
+
+    .border-dashed {
+        border: 1px dashed #dee2e6;
+    }
+
+    @@media (min-width: 768px) {
+        .border-end {
+            border-right: 1px solid #dee2e6 !important;
+        }
+    }
+</style>
