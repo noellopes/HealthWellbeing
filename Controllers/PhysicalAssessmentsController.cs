@@ -85,14 +85,18 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Trainer,Administrator")] // Apenas Treinadores e Admin
         public async Task<IActionResult> Create([Bind("PhysicalAssessmentId,AssessmentDate,Weight,Height,BodyFatPercentage,MuscleMass,Notes,MemberId,TrainerId")] PhysicalAssessment physicalAssessment)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(physicalAssessment);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(); // Persistência referida no fluxo 
+
+                TempData["SuccessMessage"] = "Avaliação física registada com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
+            // Repreenche as listas se houver erro
             ViewData["MemberId"] = new SelectList(_context.Member.Include(m => m.Client), "MemberId", "Client.Name", physicalAssessment.MemberId);
             ViewData["TrainerId"] = new SelectList(_context.Trainer, "TrainerId", "Name", physicalAssessment.TrainerId);
             return View(physicalAssessment);

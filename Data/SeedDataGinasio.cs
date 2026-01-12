@@ -632,6 +632,39 @@ internal class SeedDataGinasio
             Notes = "Athlete level assessment. Increasing intensity.",
             MemberId = members[2].MemberId,
             TrainerId = trainers[2].TrainerId
+        },
+        new PhysicalAssessment
+        {
+            AssessmentDate = DateTime.Now.AddDays(-15),
+            Weight = 78.0m,
+            Height = 1.75m,
+            BodyFatPercentage = 18.5m,
+            MuscleMass = 40.0m,
+            Notes = "Athlete level assessment. Increasing intensity.",
+            MemberId = members[2].MemberId,
+            TrainerId = trainers[2].TrainerId
+        },
+        new PhysicalAssessment
+        {
+            AssessmentDate = DateTime.Now.AddDays(-15),
+            Weight = 78.0m,
+            Height = 1.75m,
+            BodyFatPercentage = 18.5m,
+            MuscleMass = 40.0m,
+            Notes = "Athlete level assessment. Increasing intensity.",
+            MemberId = members[4].MemberId,
+            TrainerId = trainers[3].TrainerId
+        },
+        new PhysicalAssessment
+        {
+            AssessmentDate = DateTime.Now.AddDays(-15),
+            Weight = 78.0m,
+            Height = 1.75m,
+            BodyFatPercentage = 18.5m,
+            MuscleMass = 40.0m,
+            Notes = "Athlete level assessment. Increasing intensity.",
+            MemberId = members[3].MemberId,
+            TrainerId = trainers[2].TrainerId
         }
     };
 

@@ -10,5 +10,7 @@ namespace HealthWellbeing.Models
         public Client? Client { get; set; } = default;
 
         public ICollection<MemberPlan> MemberPlans { get; set; } = new List<MemberPlan>();
+
+        public virtual ICollection<PhysicalAssessment> PhysicalAssessments { get; set; } = new List<PhysicalAssessment>();
     }
 }
