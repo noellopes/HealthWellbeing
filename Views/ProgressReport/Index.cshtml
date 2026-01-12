@@ -1,0 +1,100 @@
+﻿@model HealthWellbeing.ViewModels.ProgressReport
+
+@{
+    ViewData["Title"] = "Progress Report";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4 text-primary fw-bold">
+        <i class="bi bi-graph-up-arrow me-2"></i>Progress Report
+    </h1>
+
+    <!-- Filters -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-dark text-white py-3">
+            <h5 class="mb-0 fw-bold">
+                <i class="bi bi-funnel-fill me-2"></i>Filters
+            </h5>
+        </div>
+
+        <div class="card-body">
+            <form method="post" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">From</label>
+                    <input asp-for="From" type="date" class="form-control shadow-sm" />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">To</label>
+                    <input asp-for="To" type="date" class="form-control shadow-sm" />
+                </div>
+
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100 shadow-sm fw-bold">
+                        <i class="bi bi-search"></i> Generate Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-primary text-white py-3">
+            <h5 class="mb-0 fw-bold">
+                <i class="bi bi-bar-chart-fill me-2"></i>Summary
+            </h5>
+        </div>
+
+        <div class="card-body">
+            <p class="mb-0">
+                <strong>Total Trainings Attended:</strong>
+                @Model.TotalTrainingsAttended
+            </p>
+        </div>
+    </div>
+
+    <!-- Physical Assessments -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-success text-white py-3">
+            <h5 class="mb-0 fw-bold">
+                <i class="bi bi-heart-pulse-fill me-2"></i>Physical Assessments
+            </h5>
+        </div>
+
+        <div class="card-body">
+            @if (!Model.Assessments.Any())
+            {
+                <p class="text-muted">No assessments found for this period.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Weight</th>
+                                <th>Body Fat %</th>
+                                <th>Muscle Mass</th>
+                                <th>Trainer</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var a in Model.Assessments)
+                            {
+                                <tr>
+                                    <td>@a.AssessmentDate.ToShortDateString()</td>
+                                    <td>@a.Weight</td>
+                                    <td>@a.BodyFatPercentage</td>
+                                    <td>@a.MuscleMass</td>
+                                    <td>@a.Trainer?.Name</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
