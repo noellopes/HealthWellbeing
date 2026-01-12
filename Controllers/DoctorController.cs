@@ -49,7 +49,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Doctors/Details
-        [Authorize(Roles = "DiretorClimico,Medico")]
+        [Authorize(Roles = "DiretorClinico,Medico")]
 
         public async Task<IActionResult> Details(int? id)
         {
@@ -76,7 +76,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Doctors/Create
-        [Authorize(Roles = "DiretorClimico")]
+        [Authorize(Roles = "DiretorClinico")]
 
         public IActionResult Create()
         {
@@ -93,7 +93,7 @@ namespace HealthWellbeing.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "DiretorClimico")]
+        [Authorize(Roles = "DiretorClinico")]
         public async Task<IActionResult> Create([Bind("IdMedico,Nome,Telemovel,Email,IdEspecialidade")] Doctor doctor)
         {
             if (await _context.Doctor.AnyAsync(d => d.Email == doctor.Email))

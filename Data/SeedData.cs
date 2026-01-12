@@ -1141,8 +1141,9 @@ namespace HealthWellbeing.Data
             EnsureUserIsCreatedAsync(userManager, "anab@jbma.pt", "Secret123$", new[] { "Utente" }).GetAwaiter().GetResult();
             EnsureUserIsCreatedAsync(userManager, "brunoMP@jbma.pt", "Secret123$", new[] { "Utente" }).GetAwaiter().GetResult();
             EnsureUserIsCreatedAsync(userManager, "diretorClinico@healthwellbeing.pt", "Secret123$", new[] { "DiretorClinico" }).GetAwaiter().GetResult();
-
             EnsureUserIsCreatedAsync(userManager, "carla.ferreira@healthwellbeing.pt", "Secret123$", new[] { "Medico" }).GetAwaiter().GetResult();
+            EnsureUserIsCreatedAsync(userManager, "alice.w@example.com", "Secret123$", new[] { "Utente" }).GetAwaiter().GetResult();
+            EnsureUserIsCreatedAsync(userManager, "carlos.ferro@healthwellbeing.pt", "Secret123$", new[] { "Medico" }).GetAwaiter().GetResult();
             EnsureUserIsCreatedAsync(userManager, "bruno.carvalho@healthwellbeing.pt", "Secret123$", new[] { "Medico" }).GetAwaiter().GetResult();
             EnsureUserIsCreatedAsync(userManager, "ana.beatriz.silva@example.pt", "Secret123$", new[] { "Utente" }).GetAwaiter().GetResult();
             EnsureUserIsCreatedAsync(userManager, "ana.martins@healthwellbeing.pt", "Secret123$", new[] { "Medico" }).GetAwaiter().GetResult();
