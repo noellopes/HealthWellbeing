@@ -91,7 +91,7 @@ namespace HealthWellbeing.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> Edit(int id, [Bind("TrainerId,Name,Email,Phone,Address,BirthDate,Gender,IsAdministrator,IsTrainer")] Trainer trainer)
+        public async Task<IActionResult> Edit(int id, [Bind("TrainerId,Name,Email,Phone,Address,BirthDate,Gender,IsAdministrator,IsTrainer,IsActive")] Trainer trainer)
         {
             if (id != trainer.TrainerId)
             {
