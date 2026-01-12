@@ -1,4 +1,60 @@
-﻿@{
+﻿@model HealthWellbeing.ViewModels.UtentesDashboardViewModel
+
+@{
     ViewData["Title"] = "Dashboard";
 }
-<h1>Dashboard</h1>
+
+<h2>Dashboard</h2>
+
+<div class="row g-3 mt-3">
+
+    <div class="col-md-4">
+        <div class="card text-bg-primary shadow">
+            <div class="card-body">
+                <h5 class="card-title">Total de Utentes</h5>
+                <h2>@Model.TotalUtentes</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-bg-success shadow">
+            <div class="card-body">
+                <h5 class="card-title">Utentes Ativos</h5>
+                <h2>@Model.UtentesAtivos</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-bg-secondary shadow">
+            <div class="card-body">
+                <h5 class="card-title">Utentes Inativos</h5>
+                <h2>@Model.UtentesInativos</h2>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<hr />
+
+<h4 class="mt-4">Últimos Utentes</h4>
+
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Ativo</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var u in Model.Utentes)
+        {
+            <tr>
+                <td>@u.NomeCompleto</td>
+                <td>@(u.Ativo ? "Sim" : "Não")</td>
+            </tr>
+        }
+    </tbody>
+</table>

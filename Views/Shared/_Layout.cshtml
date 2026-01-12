@@ -44,14 +44,8 @@
 
                         @if (User.Identity?.IsAuthenticated ?? false)
                         {
-                            <!-- DASHBOARD PRINCIPAL (UTENTES) -->
-                            <li class="nav-item">
-                                <a class="nav-link text-white @(controller == "Utentes" ? "active" : "")"
-                                   asp-controller="Utentes"
-                                   asp-action="Dashboard">
-                                    Dashboard
-                                </a>
-                            </li>
+                            
+                            
 
                             <li class="nav-item">
                                 <a class="nav-link text-white"
