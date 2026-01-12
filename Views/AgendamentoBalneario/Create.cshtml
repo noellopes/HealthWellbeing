@@ -141,18 +141,12 @@
     }
 
     <script>
-        // Usamos DOMContentLoaded para garantir que os elementos já existem no HTML
         document.addEventListener("DOMContentLoaded", function () {
             const comboServico = document.getElementById("ServicoId");
 
             if (comboServico) {
                 comboServico.addEventListener("change", function () {
                     const servicoId = this.value;
-                    const campoPreco = document.getElementById("Preco");
-                    const campoDuracao = document.getElementById("DuracaoMinutos");
-                    const campoTipoSelect = document.getElementById("TipoServicosId");
-                    const campoTipoHidden = document.getElementById("TipoServicosIdHidden");
-
                     if (!servicoId) {
                         limparCampos();
                         return;
@@ -179,13 +173,5 @@
                 });
             }
         });
-
-        function limparCampos() {
-            const campos = ["Preco", "DuracaoMinutos", "TipoServicosId", "TipoServicosIdHidden"];
-            campos.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = "";
-            });
-        }
     </script>
 }
