@@ -108,45 +108,59 @@ namespace HealthWellbeing.Controllers
         // 3. CREATE (AGENDAMENTO)
         // =========================================================
 
-        // GET: Create?trainingId=5 (Mostra confirmação)
+        // GET: Sessions/Book/5
         public async Task<IActionResult> Create(int? trainingId)
         {
-            if (trainingId == null)
-            {
-                TempData["Error"] = "No training selected.";
-                return RedirectToAction("Index", "Training");
-            }
+            if (trainingId == null) return NotFound();
 
+            // 1. Obter utilizador e treino
             var member = await GetCurrentMemberAsync();
-
-            // Verifica se o plano do membro cobre este treino
-            bool isAllowed = await _context.MemberPlan
-                .Join(_context.TrainingPlan,
-                      mp => mp.PlanId,
-                      tp => tp.PlanId,
-                      (mp, tp) => new { mp, tp })
-                .AnyAsync(x => x.mp.MemberId == member.MemberId
-                            && x.mp.Status == "Active"
-                            && x.tp.TrainingId == trainingId);
-
-            if (!isAllowed)
-            {
-                TempData["Error"] = "Your current plan does not include this training.";
-                return RedirectToAction(nameof(AvailableTrainings));
-            }
-
             var training = await _context.Training
-                .Include(t => t.Trainer)
                 .Include(t => t.TrainingType)
+                .Include(t => t.Trainer)
                 .FirstOrDefaultAsync(m => m.TrainingId == trainingId);
 
             if (training == null) return NotFound();
 
-            // Calcular próxima data disponível baseada no dia da semana da aula
-            DayOfWeek targetDay = (DayOfWeek)training.DayOfWeek;
-            DateTime nextDate = GetNextWeekday(DateTime.Today, targetDay);
+            // 2. Verificar o Plano Atual
+            var activeMemberPlan = await _context.MemberPlan
+                .Include(mp => mp.Plan)
+                .FirstOrDefaultAsync(mp => mp.MemberId == member.MemberId && mp.Status == "Active");
 
+            string currentPlanName = activeMemberPlan?.Plan?.Name ?? "No Plan";
+
+            // 3. Verificar Permissão (Security Check)
+            bool isAllowed = false;
+            if (activeMemberPlan != null)
+            {
+                isAllowed = await _context.TrainingPlan
+                    .AnyAsync(tp => tp.PlanId == activeMemberPlan.PlanId && tp.TrainingId == trainingId);
+            }
+
+            // --- LÓGICA DE UPGRADE (NOVO!) ---
+            if (!isAllowed)
+            {
+                // Descobre quais os planos que INCLUEM este treino
+                var requiredPlans = await _context.TrainingPlan
+                    .Include(tp => tp.Plan)
+                    .Where(tp => tp.TrainingId == trainingId)
+                    .Select(tp => tp.Plan)
+                    .Distinct()
+                    .ToListAsync();
+
+                // Passa os dados para a vista de "Upgrade Necessário"
+                ViewBag.CurrentPlan = currentPlanName;
+                ViewBag.TrainingName = training.Name;
+
+                // Retorna a vista de sugestão em vez da vista de criar sessão
+                return View("UpgradeRequired", requiredPlans);
+            }
+            // ---------------------------------
+
+            // Se estiver tudo bem, continua para o agendamento normal
+            DateTime nextDate = GetNextWeekday(DateTime.Today, (DayOfWeek)training.DayOfWeek);
             ViewBag.SuggestedDate = nextDate.ToString("yyyy-MM-dd");
+
             return View(training);
         }
 

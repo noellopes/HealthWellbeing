@@ -14,11 +14,11 @@
         <div class="card-body p-4">
             <p class="text-muted small mb-4">Please review the class details below before confirming your attendance.</p>
 
-            <form asp-action="Create" method="post">
+            <from asp-action="Create" method="post">
                 @Html.AntiForgeryToken()
 
                 <input type="hidden" name="TrainingId" value="@Model.TrainingId" />
-                @* A data sugerida vem do Controller (ViewBag) ou calculada *@
+                @* A data sugerida vem do Controller (ViewBag) *@
                 <input type="hidden" name="SessionDate" value="@ViewBag.SuggestedDate" />
 
                 <div class="alert alert-info border-0 shadow-sm d-flex align-items-center mb-4 p-3 bg-opacity-10">
@@ -49,28 +49,4 @@
                         <label class="form-label fw-bold text-muted">Trainer</label>
                         <div class="input-group shadow-sm">
                             <span class="input-group-text bg-white border-end-0"><i class="bi bi-person-badge"></i></span>
-                            <input value="@Model.Trainer?.Name" class="form-control bg-light border-start-0" disabled readonly />
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold text-muted">Start Time</label>
-                        <div class="input-group shadow-sm">
-                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-clock"></i></span>
-                            <input value="@Model.StartTime.ToString(@"hh\:mm")" class="form-control bg-light border-start-0" disabled readonly />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
-                    <button type="submit" class="btn btn-success px-5 shadow-sm fw-bold">
-                        <i class="bi bi-check-lg me-1"></i> Confirm Booking
-                    </button>
-                    <a asp-controller="Training" asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
-                        Cancel
-                    </a>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+                            <input value="@Model.Trainer?.Name" class="form-control bg-light border-start-0"
