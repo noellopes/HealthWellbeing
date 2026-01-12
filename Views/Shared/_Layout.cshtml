@@ -37,9 +37,31 @@
                             <li class="nav-item">
                                 <a class="nav-link text-white" asp-controller="TipoServico" asp-action="Index">Tipo de Serviços</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="AgendamentoBalneario" asp-action="Index">Agendamentos</a>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link text-white dropdown-toggle" href="#" id="navbarAgendamentos" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Agendamentos
+                                </a>
+                                <ul class="dropdown-menu shadow" aria-labelledby="navbarAgendamentos">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="AgendamentoBalneario" asp-action="Create">
+                                            <i class="bi bi-calendar-plus me-2 text-primary"></i>Criar Agendamento
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="AgendamentoBalneario" asp-action="Index">
+                                            <i class="bi bi-search me-2 text-primary"></i>Consultar Agendamentos
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" asp-controller="AgendamentoBalneario" asp-action="Index">
+                                            <i class="bi bi-calendar-x me-2"></i>Cancelar Agendamento
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
+
                             <li class="nav-item">
                                 <a class="nav-link text-white" asp-controller="Consultas" asp-action="Index">Marcar Consulta</a>
                             </li>
