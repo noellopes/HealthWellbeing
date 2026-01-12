@@ -20,12 +20,20 @@ namespace HealthWellbeing.Controllers
         // GET: TrainingType
         public async Task<IActionResult> Index(
             int page = 1,
+            string searchName = "",
             string searchActive = "",
             int? searchMaxParticipants = null)
         {
             var trainingTypesQuery = _context.TrainingType.AsQueryable();
 
-            // Filtro por estado ativo
+            // 🔍 Filtro por nome
+            if (!string.IsNullOrWhiteSpace(searchName))
+            {
+                trainingTypesQuery = trainingTypesQuery
+                    .Where(t => t.Name.Contains(searchName));
+            }
+
+            // 🔍 Filtro por estado ativo
             if (!string.IsNullOrEmpty(searchActive))
             {
                 if (searchActive == "Yes")
@@ -34,13 +42,15 @@ namespace HealthWellbeing.Controllers
                     trainingTypesQuery = trainingTypesQuery.Where(t => !t.IsActive);
             }
 
-            // Filtro por número máximo de participantes
+            // 🔍 Filtro por número máximo de participantes
             if (searchMaxParticipants.HasValue)
             {
                 trainingTypesQuery = trainingTypesQuery
                     .Where(t => t.MaxParticipants == searchMaxParticipants.Value);
             }
 
+            // Enviar filtros para a View
+            ViewBag.SearchName = searchName;
             ViewBag.SearchActive = searchActive;
             ViewBag.SearchMaxParticipants = searchMaxParticipants;
 
@@ -176,4 +186,3 @@ namespace HealthWellbeing.Controllers
         }
     }
 }
-

@@ -16,12 +16,28 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Training
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(String searchName = "")
         {
+            var training = _context.Training
+                .Include(t => t.Trainer)
+                .Include(t => t.TrainingType)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchName))
+            {
+                    training = training
+                    .Where(t => t.Name.Contains(searchName));
+            }
+
+            ViewBag.SearchName = searchName;
+
             // Alterado para devolver uma Lista simples (sem Paginação) para corrigir o erro
             var healthWellbeingDbContext = _context.Training.Include(t => t.Trainer).Include(t => t.TrainingType);
             return View(await healthWellbeingDbContext.ToListAsync());
         }
+
+        
+
 
         // GET: Training/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -46,10 +62,11 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-        // POST: Training/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TrainingId,TrainerId,TrainingTypeId,Name,Description,DayOfWeek,StartTime,Duration,MaxParticipants")] Training training)
+        public async Task<IActionResult> Create(
+    [Bind("TrainerId,TrainingTypeId,Name,Description,Duration,DayOfWeek,StartTime")]
+    Training training)
         {
             if (ModelState.IsValid)
             {
@@ -57,10 +74,13 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["TrainerId"] = new SelectList(_context.Trainer, "TrainerId", "Name", training.TrainerId);
-            ViewData["TrainingTypeId"] = new SelectList(_context.TrainingType, "TrainingTypeId", "Name", training.TrainingTypeId);
+
+            ViewData["TrainerId"] = new SelectList(_context.Trainer, "TrainerId", "Name");
+            ViewData["TrainingTypeId"] = new SelectList(_context.TrainingType, "TrainingTypeId", "Name");
+
             return View(training);
         }
+
 
         // GET: Training/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -77,7 +97,7 @@ namespace HealthWellbeing.Controllers
         // POST: Training/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TrainingId,TrainerId,TrainingTypeId,Name,Description,DayOfWeek,StartTime,Duration,MaxParticipants")] Training training)
+        public async Task<IActionResult> Edit(int id, [Bind("TrainingId,TrainerId,TrainingTypeId,Name,Description,DayOfWeek,StartTime,Duration")] Training training)
         {
             if (id != training.TrainingId) return NotFound();
 
