@@ -30,7 +30,7 @@ public class UtentesController : Controller
         return View(vm);
     }
 
-    // ✅ DASHBOARD NO SÍTIO CERTO (UTENTES)
+    // DASHBOARD (UTENTES)
     public IActionResult Dashboard()
     {
         var vm = new UtentesDashboardViewModel
