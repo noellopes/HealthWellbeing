@@ -5,7 +5,6 @@ namespace HealthWellbeing.Models
     public class UtenteBalneario
     {
         [Key]
-        //Infos Utente
         public int UtenteBalnearioId { get; set; }
 
         [Required(ErrorMessage = "O nome é obrigatório")]
@@ -45,13 +44,6 @@ namespace HealthWellbeing.Models
         public bool Ativo { get; set; }
 
     }
-    
-        public enum Sexo
-        {
-             Masculino,
-             Feminino,
-             Outro
-        }
 
         public class DadosMedicos
         
