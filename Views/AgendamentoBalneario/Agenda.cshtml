@@ -1,0 +1,74 @@
+﻿@model HealthWellbeing.ViewModel.AgendamentoBalnearioViewModel
+
+<div class="container py-4">
+    <h2 class="mb-4"><i class="bi bi-calendar-check-fill me-2"></i>Gestão de Agendamentos</h2>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @foreach (var item in Model.ListaAgendamentos)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 rounded-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            @{
+                                var badgeClass = item.Estado switch
+                                {
+                                    EstadoAgendamento.Confirmado => "bg-success",
+                                    EstadoAgendamento.Pendente => "bg-warning text-dark",
+                                    EstadoAgendamento.Cancelado => "bg-danger",
+                                    EstadoAgendamento.Realizado => "bg-primary",
+                                    _ => "bg-secondary"
+                                };
+                            }
+                            <span class="badge @badgeClass px-3 py-2 rounded-pill">@item.Estado</span>
+                            <span class="text-muted fw-bold">@item.HoraInicio.ToString("HH:mm")</span>
+                        </div>
+
+                        <h5 class="card-title fw-bold text-primary mb-1">@item.Servico?.Nome</h5>
+                        <p class="text-muted small mb-3">@item.HoraInicio.ToString("dd/MM/yyyy")</p>
+
+                        <p class="mb-0"><strong>Utente:</strong> @(item.UtenteBalneario?.NomeCompleto ?? "---")</p>
+                    </div>
+
+                    <div class="card-footer bg-white border-0 p-4 pt-0">
+                        @if (item.Estado == EstadoAgendamento.Pendente)
+                        {
+                            <div class="d-flex gap-2">
+                                <a asp-action="UpdateStatus" asp-route-id="@item.AgendamentoId" asp-route-status="Confirmado"
+                                   class="btn btn-success flex-grow-1 rounded-3">Confirmar</a>
+                                <a asp-action="UpdateStatus" asp-route-id="@item.AgendamentoId" asp-route-status="Cancelado"
+                                   class="btn btn-outline-danger flex-grow-1 rounded-3">Cancelar</a>
+                            </div>
+                        }
+                        else if (item.Estado == EstadoAgendamento.Confirmado)
+                        {
+                            <a asp-action="UpdateStatus" asp-route-id="@item.AgendamentoId" asp-route-status="Realizado"
+                               class="btn btn-primary w-100 rounded-3">
+                                <i class="bi bi-check-lg me-1"></i> Marcar como Realizado
+                            </a>
+                        }
+                        else
+                        {
+                            <button class="btn btn-light w-100 rounded-3 text-muted" disabled>Concluído</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: all 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important;
+        }
+
+    .rounded-4 {
+        border-radius: 1rem !important;
+    }
+</style>

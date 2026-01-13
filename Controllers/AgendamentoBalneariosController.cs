@@ -276,7 +276,44 @@ public async Task<IActionResult> Edit(int? id)
             return Json(terapeutas);
         }
 
-       
+        public async Task<IActionResult> Agenda()
+        {
+            // Procura todos os agendamentos incluindo as relações para mostrar nomes em vez de IDs
+            var agendamentoBalneario = await _context.Agendamentos
+                 .Include(a => a.UtenteBalneario)
+                .Include(a => a.Terapeuta)
+                .Include(a => a.Servico)
+                .Include(a => a.TipoServico)
+                .OrderBy(a => a.HoraInicio) // Ordena por hora para facilitar ao terapeuta
+                .ToListAsync();
+
+            var viewModel = new AgendamentoBalnearioViewModel
+            {
+                ListaAgendamentos = agendamentoBalneario.ToList(),
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UpdateStatus(int id, string status)
+        {
+            var agendamento = await _context.Agendamentos.FindAsync(id);
+
+            if (agendamento == null) return NotFound();
+
+            if (Enum.TryParse<EstadoAgendamento>(status, out var novoEstado))
+            {
+                agendamento.Estado = novoEstado;
+                _context.Update(agendamento);
+                await _context.SaveChangesAsync();
+
+                // Redireciona para o Index onde a tabela já tem as cores configuradas
+                return RedirectToAction(nameof(Index), new { successMessage = $"Agendamento marcado como {status}!" });
+            }
+
+            return RedirectToAction(nameof(Agenda));
+        }
         private bool AgendamentoBalnearioExists(int id)
         {
             return _context.Agendamentos.Any(e => e.AgendamentoId == id);
