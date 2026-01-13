@@ -82,13 +82,31 @@ namespace HealthWellbeing.Controllers
 
             return View(agendamentoBalneario);
         }
+
         // GET: AgendamentoBalnearios/Create
+        public IActionResult Create()
+        {
+
+
+           
+            ViewBag.UtenteBalnearioId = new SelectList(_context.Utentes.OrderBy(u => u.NomeCompleto), "UtenteBalnearioId", "NomeCompleto");
+            ViewBag.TerapeutaId = new SelectList(_context.Terapeuta.OrderBy(t => t.Email), "TerapeutaId", "Email");
+
+            var listaServicos = _context.Servicos.OrderBy(s => s.Nome).ToList();
+            ViewBag.ServicoId = new SelectList(listaServicos, "ServicoId", "Nome");
+
+            ViewBag.TipoServicosId = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome", null);
+            return View();
+        }
+
+        // POST: AgendamentoBalnearios/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
             [Bind("AgendamentoId,UtenteBalnearioId,TerapeutaId,ServicoId,TipoServicosId,HoraInicio,DuracaoMinutos,Preco,Descricao,Estado")]
             AgendamentoBalneario agendamentoBalneario)
         {
+            // Remove navigation properties (igual ao Servico)
             ModelState.Remove("UtenteBalneario");
             ModelState.Remove("Servico");
             ModelState.Remove("Terapeuta");
@@ -117,6 +135,8 @@ namespace HealthWellbeing.Controllers
 
             return View(agendamentoBalneario);
         }
+    
+
 
 // GET: AgendamentoBalnearios/Edit/5
 public async Task<IActionResult> Edit(int? id)
@@ -279,6 +299,7 @@ public async Task<IActionResult> Edit(int? id)
         public async Task<IActionResult> UpdateStatus(int id, string status)
         {
             var agendamento = await _context.Agendamentos.FindAsync(id);
+
             if (agendamento == null) return NotFound();
 
             if (Enum.TryParse<EstadoAgendamento>(status, out var novoEstado))
@@ -290,6 +311,7 @@ public async Task<IActionResult> Edit(int? id)
                 // Redireciona para o Index onde a tabela já tem as cores configuradas
                 return RedirectToAction(nameof(Index), new { successMessage = $"Agendamento marcado como {status}!" });
             }
+
             return RedirectToAction(nameof(Agenda));
         }
         private bool AgendamentoBalnearioExists(int id)
