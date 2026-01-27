@@ -9,7 +9,9 @@
 <hr />
 
 <form asp-action="Create" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="text-danger"></div>
 
     <div class="form-group mb-2">
         <label asp-for="Nome"></label>
@@ -19,13 +21,18 @@
 
     <div class="form-group mb-2">
         <label asp-for="DataNascimento"></label>
-        <input asp-for="DataNascimento" class="form-control" />
+        <input asp-for="DataNascimento" class="form-control" type="date" />
         <span asp-validation-for="DataNascimento" class="text-danger"></span>
     </div>
 
     <div class="form-group mb-2">
         <label asp-for="Genero"></label>
-        <input asp-for="Genero" class="form-control" />
+        <select asp-for="Genero" class="form-control">
+            <option value="">-- Selecione --</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Feminino">Feminino</option>
+            <option value="Outro">Outro</option>
+        </select>
         <span asp-validation-for="Genero" class="text-danger"></span>
     </div>
 
@@ -44,35 +51,14 @@
     <div class="form-group mb-2">
         <label asp-for="Morada"></label>
         <input asp-for="Morada" class="form-control" />
+        <span asp-validation-for="Morada" class="text-danger"></span>
     </div>
 
-    <hr />
-
-    <h5>Dados Médicos</h5>
-
-    <div class="form-group mb-2">
-        <label asp-for="HistoricoClinico"></label>
-        <textarea asp-for="HistoricoClinico" class="form-control"></textarea>
-    </div>
-
-    <div class="form-group mb-2">
-        <label asp-for="IndicacoesTerapeuticas"></label>
-        <textarea asp-for="IndicacoesTerapeuticas" class="form-control"></textarea>
-    </div>
-
-    <div class="form-group mb-2">
-        <label asp-for="ContraIndicacoes"></label>
-        <textarea asp-for="ContraIndicacoes" class="form-control"></textarea>
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="MedicoResponsavel"></label>
-        <input asp-for="MedicoResponsavel" class="form-control" />
-    </div>
 
     <button type="submit" class="btn btn-primary">Guardar</button>
     <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
 </form>
+
 
 @section Scripts {
     @{

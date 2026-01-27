@@ -8,6 +8,14 @@
 
 <hr />
 
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+
 <div class="card mb-4">
     <div class="card-header">
         <strong>Dados Pessoais</strong>

@@ -4,7 +4,22 @@
     ViewData["Title"] = "Utentes do Balneário";
 }
 
+
+
 <h2>Utentes do Balneário</h2>
+<p>
+    <a asp-action="Create" class="btn btn-primary">
+        Criar Utente
+    </a>
+</p>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
 
 <table class="table table-striped">
     <thead>

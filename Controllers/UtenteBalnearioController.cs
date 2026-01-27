@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using System;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace HealthWellbeing.Controllers
 {
@@ -49,15 +49,23 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(UtenteBalneario utenteBalneario)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(utenteBalneario);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return View(utenteBalneario);
             }
 
-            return View(utenteBalneario);
-        }
+            utenteBalneario.DataInscricao = DateTime.Now;
+            utenteBalneario.Ativo = true;
 
+            _context.Add(utenteBalneario);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Utente criado com sucesso!";
+
+            return RedirectToAction(
+                nameof(Details),
+                new { id = utenteBalneario.UtenteBalnearioId }
+            );
+        }
     }
 }
