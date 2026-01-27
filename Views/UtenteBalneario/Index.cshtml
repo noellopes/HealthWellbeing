@@ -1,0 +1,39 @@
+﻿@model IEnumerable<HealthWellbeing.Models.UtenteBalneario>
+
+@{
+    ViewData["Title"] = "Utentes do Balneário";
+}
+
+<h2>Utentes do Balneário</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Género</th>
+            <th>Contacto</th>
+            <th>Data de Inscrição</th>
+            <th>Estado</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Nome</td>
+                <td>@item.Genero</td>
+                <td>@item.Contacto</td>
+                <td>@item.DataInscricao.ToShortDateString()</td>
+                <td>
+                    @(item.Ativo ? "Ativo" : "Inativo")
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.UtenteBalnearioId">
+                        Detalhes
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
