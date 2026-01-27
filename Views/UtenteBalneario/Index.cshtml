@@ -41,8 +41,11 @@
                 <td>@item.Contacto</td>
                 <td>@item.DataInscricao.ToShortDateString()</td>
                 <td>
-                    @(item.Ativo ? "Ativo" : "Inativo")
+                    <span class="badge @(item.Ativo ? "bg-success" : "bg-secondary")">
+                        @(item.Ativo ? "Ativo" : "Inativo")
+                    </span>
                 </td>
+
                 <td>
                     <a asp-action="Details" asp-route-id="@item.UtenteBalnearioId">
                         Detalhes

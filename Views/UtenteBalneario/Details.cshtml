@@ -84,12 +84,21 @@
     </div>
 </div>
 
+
+<!--Botões-->
+<form asp-action="ToggleAtivo" method="post" class="d-inline">
+    <input type="hidden" name="id" value="@Model.UtenteBalnearioId" />
+    <button type="submit"
+            class="btn @(Model.Ativo ? "btn-danger" : "btn-success")">
+        @(Model.Ativo ? "Desativar" : "Ativar")
+    </button>
+</form>
+
 <a asp-action="Edit"
    asp-route-id="@Model.UtenteBalnearioId"
    class="btn btn-warning">
     Editar
 </a>
-
 
 <a asp-action="Index" class="btn btn-secondary">
     Voltar

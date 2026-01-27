@@ -111,5 +111,25 @@ namespace HealthWellbeing.Controllers
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleAtivo(int id)
+        {
+            var utente = await _context.UtenteBalnearios.FindAsync(id);
+
+            if (utente == null)
+                return NotFound();
+
+            utente.Ativo = !utente.Ativo;
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = utente.Ativo
+                ? "Utente ativado com sucesso!"
+                : "Utente desativado com sucesso!";
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+
     }
 }
