@@ -1,0 +1,81 @@
+﻿@model HealthWellbeing.Models.UtenteBalneario
+
+@{
+    ViewData["Title"] = "Detalhes do Utente";
+}
+
+<h2>Detalhes do Utente</h2>
+
+<hr />
+
+<div class="card mb-4">
+    <div class="card-header">
+        <strong>Dados Pessoais</strong>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Nome</dt>
+            <dd class="col-sm-9">@Model.Nome</dd>
+
+            <dt class="col-sm-3">Data de Nascimento</dt>
+            <dd class="col-sm-9">@Model.DataNascimento.ToShortDateString()</dd>
+
+            <dt class="col-sm-3">Género</dt>
+            <dd class="col-sm-9">@Model.Genero</dd>
+
+            <dt class="col-sm-3">NIF</dt>
+            <dd class="col-sm-9">@Model.NIF</dd>
+
+            <dt class="col-sm-3">Contacto</dt>
+            <dd class="col-sm-9">@Model.Contacto</dd>
+
+            <dt class="col-sm-3">Morada</dt>
+            <dd class="col-sm-9">@Model.Morada</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <strong>Dados Médicos</strong>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Histórico Clínico</dt>
+            <dd class="col-sm-9">@Model.HistoricoClinico</dd>
+
+            <dt class="col-sm-3">Indicações Terapêuticas</dt>
+            <dd class="col-sm-9">@Model.IndicacoesTerapeuticas</dd>
+
+            <dt class="col-sm-3">Contraindicações / Alergias</dt>
+            <dd class="col-sm-9">@Model.ContraIndicacoes</dd>
+
+            <dt class="col-sm-3">Médico Responsável</dt>
+            <dd class="col-sm-9">@Model.MedicoResponsavel</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <strong>Dados Administrativos</strong>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Data de Inscrição</dt>
+            <dd class="col-sm-9">@Model.DataInscricao.ToShortDateString()</dd>
+
+            <dt class="col-sm-3">Seguro de Saúde</dt>
+            <dd class="col-sm-9">@Model.SeguroSaude</dd>
+
+            <dt class="col-sm-3">Estado</dt>
+            <dd class="col-sm-9">
+                @(Model.Ativo ? "Ativo" : "Inativo")
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary">
+    Voltar
+</a>
