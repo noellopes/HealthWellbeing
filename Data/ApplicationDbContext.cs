@@ -1,7 +1,6 @@
 ﻿using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Data
 {
@@ -11,6 +10,10 @@ namespace HealthWellbeing.Data
             : base(options)
         {
         }
+
+        // =========================
+        // DbSets
+        // =========================
+        public DbSet<UtenteBalneario> UtenteBalnearios { get; set; }
     }
 }
-
