@@ -67,5 +67,49 @@ namespace HealthWellbeing.Controllers
                 new { id = utenteBalneario.UtenteBalnearioId }
             );
         }
+
+
+        // GET: UtenteBalneario/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            var utente = await _context.UtenteBalnearios.FindAsync(id);
+
+            if (utente == null)
+                return NotFound();
+
+            return View(utente);
+        }
+
+        // POST: UtenteBalneario/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, UtenteBalneario utenteBalneario)
+        {
+            if (id != utenteBalneario.UtenteBalnearioId)
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return View(utenteBalneario);
+
+            try
+            {
+                _context.Update(utenteBalneario);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "Utente atualizado com sucesso!";
+                return RedirectToAction(nameof(Details), new { id = utenteBalneario.UtenteBalnearioId });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.UtenteBalnearios.Any(e => e.UtenteBalnearioId == id))
+                    return NotFound();
+
+                throw;
+            }
+        }
+
     }
 }
