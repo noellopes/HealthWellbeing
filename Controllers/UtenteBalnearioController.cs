@@ -37,5 +37,27 @@ namespace HealthWellbeing.Controllers
 
             return View(utente);
         }
+
+        // GET: UtenteBalneario/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: UtenteBalneario/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(UtenteBalneario utenteBalneario)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(utenteBalneario);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(utenteBalneario);
+        }
+
     }
 }
