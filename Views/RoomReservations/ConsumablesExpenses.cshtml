@@ -20,7 +20,7 @@
                     <th>Consumível</th>
                     <th>Quantidade utilizada</th>
                     <th>Sala</th>
-                    @* <th>Reserva</th> *@
+                    <th>Reserva</th>
                 </tr>
             </thead>
 
@@ -48,7 +48,7 @@
                             <td>@item.Consumable?.Nome</td>
                             <td>@item.QuantityUsed</td>
                             <td>@item.Room?.Name</td>
-                            @* <td>@item.RoomReservationId.ToString("D3")</td> *@
+                            <td>@item.RoomReservationId</td>
                         </tr>
                     }
                 }
