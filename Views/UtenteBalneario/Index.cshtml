@@ -115,6 +115,32 @@
     {
         <nav class="mt-4">
             <ul class="pagination justify-content-center">
+
+                <!-- Primeira página -->
+                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="1"
+                       asp-route-search="@ViewBag.Search"
+                       asp-route-ativos="@ViewBag.Ativos"
+                       asp-route-sort="@ViewBag.Sort">
+                        ⏮
+                    </a>
+                </li>
+
+                <!-- Página anterior -->
+                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@(ViewBag.CurrentPage - 1)"
+                       asp-route-search="@ViewBag.Search"
+                       asp-route-ativos="@ViewBag.Ativos"
+                       asp-route-sort="@ViewBag.Sort">
+                        ◀
+                    </a>
+                </li>
+
+                <!-- Números das páginas -->
                 @for (int i = 1; i <= ViewBag.TotalPages; i++)
                 {
                     <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
@@ -122,13 +148,40 @@
                            asp-action="Index"
                            asp-route-page="@i"
                            asp-route-search="@ViewBag.Search"
-                           asp-route-ativos="@ViewBag.Ativos">
+                           asp-route-ativos="@ViewBag.Ativos"
+                           asp-route-sort="@ViewBag.Sort">
                             @i
                         </a>
                     </li>
                 }
+
+                <!-- Página seguinte -->
+                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@(ViewBag.CurrentPage + 1)"
+                       asp-route-search="@ViewBag.Search"
+                       asp-route-ativos="@ViewBag.Ativos"
+                       asp-route-sort="@ViewBag.Sort">
+                        ▶
+                    </a>
+                </li>
+
+                <!-- Última página -->
+                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@ViewBag.TotalPages"
+                       asp-route-search="@ViewBag.Search"
+                       asp-route-ativos="@ViewBag.Ativos"
+                       asp-route-sort="@ViewBag.Sort">
+                        ⏭
+                    </a>
+                </li>
+
             </ul>
         </nav>
     }
+
 
 </div>
