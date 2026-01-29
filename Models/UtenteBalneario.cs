@@ -43,9 +43,16 @@ namespace HealthWellbeing.Models
         // =========================
         // Dados Médicos
         // =========================
+
+        [Display(Name = "Histórico Clínico")]
         public string? HistoricoClinico { get; set; }
+
+        [Display(Name = "Indicações Terapêuticas")]
         public string? IndicacoesTerapeuticas { get; set; }
+
+        [Display(Name = "Contraindicações / Alergias")]
         public string? ContraIndicacoes { get; set; }
+
 
         [Display(Name = "Terapeuta Responsável")]
         public string? TerapeutaResponsavel { get; set; }

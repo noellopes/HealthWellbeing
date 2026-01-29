@@ -113,12 +113,21 @@ namespace HealthWellbeing.Controllers
             if (utenteDb == null)
                 return NotFound();
 
+            // =========================
+            // UTENTE
+            // =========================
+
             utenteDb.Nome = utente.Nome;
             utenteDb.DataNascimento = utente.DataNascimento;
             utenteDb.GeneroId = utente.GeneroId;
             utenteDb.NIF = utente.NIF;
             utenteDb.Contacto = utente.Contacto;
             utenteDb.Morada = utente.Morada;
+
+            // =========================
+            // DADOS MÉDICOS
+            // =========================
+
 
             utenteDb.HistoricoClinico = utente.HistoricoClinico;
             utenteDb.IndicacoesTerapeuticas = utente.IndicacoesTerapeuticas;
@@ -135,7 +144,7 @@ namespace HealthWellbeing.Controllers
 
 
         // =========================
-        // aTIVAR/DESATIVAR UTENTE
+        // ATIVAR/DESATIVAR UTENTE
         // =========================
 
         [HttpPost]
