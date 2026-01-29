@@ -40,6 +40,7 @@ namespace HealthWellbeing.Controllers
                 .Include(u => u.SeguroSaude)
                 .FirstOrDefaultAsync(u => u.UtenteBalnearioId == id);
 
+
             if (utente == null)
                 return NotFound();
 
@@ -138,7 +139,7 @@ namespace HealthWellbeing.Controllers
             utenteDb.IndicacoesTerapeuticas = utente.IndicacoesTerapeuticas;
             utenteDb.ContraIndicacoes = utente.ContraIndicacoes;
             utenteDb.TerapeutaResponsavel = utente.TerapeutaResponsavel;
-            utenteDb.SeguroSaude = utente.SeguroSaude;
+            utenteDb.SeguroSaudeId = utente.SeguroSaudeId;
 
             await _context.SaveChangesAsync();
 
