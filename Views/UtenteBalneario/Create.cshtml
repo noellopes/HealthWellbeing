@@ -57,6 +57,39 @@
         <span asp-validation-for="Morada" class="text-danger"></span>
     </div>
 
+    <hr />
+    <h4>Dados Médicos</h4>
+
+    <div class="form-group mb-2">
+        <label asp-for="HistoricoClinico"></label>
+        <textarea asp-for="HistoricoClinico" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group mb-2">
+        <label asp-for="IndicacoesTerapeuticas"></label>
+        <textarea asp-for="IndicacoesTerapeuticas" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group mb-2">
+        <label asp-for="ContraIndicacoes"></label>
+        <textarea asp-for="ContraIndicacoes" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group mb-2">
+        <label asp-for="TerapeutaResponsavel"></label>
+        <input asp-for="TerapeutaResponsavel" class="form-control" />
+    </div>
+
+    <hr />
+    <h4>Dados Administrativos</h4>
+
+    <div class="form-group mb-2">
+        <label asp-for="SeguroSaude"></label>
+        <input asp-for="SeguroSaude" class="form-control" />
+    </div>
+
+
+
 
     <button type="submit" class="btn btn-primary">Guardar</button>
     <a asp-action="Index" class="btn btn-secondary">Cancelar</a>

@@ -46,7 +46,17 @@ namespace HealthWellbeing.Models
         public string? HistoricoClinico { get; set; }
         public string? IndicacoesTerapeuticas { get; set; }
         public string? ContraIndicacoes { get; set; }
-        public string? MedicoResponsavel { get; set; }
+
+        [Display(Name = "Terapeuta Responsável")]
+        public string? TerapeutaResponsavel { get; set; }
+
+
+        //Sem haver BD dos Terapeutas
+        /*
+        public int? FisioterapeutaId { get; set; }
+        public Fisioterapeuta? Fisioterapeuta { get; set; }
+        */
+
 
         // =========================
         // Dados Administrativos

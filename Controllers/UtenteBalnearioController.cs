@@ -58,11 +58,9 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(UtenteBalneario utente)
         {
-            
-
             if (!ModelState.IsValid)
             {
-                LoadGeneros();
+                LoadGeneros(utente.GeneroId);
                 return View(utente);
             }
 
@@ -86,9 +84,10 @@ namespace HealthWellbeing.Controllers
             if (utente == null)
                 return NotFound();
 
-            LoadGeneros();
+            LoadGeneros(utente.GeneroId); 
             return View(utente);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -97,41 +96,83 @@ namespace HealthWellbeing.Controllers
             if (id != utente.UtenteBalnearioId)
                 return NotFound();
 
-           
+            if (utente.GeneroId == null || utente.GeneroId <= 0)
+            {
+                ModelState.AddModelError("GeneroId", "Selecione um género válido.");
+            }
 
             if (!ModelState.IsValid)
             {
-                LoadGeneros();
+                LoadGeneros(utente.GeneroId);
                 return View(utente);
             }
 
-            try
-            {
-                _context.Update(utente);
-                await _context.SaveChangesAsync();
+            var utenteDb = await _context.UtenteBalnearios
+                .FirstOrDefaultAsync(u => u.UtenteBalnearioId == id);
 
-                TempData["Success"] = "Utente atualizado com sucesso!";
-                return RedirectToAction(nameof(Details), new { id = utente.UtenteBalnearioId });
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.UtenteBalnearios.Any(e => e.UtenteBalnearioId == id))
-                    return NotFound();
+            if (utenteDb == null)
+                return NotFound();
 
-                throw;
-            }
+            utenteDb.Nome = utente.Nome;
+            utenteDb.DataNascimento = utente.DataNascimento;
+            utenteDb.GeneroId = utente.GeneroId;
+            utenteDb.NIF = utente.NIF;
+            utenteDb.Contacto = utente.Contacto;
+            utenteDb.Morada = utente.Morada;
+
+            utenteDb.HistoricoClinico = utente.HistoricoClinico;
+            utenteDb.IndicacoesTerapeuticas = utente.IndicacoesTerapeuticas;
+            utenteDb.ContraIndicacoes = utente.ContraIndicacoes;
+            utenteDb.TerapeutaResponsavel = utente.TerapeutaResponsavel;
+            utenteDb.SeguroSaude = utente.SeguroSaude;
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Utente atualizado com sucesso!";
+            return RedirectToAction(nameof(Details), new { id });
         }
+
+
+
+        // =========================
+        // aTIVAR/DESATIVAR UTENTE
+        // =========================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleAtivo(int id)
+        {
+            var utente = await _context.UtenteBalnearios.FindAsync(id);
+
+            if (utente == null)
+                return NotFound();
+
+            utente.Ativo = !utente.Ativo;
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = utente.Ativo
+                ? "Utente ativado com sucesso!"
+                : "Utente desativado com sucesso!";
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+
+
 
         // =========================
         // HELPERS
         // =========================
-        private void LoadGeneros()
+        private void LoadGeneros(int? generoSelecionado = null)
         {
             ViewBag.Generos = new SelectList(
                 _context.Generos.OrderBy(g => g.Nome),
                 "GeneroId",
-                "Nome"
+                "Nome",
+                generoSelecionado
             );
         }
+
     }
 }

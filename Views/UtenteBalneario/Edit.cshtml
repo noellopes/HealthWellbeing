@@ -25,15 +25,15 @@
     </div>
 
     <div class="form-group mb-2">
-        <label asp-for="Genero"></label>
-        <select asp-for="Genero" class="form-control">
-            <option value="">-- Selecione --</option>
-            <option>Masculino</option>
-            <option>Feminino</option>
-            <option>Outro</option>
+        <label asp-for="GeneroId">Género</label>
+        <select asp-for="GeneroId"
+                asp-items="ViewBag.Generos"
+                class="form-control">
+            <option value="">-- Selecione o género --</option>
         </select>
-        <span asp-validation-for="Genero" class="text-danger"></span>
+        <span asp-validation-for="GeneroId" class="text-danger"></span>
     </div>
+
 
     <div class="form-group mb-2">
         <label asp-for="NIF"></label>
@@ -55,6 +55,9 @@
     <hr />
     <h5>Dados Médicos</h5>
 
+    <hr />
+    <h4>Dados Médicos</h4>
+
     <div class="form-group mb-2">
         <label asp-for="HistoricoClinico"></label>
         <textarea asp-for="HistoricoClinico" class="form-control"></textarea>
@@ -70,10 +73,19 @@
         <textarea asp-for="ContraIndicacoes" class="form-control"></textarea>
     </div>
 
-    <div class="form-group mb-3">
-        <label asp-for="MedicoResponsavel"></label>
-        <input asp-for="MedicoResponsavel" class="form-control" />
+    <div class="form-group mb-2">
+        <label asp-for="TerapeutaResponsavel"></label>
+        <input asp-for="TerapeutaResponsavel" class="form-control" />
     </div>
+
+    <hr />
+    <h4>Dados Administrativos</h4>
+
+    <div class="form-group mb-2">
+        <label asp-for="SeguroSaude"></label>
+        <input asp-for="SeguroSaude" class="form-control" />
+    </div>
+
 
     <button type="submit" class="btn btn-primary">Guardar Alterações</button>
     <a asp-action="Details" asp-route-id="@Model.UtenteBalnearioId" class="btn btn-secondary">
