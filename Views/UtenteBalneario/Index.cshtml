@@ -60,10 +60,24 @@
             <table class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Nome</th>
+                        <th>
+                            <a asp-action="Index"
+                               asp-route-sort="@(ViewBag.Sort == "nome_desc" ? "" : "nome_desc")"
+                               asp-route-search="@ViewBag.Search"
+                               asp-route-ativos="@ViewBag.Ativos">
+                                Nome
+                            </a>
+                        </th>
                         <th>Género</th>
                         <th>Contacto</th>
-                        <th>Data de Inscrição</th>
+                        <th>
+                            <a asp-action="Index"
+                               asp-route-sort="@(ViewBag.Sort == "data_desc" ? "data" : "data_desc")"
+                               asp-route-search="@ViewBag.Search"
+                               asp-route-ativos="@ViewBag.Ativos">
+                                Data de Inscrição
+                            </a>
+                        </th>
                         <th>Estado</th>
                         <th class="text-end"></th>
                     </tr>

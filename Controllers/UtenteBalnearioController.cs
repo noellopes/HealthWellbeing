@@ -21,7 +21,11 @@ namespace HealthWellbeing.Controllers
         // =========================
         // INDEX COM PAGINAÇÃO, PESQUISA, FILTRO
         // =========================
-        public async Task<IActionResult> Index(string search, bool? ativos, int page = 1)
+             public async Task<IActionResult> Index(
+             string? search,
+             bool? ativos,
+             string? sort,
+             int page = 1)
         {
             int pageSize = 10;
 
@@ -29,27 +33,44 @@ namespace HealthWellbeing.Controllers
                 .Include(u => u.Genero)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(search))
+            // Pesquisa
+            if (!string.IsNullOrWhiteSpace(search))
+            {
                 query = query.Where(u => u.Nome.Contains(search));
+            }
 
+            // Filtro Ativos
             if (ativos.HasValue)
+            {
                 query = query.Where(u => u.Ativo == ativos.Value);
+            }
 
-            var total = await query.CountAsync();
+            // Ordenação
+            query = sort switch
+            {
+                "nome_desc" => query.OrderByDescending(u => u.Nome),
+                "data" => query.OrderBy(u => u.DataInscricao),
+                "data_desc" => query.OrderByDescending(u => u.DataInscricao),
+                _ => query.OrderBy(u => u.Nome)
+            };
 
+            // Paginação
+            var totalItems = await query.CountAsync();
             var utentes = await query
-                .OrderBy(u => u.Nome)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            ViewBag.Ativos = ativos;
+            // ViewBags
             ViewBag.Search = search;
+            ViewBag.Ativos = ativos;
+            ViewBag.Sort = sort;
             ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = (int)Math.Ceiling(total / (double)pageSize);
+            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
             return View(utentes);
         }
+
 
 
 
