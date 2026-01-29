@@ -156,7 +156,12 @@
                 </li>
 
                 <!-- Números das páginas -->
-                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                @{
+                    int startPage = Math.Max(1, ViewBag.CurrentPage - 2);
+                    int endPage = Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2);
+                }
+
+                @for (int i = startPage; i <= endPage; i++)
                 {
                     <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
                         <a class="page-link"
@@ -169,6 +174,7 @@
                         </a>
                     </li>
                 }
+
 
                 <!-- Página seguinte -->
                 <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
