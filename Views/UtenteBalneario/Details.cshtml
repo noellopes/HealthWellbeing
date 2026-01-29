@@ -4,80 +4,60 @@
     ViewData["Title"] = "Detalhes do Utente";
 }
 
-<h2>Detalhes do Utente</h2>
+<div class="container mt-4">
 
-<hr />
+    <h2 class="mb-3">Detalhes do Utente</h2>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["Success"]
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    <!-- 👤 Dados Pessoais -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-bold">
+            👤 Dados Pessoais
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6"><strong>Nome:</strong> @Model.Nome</div>
+                <div class="col-md-3"><strong>Género:</strong> @Model.Genero?.Nome</div>
+                <div class="col-md-3"><strong>Nascimento:</strong> @Model.DataNascimento.ToString("dd/MM/yyyy")</div>
+            </div>
+
+            <div class="row mt-2">
+                <div class="col-md-4"><strong>NIF:</strong> @Model.NIF</div>
+                <div class="col-md-4"><strong>Contacto:</strong> @Model.Contacto</div>
+                <div class="col-md-4"><strong>Morada:</strong> @Model.Morada</div>
+            </div>
+        </div>
     </div>
-}
 
-
-<div class="card mb-4">
-    <div class="card-header">
-        <strong>Dados Pessoais</strong>
+    <!-- 🩺 Dados Médicos -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-bold">
+            🩺 Dados Médicos
+        </div>
+        <div class="card-body">
+            <p><strong>Histórico Clínico:</strong> @Model.HistoricoClinico</p>
+            <p><strong>Indicações Terapêuticas:</strong> @Model.IndicacoesTerapeuticas</p>
+            <p><strong>Contraindicações:</strong> @Model.ContraIndicacoes</p>
+            <p><strong>Terapeuta Responsável:</strong> @Model.TerapeutaResponsavel</p>
+        </div>
     </div>
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">Nome</dt>
-            <dd class="col-sm-9">@Model.Nome</dd>
 
-            <dt class="col-sm-3">Data de Nascimento</dt>
-            <dd class="col-sm-9">@Model.DataNascimento.ToShortDateString()</dd>
+    <!-- 📄 Dados Administrativos -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-bold">
+            📄 Dados Administrativos
+        </div>
+        <div class="card-body">
+            <p><strong>Data de Inscrição:</strong> @Model.DataInscricao.ToString("dd/MM/yyyy")</p>
 
-            <dt class="col-sm-3">Género</dt>
-            <dd class="col-sm-9">@Model.Genero?.Nome</dd>
-
-
-
-
-            <dt class="col-sm-3">NIF</dt>
-            <dd class="col-sm-9">@Model.NIF</dd>
-
-            <dt class="col-sm-3">Contacto</dt>
-            <dd class="col-sm-9">@Model.Contacto</dd>
-
-            <dt class="col-sm-3">Morada</dt>
-            <dd class="col-sm-9">@Model.Morada</dd>
-        </dl>
-    </div>
-</div>
-
-<div class="card mb-4">
-    <div class="card-header">
-        <strong>Dados Médicos</strong>
-    </div>
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">Histórico Clínico</dt>
-            <dd class="col-sm-9">@Model.HistoricoClinico</dd>
-
-            <dt class="col-sm-3">Indicações Terapêuticas</dt>
-            <dd class="col-sm-9">@Model.IndicacoesTerapeuticas</dd>
-
-            <dt class="col-sm-3">Contraindicações / Alergias</dt>
-            <dd class="col-sm-9">@Model.ContraIndicacoes</dd>
-
-            <dt class="col-sm-3">Terapeuta Responsável</dt>
-            <dd class="col-sm-9">@Model.TerapeutaResponsavel</dd>
-        </dl>
-    </div>
-</div>
-
-<div class="card mb-4">
-    <div class="card-header">
-        <strong>Dados Administrativos</strong>
-    </div>
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">Data de Inscrição</dt>
-            <dd class="col-sm-9">@Model.DataInscricao.ToShortDateString()</dd>
-
-            <dt class="col-sm-3">Seguro de Saúde</dt>
-            <dd class="col-sm-9">
+            <p>
+                <strong>Seguro de Saúde:</strong>
                 @if (Model.SeguroSaude != null)
                 {
                     @Model.SeguroSaude.Nome
@@ -86,37 +66,35 @@
                 {
                     <span class="text-muted">Sem seguro</span>
                 }
+            </p>
 
-            </dd>
-
-
-
-            <dt class="col-sm-3">Estado</dt>
-            <dd class="col-sm-9">
-                @(Model.Ativo ? "Ativo" : "Inativo")
-            </dd>
-        </dl>
+            <p>
+                <strong>Estado:</strong>
+                <span class="badge @(Model.Ativo ? "bg-success" : "bg-danger")">
+                    @(Model.Ativo ? "Ativo" : "Inativo")
+                </span>
+            </p>
+        </div>
     </div>
+
+    <!-- Botões -->
+    <form asp-action="ToggleAtivo" method="post" class="d-inline">
+        <input type="hidden" name="id" value="@Model.UtenteBalnearioId" />
+        <button type="submit"
+                class="btn @(Model.Ativo ? "btn-danger" : "btn-success")"
+                onclick="return confirm('Tem a certeza que deseja @(Model.Ativo ? "desativar" : "ativar") este utente?');">
+            @(Model.Ativo ? "Desativar" : "Ativar")
+        </button>
+    </form>
+
+    <a asp-action="Edit"
+       asp-route-id="@Model.UtenteBalnearioId"
+       class="btn btn-warning ms-2">
+        Editar
+    </a>
+
+    <a asp-action="Index" class="btn btn-secondary ms-2">
+        Voltar
+    </a>
+
 </div>
-
-
-<!--Botões-->
-<form asp-action="ToggleAtivo" method="post" class="d-inline">
-    <input type="hidden" name="id" value="@Model.UtenteBalnearioId" />
-    <button type="submit"
-            class="btn @(Model.Ativo ? "btn-danger" : "btn-success")"
-            onclick="return confirm('Tem a certeza que deseja @(Model.Ativo ? "desativar" : "ativar") este utente?');">
-        @(Model.Ativo ? "Desativar" : "Ativar")
-    </button>
-
-</form>
-
-<a asp-action="Edit"
-   asp-route-id="@Model.UtenteBalnearioId"
-   class="btn btn-warning">
-    Editar
-</a>
-
-<a asp-action="Index" class="btn btn-secondary">
-    Voltar
-</a>
