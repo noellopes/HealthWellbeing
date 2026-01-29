@@ -104,9 +104,11 @@
 <form asp-action="ToggleAtivo" method="post" class="d-inline">
     <input type="hidden" name="id" value="@Model.UtenteBalnearioId" />
     <button type="submit"
-            class="btn @(Model.Ativo ? "btn-danger" : "btn-success")">
+            class="btn @(Model.Ativo ? "btn-danger" : "btn-success")"
+            onclick="return confirm('Tem a certeza que deseja @(Model.Ativo ? "desativar" : "ativar") este utente?');">
         @(Model.Ativo ? "Desativar" : "Ativar")
     </button>
+
 </form>
 
 <a asp-action="Edit"
