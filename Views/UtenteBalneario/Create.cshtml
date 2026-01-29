@@ -4,6 +4,9 @@
     ViewData["Title"] = "Criar Utente do Balneário";
 }
 
+<h1 style="color:red">CREATE CORRETO</h1>
+
+
 <h2>Criar Utente do Balneário</h2>
 
 <hr />
@@ -24,17 +27,17 @@
         <input asp-for="DataNascimento" class="form-control" type="date" />
         <span asp-validation-for="DataNascimento" class="text-danger"></span>
     </div>
-
     <div class="form-group mb-2">
-        <label asp-for="Genero"></label>
-        <select asp-for="Genero" class="form-control">
-            <option value="">-- Selecione --</option>
-            <option value="Masculino">Masculino</option>
-            <option value="Feminino">Feminino</option>
-            <option value="Outro">Outro</option>
+        <label asp-for="GeneroId">Género</label>
+        <select asp-for="GeneroId"
+                asp-items="ViewBag.Generos"
+                class="form-control">
+            <option value="">-- Selecione o género --</option>
         </select>
-        <span asp-validation-for="Genero" class="text-danger"></span>
+        <span asp-validation-for="GeneroId" class="text-danger"></span>
     </div>
+
+
 
     <div class="form-group mb-2">
         <label asp-for="NIF"></label>

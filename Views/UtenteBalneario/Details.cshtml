@@ -29,7 +29,10 @@
             <dd class="col-sm-9">@Model.DataNascimento.ToShortDateString()</dd>
 
             <dt class="col-sm-3">Género</dt>
-            <dd class="col-sm-9">@Model.Genero</dd>
+            <dd class="col-sm-9">@Model.Genero?.Nome</dd>
+
+
+
 
             <dt class="col-sm-3">NIF</dt>
             <dd class="col-sm-9">@Model.NIF</dd>

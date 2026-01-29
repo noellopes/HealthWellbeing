@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
+﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
@@ -16,20 +18,25 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // GET: UtenteBalneario
+        // =========================
+        // INDEX
+        // =========================
         public async Task<IActionResult> Index()
         {
-            var utentes = await _context.UtenteBalnearios.ToListAsync();
+            var utentes = await _context.UtenteBalnearios
+                .Include(u => u.Genero)
+                .ToListAsync();
+
             return View(utentes);
         }
 
-        // GET: UtenteBalneario/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // =========================
+        // DETAILS
+        // =========================
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-                return NotFound();
-
             var utente = await _context.UtenteBalnearios
+                .Include(u => u.Genero)
                 .FirstOrDefaultAsync(u => u.UtenteBalnearioId == id);
 
             if (utente == null)
@@ -38,69 +45,73 @@ namespace HealthWellbeing.Controllers
             return View(utente);
         }
 
-        // GET: UtenteBalneario/Create
+        // =========================
+        // CREATE
+        // =========================
         public IActionResult Create()
         {
+            LoadGeneros();
             return View();
         }
 
-        // POST: UtenteBalneario/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(UtenteBalneario utenteBalneario)
+        public async Task<IActionResult> Create(UtenteBalneario utente)
         {
+            
+
             if (!ModelState.IsValid)
             {
-                return View(utenteBalneario);
+                LoadGeneros();
+                return View(utente);
             }
 
-            utenteBalneario.DataInscricao = DateTime.Now;
-            utenteBalneario.Ativo = true;
+            utente.DataInscricao = DateTime.Now;
+            utente.Ativo = true;
 
-            _context.Add(utenteBalneario);
+            _context.Add(utente);
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "Utente criado com sucesso!";
-
-            return RedirectToAction(
-                nameof(Details),
-                new { id = utenteBalneario.UtenteBalnearioId }
-            );
+            return RedirectToAction(nameof(Details), new { id = utente.UtenteBalnearioId });
         }
 
-
-        // GET: UtenteBalneario/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // =========================
+        // EDIT
+        // =========================
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-                return NotFound();
-
             var utente = await _context.UtenteBalnearios.FindAsync(id);
 
             if (utente == null)
                 return NotFound();
 
+            LoadGeneros();
             return View(utente);
         }
 
-        // POST: UtenteBalneario/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, UtenteBalneario utenteBalneario)
+        public async Task<IActionResult> Edit(int id, UtenteBalneario utente)
         {
-            if (id != utenteBalneario.UtenteBalnearioId)
+            if (id != utente.UtenteBalnearioId)
                 return NotFound();
 
+           
+
             if (!ModelState.IsValid)
-                return View(utenteBalneario);
+            {
+                LoadGeneros();
+                return View(utente);
+            }
 
             try
             {
-                _context.Update(utenteBalneario);
+                _context.Update(utente);
                 await _context.SaveChangesAsync();
 
                 TempData["Success"] = "Utente atualizado com sucesso!";
-                return RedirectToAction(nameof(Details), new { id = utenteBalneario.UtenteBalnearioId });
+                return RedirectToAction(nameof(Details), new { id = utente.UtenteBalnearioId });
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -111,25 +122,16 @@ namespace HealthWellbeing.Controllers
             }
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ToggleAtivo(int id)
+        // =========================
+        // HELPERS
+        // =========================
+        private void LoadGeneros()
         {
-            var utente = await _context.UtenteBalnearios.FindAsync(id);
-
-            if (utente == null)
-                return NotFound();
-
-            utente.Ativo = !utente.Ativo;
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] = utente.Ativo
-                ? "Utente ativado com sucesso!"
-                : "Utente desativado com sucesso!";
-
-            return RedirectToAction(nameof(Details), new { id });
+            ViewBag.Generos = new SelectList(
+                _context.Generos.OrderBy(g => g.Nome),
+                "GeneroId",
+                "Nome"
+            );
         }
-
-
     }
 }
