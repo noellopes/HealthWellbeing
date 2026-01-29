@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260129184524_UniqueUtenteConstraints")]
+    partial class UniqueUtenteConstraints
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,7 +83,7 @@ namespace HealthWellbeing.Migrations
 
                     b.HasIndex("UtenteBalnearioId");
 
-                    b.ToTable("HistoricosMedicos");
+                    b.ToTable("HistoricoMedico");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.SeguroSaude", b =>
@@ -183,6 +186,9 @@ namespace HealthWellbeing.Migrations
                     b.HasIndex("GeneroId");
 
                     b.HasIndex("NIF")
+                        .IsUnique();
+
+                    b.HasIndex("Nome")
                         .IsUnique();
 
                     b.HasIndex("SeguroSaudeId");
@@ -394,13 +400,13 @@ namespace HealthWellbeing.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.HistoricoMedico", b =>
                 {
-                    b.HasOne("HealthWellbeing.Models.UtenteBalneario", "UtenteBalneario")
+                    b.HasOne("HealthWellbeing.Models.UtenteBalneario", "Utente")
                         .WithMany("HistoricosMedicos")
                         .HasForeignKey("UtenteBalnearioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("UtenteBalneario");
+                    b.Navigation("Utente");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.UtenteBalneario", b =>

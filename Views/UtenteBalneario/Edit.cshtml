@@ -18,7 +18,9 @@
                 <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
                 <!-- 👤 Dados Pessoais -->
-                <h5>👤 Dados Pessoais</h5>
+                <h5 class="fw-bold">
+                    <i class="bi bi-person"></i> Dados Pessoais
+                </h5>
                 <hr />
 
                 <div class="row">
@@ -60,7 +62,9 @@
                 </div>
 
                 <!-- 🩺 Dados Médicos -->
-                <h5 class="mt-4">🩺 Dados Médicos</h5>
+                <h5 class="fw-bold mt-4">
+                    <i class="bi bi-heart-pulse"></i> Dados Médicos
+                </h5>
                 <hr />
 
                 <div class="mb-3">
@@ -84,7 +88,9 @@
                 </div>
 
                 <!-- 📄 Dados Administrativos -->
-                <h5 class="mt-4">📄 Dados Administrativos</h5>
+                <h5 class="fw-bold mt-4">
+                    <i class="bi bi-clipboard"></i> Dados Administrativos
+                </h5>
                 <hr />
 
                 <div class="col-md-4 mb-3">
@@ -99,12 +105,13 @@
                 <!-- Botões -->
                 <div class="text-end mt-4">
                     <button type="submit" class="btn btn-primary">
-                        Guardar Alterações
+                        <i class="bi bi-save"></i> Guardar Alterações
                     </button>
+
                     <a asp-action="Details"
                        asp-route-id="@Model.UtenteBalnearioId"
-                       class="btn btn-secondary">
-                        Cancelar
+                       class="btn btn-secondary ms-2">
+                        <i class="bi bi-x-circle"></i> Cancelar
                     </a>
                 </div>
 

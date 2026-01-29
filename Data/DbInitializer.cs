@@ -69,6 +69,31 @@ namespace HealthWellbeing.Data
 
                 var seguro = seguros[random.Next(seguros.Count)];
 
+                var historicos = new List<HistoricoMedico>();
+
+                foreach (var utente in utentes.Take(20)) // só alguns
+                {
+                    historicos.Add(new HistoricoMedico
+                    {
+                        UtenteBalneario = utente,
+                        DataRegisto = utente.DataInscricao.AddDays(5),
+                        Descricao = "Avaliação inicial e diagnóstico funcional."
+                    });
+
+                    historicos.Add(new HistoricoMedico
+                    {
+                        UtenteBalneario = utente,
+                        DataRegisto = utente.DataInscricao.AddDays(15),
+                        Descricao = "Sessão de hidroterapia. Boa resposta ao tratamento."
+                    });
+                }
+
+                context.HistoricosMedicos.AddRange(historicos);
+                context.SaveChanges();
+
+
+
+
 
                 utentes.Add(new UtenteBalneario
                 {

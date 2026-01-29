@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260129203526_AddHistoricoMedico")]
+    partial class AddHistoricoMedico
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,7 +71,7 @@ namespace HealthWellbeing.Migrations
                     b.Property<DateTime>("DataRegisto")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Descricao")
+                    b.Property<string>("Observacoes")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -80,7 +83,7 @@ namespace HealthWellbeing.Migrations
 
                     b.HasIndex("UtenteBalnearioId");
 
-                    b.ToTable("HistoricosMedicos");
+                    b.ToTable("HistoricoMedico");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.SeguroSaude", b =>
@@ -394,13 +397,13 @@ namespace HealthWellbeing.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.HistoricoMedico", b =>
                 {
-                    b.HasOne("HealthWellbeing.Models.UtenteBalneario", "UtenteBalneario")
+                    b.HasOne("HealthWellbeing.Models.UtenteBalneario", "Utente")
                         .WithMany("HistoricosMedicos")
                         .HasForeignKey("UtenteBalnearioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("UtenteBalneario");
+                    b.Navigation("Utente");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.UtenteBalneario", b =>

@@ -18,7 +18,7 @@
     <!-- 👤 Dados Pessoais -->
     <div class="card shadow-sm mb-4">
         <div class="card-header fw-bold">
-            👤 Dados Pessoais
+            <i class="bi bi-person"></i> Dados Pessoais
         </div>
         <div class="card-body">
             <div class="row">
@@ -38,34 +38,26 @@
     <!-- 🩺 Dados Médicos -->
     <div class="card shadow-sm mb-4">
         <div class="card-header fw-bold">
-            🩺 Dados Médicos
+            <i class="bi bi-heart-pulse"></i> Dados Médicos
         </div>
         <div class="card-body">
-            <p><strong>Histórico Clínico:</strong> @Model.HistoricoClinico</p>
-            <p><strong>Indicações Terapêuticas:</strong> @Model.IndicacoesTerapeuticas</p>
-            <p><strong>Contraindicações:</strong> @Model.ContraIndicacoes</p>
-            <p><strong>Terapeuta Responsável:</strong> @Model.TerapeutaResponsavel</p>
+            <p><strong>Indicações Terapêuticas:</strong> @Model.IndicacoesTerapeuticas ?? <span class="text-muted">—</span></p>
+            <p><strong>Contraindicações:</strong> @Model.ContraIndicacoes ?? <span class="text-muted">—</span></p>
+            <p><strong>Terapeuta Responsável:</strong> @Model.TerapeutaResponsavel ?? <span class="text-muted">—</span></p>
         </div>
     </div>
 
     <!-- 📄 Dados Administrativos -->
     <div class="card shadow-sm mb-4">
         <div class="card-header fw-bold">
-            📄 Dados Administrativos
+            <i class="bi bi-clipboard"></i> Dados Administrativos
         </div>
         <div class="card-body">
             <p><strong>Data de Inscrição:</strong> @Model.DataInscricao.ToString("dd/MM/yyyy")</p>
 
             <p>
                 <strong>Seguro de Saúde:</strong>
-                @if (Model.SeguroSaude != null)
-                {
-                    @Model.SeguroSaude.Nome
-                }
-                else
-                {
-                    <span class="text-muted">Sem seguro</span>
-                }
+                @(Model.SeguroSaude != null ? Model.SeguroSaude.Nome : "Sem seguro")
             </p>
 
             <p>
@@ -77,12 +69,37 @@
         </div>
     </div>
 
+    <!-- 📚 Histórico Clínico -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-bold">
+            <i class="bi bi-journal-medical"></i> Histórico Clínico
+        </div>
+        <div class="card-body">
+            @if (Model.HistoricosMedicos.Any())
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var h in Model.HistoricosMedicos.OrderByDescending(h => h.DataRegisto))
+                    {
+                        <li class="list-group-item">
+                            <strong>@h.DataRegisto.ToString("dd/MM/yyyy")</strong><br />
+                            @h.Descricao
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <span class="text-muted">Sem registos clínicos.</span>
+            }
+        </div>
+    </div>
+
     <!-- Botões -->
     <form asp-action="ToggleAtivo" method="post" class="d-inline">
         <input type="hidden" name="id" value="@Model.UtenteBalnearioId" />
         <button type="submit"
                 class="btn @(Model.Ativo ? "btn-danger" : "btn-success")"
-                onclick="return confirm('Tem a certeza que deseja @(Model.Ativo ? "desativar" : "ativar") este utente?');">
+                onclick="return confirm('Tem a certeza?');">
             @(Model.Ativo ? "Desativar" : "Ativar")
         </button>
     </form>

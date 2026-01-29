@@ -1,8 +1,13 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace HealthWellbeing.Models
 {
+
+    [Index(nameof(NIF), IsUnique = true)]
+    [Index(nameof(Contacto), IsUnique = true)]
     public class UtenteBalneario
     {
         [Key]
@@ -79,5 +84,12 @@ namespace HealthWellbeing.Models
 
 
         public bool Ativo { get; set; } = true;
+
+        // =========================
+        // Histórico Médico
+        // =========================
+        public ICollection<HistoricoMedico> HistoricosMedicos { get; set; }
+        = new List<HistoricoMedico>();
+
     }
 }

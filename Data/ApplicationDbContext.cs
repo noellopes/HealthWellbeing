@@ -14,10 +14,23 @@ namespace HealthWellbeing.Data
 
         public DbSet<SeguroSaude> SegurosSaude { get; set; }
 
+        public DbSet<HistoricoMedico> HistoricosMedicos { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<UtenteBalneario>()
+                .HasIndex(u => u.NIF)
+                .IsUnique();
+
+            modelBuilder.Entity<UtenteBalneario>()
+                .HasIndex(u => u.Contacto)
+                .IsUnique();
+
+            
 
             modelBuilder.Entity<Genero>().HasData(
                 new Genero { GeneroId = 1, Nome = "Masculino" },
@@ -26,12 +39,13 @@ namespace HealthWellbeing.Data
             );
 
             modelBuilder.Entity<SeguroSaude>().HasData(
-             new SeguroSaude { SeguroSaudeId = 1, Nome = "ADSE" },
-             new SeguroSaude { SeguroSaudeId = 2, Nome = "Multicare" },
-             new SeguroSaude { SeguroSaudeId = 3, Nome = "Médis" },
-             new SeguroSaude { SeguroSaudeId = 4, Nome = "Particular" }
-             );
+                new SeguroSaude { SeguroSaudeId = 1, Nome = "ADSE" },
+                new SeguroSaude { SeguroSaudeId = 2, Nome = "Multicare" },
+                new SeguroSaude { SeguroSaudeId = 3, Nome = "Médis" },
+                new SeguroSaude { SeguroSaudeId = 4, Nome = "Particular" }
+            );
         }
+
 
 
     }

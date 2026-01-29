@@ -8,69 +8,26 @@
 
     <!-- Cabeçalho -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Utentes do Balneário</h2>
-        <a asp-action="Create" class="btn btn-primary">
-            + Criar Utente
-        </a>
+        <h2>Utentes do Balneário</h2>
+        <a asp-action="Create" class="btn btn-primary">+ Criar Utente</a>
     </div>
 
-    <!-- Alerta -->
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">
-            @TempData["Success"]
-        </div>
+        <div class="alert alert-success">@TempData["Success"]</div>
     }
-
-    <!--Dashboard-->
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h6 class="text-muted">Total</h6>
-                    <h3>@ViewBag.TotalItems</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card text-center shadow-sm border-success">
-                <div class="card-body">
-                    <h6 class="text-muted">Ativos</h6>
-                    <h3 class="text-success">@ViewBag.TotalAtivos</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card text-center shadow-sm border-danger">
-                <div class="card-body">
-                    <h6 class="text-muted">Inativos</h6>
-                    <h3 class="text-danger">@ViewBag.TotalInativos</h3>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
 
     <!-- Pesquisa + Filtros -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <form method="get" class="row g-2 align-items-center">
-
                 <div class="col-md-6">
-                    <input type="text"
-                           name="search"
-                           value="@ViewBag.Search"
-                           class="form-control"
-                           placeholder="Pesquisar por nome..." />
+                    <input type="text" name="search" value="@ViewBag.Search"
+                           class="form-control" placeholder="Pesquisar por nome..." />
                 </div>
 
                 <div class="col-md-2">
-                    <button class="btn btn-outline-primary w-100" type="submit">
-                        Pesquisar
-                    </button>
+                    <button class="btn btn-outline-primary w-100">Pesquisar</button>
                 </div>
 
                 <div class="col-md-4 text-end">
@@ -80,56 +37,24 @@
                         <a asp-action="Index" asp-route-ativos="false" class="btn btn-outline-danger">Inativos</a>
                     </div>
                 </div>
-
             </form>
         </div>
     </div>
 
-    <!--Mostrar x Atributos-->
-    @if (ViewBag.TotalItems > 0)
-    {
-        <div class="text-muted mb-2">
-            A mostrar
-            @((ViewBag.CurrentPage - 1) * ViewBag.PageSize + 1)
-            –
-            @(Math.Min(ViewBag.CurrentPage * ViewBag.PageSize, ViewBag.TotalItems))
-            de
-            @ViewBag.TotalItems
-            utentes
-        </div>
-    }
-
-
     <!-- Tabela -->
     <div class="card shadow-sm">
         <div class="card-body p-0">
-
             <table class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>
-                            <a asp-action="Index"
-                               asp-route-sort="@(ViewBag.Sort == "nome_desc" ? "" : "nome_desc")"
-                               asp-route-search="@ViewBag.Search"
-                               asp-route-ativos="@ViewBag.Ativos">
-                                Nome
-                            </a>
-                        </th>
+                        <th>Nome</th>
                         <th>Género</th>
                         <th>Contacto</th>
-                        <th>
-                            <a asp-action="Index"
-                               asp-route-sort="@(ViewBag.Sort == "data_desc" ? "data" : "data_desc")"
-                               asp-route-search="@ViewBag.Search"
-                               asp-route-ativos="@ViewBag.Ativos">
-                                Data de Inscrição
-                            </a>
-                        </th>
+                        <th>Data de Inscrição</th>
                         <th>Estado</th>
                         <th class="text-end"></th>
                     </tr>
                 </thead>
-
                 <tbody>
                     @foreach (var item in Model)
                     {
@@ -147,7 +72,7 @@
                                 <a asp-action="Details"
                                    asp-route-id="@item.UtenteBalnearioId"
                                    class="btn btn-sm btn-outline-primary">
-                                    👁 Detalhes
+                                    <i class="bi bi-eye"></i> Detalhes
                                 </a>
                             </td>
                         </tr>
@@ -156,85 +81,5 @@
             </table>
         </div>
     </div>
-
-    <!-- Paginação -->
-    @if (ViewBag.TotalPages > 1)
-    {
-        <nav class="mt-4">
-            <ul class="pagination justify-content-center">
-
-                <!-- Primeira página -->
-                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
-                    <a class="page-link"
-                       asp-action="Index"
-                       asp-route-page="1"
-                       asp-route-search="@ViewBag.Search"
-                       asp-route-ativos="@ViewBag.Ativos"
-                       asp-route-sort="@ViewBag.Sort">
-                        ⏮
-                    </a>
-                </li>
-
-                <!-- Página anterior -->
-                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
-                    <a class="page-link"
-                       asp-action="Index"
-                       asp-route-page="@(ViewBag.CurrentPage - 1)"
-                       asp-route-search="@ViewBag.Search"
-                       asp-route-ativos="@ViewBag.Ativos"
-                       asp-route-sort="@ViewBag.Sort">
-                        ◀
-                    </a>
-                </li>
-
-                <!-- Números das páginas -->
-                @{
-                    int startPage = Math.Max(1, ViewBag.CurrentPage - 2);
-                    int endPage = Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2);
-                }
-
-                @for (int i = startPage; i <= endPage; i++)
-                {
-                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                        <a class="page-link"
-                           asp-action="Index"
-                           asp-route-page="@i"
-                           asp-route-search="@ViewBag.Search"
-                           asp-route-ativos="@ViewBag.Ativos"
-                           asp-route-sort="@ViewBag.Sort">
-                            @i
-                        </a>
-                    </li>
-                }
-
-
-                <!-- Página seguinte -->
-                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
-                    <a class="page-link"
-                       asp-action="Index"
-                       asp-route-page="@(ViewBag.CurrentPage + 1)"
-                       asp-route-search="@ViewBag.Search"
-                       asp-route-ativos="@ViewBag.Ativos"
-                       asp-route-sort="@ViewBag.Sort">
-                        ▶
-                    </a>
-                </li>
-
-                <!-- Última página -->
-                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
-                    <a class="page-link"
-                       asp-action="Index"
-                       asp-route-page="@ViewBag.TotalPages"
-                       asp-route-search="@ViewBag.Search"
-                       asp-route-ativos="@ViewBag.Ativos"
-                       asp-route-sort="@ViewBag.Sort">
-                        ⏭
-                    </a>
-                </li>
-
-            </ul>
-        </nav>
-    }
-
 
 </div>
