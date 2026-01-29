@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260129155527_AddSeguroSaude")]
+    partial class AddSeguroSaude
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,28 +76,6 @@ namespace HealthWellbeing.Migrations
                     b.HasKey("SeguroSaudeId");
 
                     b.ToTable("SegurosSaude");
-
-                    b.HasData(
-                        new
-                        {
-                            SeguroSaudeId = 1,
-                            Nome = "ADSE"
-                        },
-                        new
-                        {
-                            SeguroSaudeId = 2,
-                            Nome = "Multicare"
-                        },
-                        new
-                        {
-                            SeguroSaudeId = 3,
-                            Nome = "Médis"
-                        },
-                        new
-                        {
-                            SeguroSaudeId = 4,
-                            Nome = "Particular"
-                        });
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.UtenteBalneario", b =>

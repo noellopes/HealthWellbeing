@@ -12,6 +12,9 @@ namespace HealthWellbeing.Data
         public DbSet<UtenteBalneario> UtenteBalnearios { get; set; }
         public DbSet<Genero> Generos { get; set; }
 
+        public DbSet<SeguroSaude> SegurosSaude { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -21,7 +24,16 @@ namespace HealthWellbeing.Data
                 new Genero { GeneroId = 2, Nome = "Feminino" },
                 new Genero { GeneroId = 3, Nome = "Outro" }
             );
+
+            modelBuilder.Entity<SeguroSaude>().HasData(
+             new SeguroSaude { SeguroSaudeId = 1, Nome = "ADSE" },
+             new SeguroSaude { SeguroSaudeId = 2, Nome = "Multicare" },
+             new SeguroSaude { SeguroSaudeId = 3, Nome = "Médis" },
+             new SeguroSaude { SeguroSaudeId = 4, Nome = "Particular" }
+             );
         }
+
+
     }
 
 }

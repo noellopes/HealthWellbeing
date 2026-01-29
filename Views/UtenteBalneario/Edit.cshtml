@@ -86,9 +86,14 @@
     <h4>Dados Administrativos</h4>
 
     <div class="form-group mb-2">
-        <label asp-for="SeguroSaude"></label>
-        <input asp-for="SeguroSaude" class="form-control" />
+        <label asp-for="SeguroSaudeId"></label>
+        <select asp-for="SeguroSaudeId"
+                asp-items="ViewBag.Seguros"
+                class="form-control">
+            <option value="">-- Sem seguro --</option>
+        </select>
     </div>
+
 
 
     <button type="submit" class="btn btn-primary">Guardar Alterações</button>

@@ -37,6 +37,7 @@ namespace HealthWellbeing.Controllers
         {
             var utente = await _context.UtenteBalnearios
                 .Include(u => u.Genero)
+                .Include(u => u.SeguroSaude)
                 .FirstOrDefaultAsync(u => u.UtenteBalnearioId == id);
 
             if (utente == null)
@@ -51,6 +52,7 @@ namespace HealthWellbeing.Controllers
         public IActionResult Create()
         {
             LoadGeneros();
+            LoadSeguros();
             return View();
         }
 
@@ -61,6 +63,7 @@ namespace HealthWellbeing.Controllers
             if (!ModelState.IsValid)
             {
                 LoadGeneros(utente.GeneroId);
+                LoadSeguros(utente.SeguroSaudeId);
                 return View(utente);
             }
 
@@ -84,7 +87,8 @@ namespace HealthWellbeing.Controllers
             if (utente == null)
                 return NotFound();
 
-            LoadGeneros(utente.GeneroId); 
+            LoadGeneros(utente.GeneroId);
+            LoadSeguros(utente.SeguroSaudeId);
             return View(utente);
         }
 
@@ -104,6 +108,7 @@ namespace HealthWellbeing.Controllers
             if (!ModelState.IsValid)
             {
                 LoadGeneros(utente.GeneroId);
+                LoadSeguros(utente.SeguroSaudeId);
                 return View(utente);
             }
 
@@ -182,6 +187,17 @@ namespace HealthWellbeing.Controllers
                 generoSelecionado
             );
         }
+
+        private void LoadSeguros(int? selected = null)
+        {
+            ViewBag.Seguros = new SelectList(
+                _context.SegurosSaude.OrderBy(s => s.Nome),
+                "SeguroSaudeId",
+                "Nome",
+                selected
+            );
+        }
+
 
     }
 }

@@ -71,7 +71,13 @@ namespace HealthWellbeing.Models
         [DataType(DataType.Date)]
         public DateTime DataInscricao { get; set; } = DateTime.Now;
 
-        public string? SeguroSaude { get; set; }
+
+        [Display(Name = "Seguro de Saúde")]
+        public int? SeguroSaudeId { get; set; }
+
+        public SeguroSaude? SeguroSaude { get; set; }
+
+
         public bool Ativo { get; set; } = true;
     }
 }

@@ -77,7 +77,8 @@
             <dd class="col-sm-9">@Model.DataInscricao.ToShortDateString()</dd>
 
             <dt class="col-sm-3">Seguro de Saúde</dt>
-            <dd class="col-sm-9">@Model.SeguroSaude</dd>
+            @Model.SeguroSaude?.Nome ?? "Sem seguro"
+
 
             <dt class="col-sm-3">Estado</dt>
             <dd class="col-sm-9">
