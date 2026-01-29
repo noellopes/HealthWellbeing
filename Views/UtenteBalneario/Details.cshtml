@@ -1,5 +1,4 @@
 ﻿@model HealthWellbeing.Models.UtenteBalneario
-
 @{
     ViewData["Title"] = "Detalhes do Utente";
 }
@@ -10,9 +9,7 @@
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">
-            @TempData["Success"]
-        </div>
+        <div class="alert alert-success">@TempData["Success"]</div>
     }
 
     <!-- 👤 Dados Pessoais -->
@@ -24,7 +21,10 @@
             <div class="row">
                 <div class="col-md-6"><strong>Nome:</strong> @Model.Nome</div>
                 <div class="col-md-3"><strong>Género:</strong> @Model.Genero?.Nome</div>
-                <div class="col-md-3"><strong>Nascimento:</strong> @Model.DataNascimento.ToString("dd/MM/yyyy")</div>
+                <div class="col-md-3">
+                    <strong>Nascimento:</strong>
+                    @Model.DataNascimento.ToString("dd/MM/yyyy")
+                </div>
             </div>
 
             <div class="row mt-2">
@@ -41,9 +41,9 @@
             <i class="bi bi-heart-pulse"></i> Dados Médicos
         </div>
         <div class="card-body">
-            <p><strong>Indicações Terapêuticas:</strong> @Model.IndicacoesTerapeuticas ?? <span class="text-muted">—</span></p>
-            <p><strong>Contraindicações:</strong> @Model.ContraIndicacoes ?? <span class="text-muted">—</span></p>
-            <p><strong>Terapeuta Responsável:</strong> @Model.TerapeutaResponsavel ?? <span class="text-muted">—</span></p>
+            <p><strong>Indicações Terapêuticas:</strong> @(string.IsNullOrWhiteSpace(Model.IndicacoesTerapeuticas) ? "Nada a registar." : Model.IndicacoesTerapeuticas)</p>
+            <p><strong>Contraindicações:</strong> @(string.IsNullOrWhiteSpace(Model.ContraIndicacoes) ? "Nada a registar." : Model.ContraIndicacoes)</p>
+            <p><strong>Terapeuta Responsável:</strong> @(string.IsNullOrWhiteSpace(Model.TerapeutaResponsavel) ? "—" : Model.TerapeutaResponsavel)</p>
         </div>
     </div>
 
@@ -54,12 +54,7 @@
         </div>
         <div class="card-body">
             <p><strong>Data de Inscrição:</strong> @Model.DataInscricao.ToString("dd/MM/yyyy")</p>
-
-            <p>
-                <strong>Seguro de Saúde:</strong>
-                @(Model.SeguroSaude != null ? Model.SeguroSaude.Nome : "Sem seguro")
-            </p>
-
+            <p><strong>Seguro de Saúde:</strong> @(Model.SeguroSaude?.Nome ?? "Sem seguro")</p>
             <p>
                 <strong>Estado:</strong>
                 <span class="badge @(Model.Ativo ? "bg-success" : "bg-danger")">
@@ -71,9 +66,19 @@
 
     <!-- 📚 Histórico Clínico -->
     <div class="card shadow-sm mb-4">
-        <div class="card-header fw-bold">
-            <i class="bi bi-journal-medical"></i> Histórico Clínico
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-journal-medical"></i> Histórico Clínico</span>
+
+            @if (User.IsInRole("Admin") || User.IsInRole("Medico"))
+            {
+                <button class="btn btn-sm btn-outline-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addHistoricoModal">
+                    <i class="bi bi-plus-circle"></i> Adicionar
+                </button>
+            }
         </div>
+
         <div class="card-body">
             @if (Model.HistoricosMedicos.Any())
             {
@@ -81,8 +86,31 @@
                     @foreach (var h in Model.HistoricosMedicos.OrderByDescending(h => h.DataRegisto))
                     {
                         <li class="list-group-item">
-                            <strong>@h.DataRegisto.ToString("dd/MM/yyyy")</strong><br />
+                            <strong>@h.DataRegisto.ToString("dd/MM/yyyy 'às' HH:mm")</strong><br />
                             @h.Descricao
+
+                            <div class="text-muted small">
+                                Registado por: @(h.CriadoPorUser?.UserName ?? "—")
+                            </div>
+
+                            @if (User.IsInRole("Admin") || User.IsInRole("Medico"))
+                            {
+                                <div class="mt-2 d-flex gap-2">
+                                    <a asp-action="EditHistorico"
+                                       asp-route-id="@h.HistoricoMedicoId"
+                                       class="btn btn-sm btn-outline-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteHistoricoModal"
+                                            data-id="@h.HistoricoMedicoId">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            }
                         </li>
                     }
                 </ul>
@@ -94,24 +122,98 @@
         </div>
     </div>
 
-    <!-- Botões -->
-    <form asp-action="ToggleAtivo" method="post" class="d-inline">
-        <input type="hidden" name="id" value="@Model.UtenteBalnearioId" />
-        <button type="submit"
-                class="btn @(Model.Ativo ? "btn-danger" : "btn-success")"
-                onclick="return confirm('Tem a certeza?');">
-            @(Model.Ativo ? "Desativar" : "Ativar")
-        </button>
-    </form>
+    <!-- 🔘 Botões -->
+    <div class="d-flex gap-2">
+        <form asp-action="ToggleAtivo" method="post">
+            <input type="hidden" name="id" value="@Model.UtenteBalnearioId" />
+            <button class="btn @(Model.Ativo ? "btn-danger" : "btn-success")">
+                <i class="bi @(Model.Ativo ? "bi-x-circle" : "bi-check-circle")"></i>
+                @(Model.Ativo ? "Desativar" : "Ativar")
+            </button>
+        </form>
 
-    <a asp-action="Edit"
-       asp-route-id="@Model.UtenteBalnearioId"
-       class="btn btn-warning ms-2">
-        Editar
-    </a>
+        <a asp-action="Edit" asp-route-id="@Model.UtenteBalnearioId" class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Editar
+        </a>
 
-    <a asp-action="Index" class="btn btn-secondary ms-2">
-        Voltar
-    </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
 
 </div>
+
+<!-- 🧾 Modal Adicionar Histórico -->
+<div class="modal fade" id="addHistoricoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-action="AddHistoricoMedico" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="UtenteBalnearioId" value="@Model.UtenteBalnearioId" />
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-journal-plus"></i> Novo Registo Clínico
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <textarea name="Descricao" class="form-control" rows="5" required></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary"
+                            onclick="this.disabled=true; this.form.submit();">
+                        <i class="bi bi-save"></i> Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 🧾 Modal Apagar Histórico -->
+<div class="modal fade" id="deleteHistoricoModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-action="DeleteHistorico" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="deleteHistoricoId" name="id" />
+
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">
+                        <i class="bi bi-exclamation-triangle"></i> Confirmar remoção
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    Tem a certeza que deseja apagar este registo clínico?
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Apagar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const deleteModal = document.getElementById('deleteHistoricoModal');
+
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                document.getElementById('deleteHistoricoId').value =
+                    button.getAttribute('data-id');
+            });
+        });
+    </script>
+}

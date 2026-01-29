@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
 {
@@ -8,8 +10,10 @@ namespace HealthWellbeing.Models
         [Key]
         public int HistoricoMedicoId { get; set; }
 
+        //FK
         [Required]
         public int UtenteBalnearioId { get; set; }
+        [ForeignKey(nameof(UtenteBalnearioId))]
         public UtenteBalneario UtenteBalneario { get; set; } = null!;
 
         [Required]
@@ -19,5 +23,8 @@ namespace HealthWellbeing.Models
         [Required]
         [StringLength(500)]
         public string Descricao { get; set; } = string.Empty;
+
+        public string? CriadoPorUserId { get; set; }
+        public IdentityUser? CriadoPorUser { get; set; }
     }
 }

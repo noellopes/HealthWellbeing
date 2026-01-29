@@ -1,5 +1,7 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,16 +14,21 @@ namespace HealthWellbeing.Controllers
     public class UtenteBalnearioController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public UtenteBalnearioController(ApplicationDbContext context)
+        public UtenteBalnearioController(
+            ApplicationDbContext context,
+            UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
+
 
         // =========================
         // INDEX COM PAGINAÇÃO, PESQUISA, FILTRO
         // =========================
-             public async Task<IActionResult> Index(
+        public async Task<IActionResult> Index(
              string? search,
              bool? ativos,
              string? sort,
@@ -78,6 +85,113 @@ namespace HealthWellbeing.Controllers
         }
 
 
+        // =========================
+        // ADICIONAR HISTORICO CLINICO
+        // =========================
+
+
+
+        [Authorize(Roles = "Admin,Medico")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddHistoricoMedico(int UtenteBalnearioId, string Descricao)
+        {
+            if (string.IsNullOrWhiteSpace(Descricao))
+            {
+                TempData["Error"] = "A descrição é obrigatória.";
+                return RedirectToAction(nameof(Details), new { id = UtenteBalnearioId });
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            var historico = new HistoricoMedico
+            {
+                UtenteBalnearioId = UtenteBalnearioId,
+                Descricao = Descricao,
+                DataRegisto = DateTime.Now,
+                CriadoPorUserId = user?.Id
+            };
+
+            _context.HistoricosMedicos.Add(historico);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Registo clínico adicionado com sucesso.";
+            return RedirectToAction(nameof(Details), new { id = UtenteBalnearioId });
+        }
+
+
+
+        // =========================
+        // EDITAR HISTORICO CLINICO (GET)
+        // =========================
+        [HttpGet]
+        [Authorize(Roles = "Admin,Medico")]
+        public async Task<IActionResult> EditHistorico(int id)
+        {
+            var historico = await _context.HistoricosMedicos
+                .FirstOrDefaultAsync(h => h.HistoricoMedicoId == id);
+
+            if (historico == null)
+                return NotFound();
+
+            return View(historico);
+        }
+
+
+        // =========================
+        // EDITAR HISTORICO CLINICO (POST)
+        // =========================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Medico")]
+        public async Task<IActionResult> EditHistorico(HistoricoMedico model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Descricao))
+            {
+                ModelState.AddModelError("Descricao", "A descrição é obrigatória.");
+                return View(model);
+            }
+
+            var historico = await _context.HistoricosMedicos
+                .FirstOrDefaultAsync(h => h.HistoricoMedicoId == model.HistoricoMedicoId);
+
+            if (historico == null)
+                return NotFound();
+
+            historico.Descricao = model.Descricao;
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Registo clínico atualizado com sucesso.";
+
+            return RedirectToAction(nameof(Details),
+                new { id = historico.UtenteBalnearioId });
+        }
+
+
+
+
+        // =========================
+        // APAGAR HISTORICO CLINICO
+        // =========================
+
+        [Authorize(Roles = "Admin,Medico")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteHistorico(int id)
+        {
+            var historico = _context.HistoricosMedicos.Find(id);
+            if (historico == null) return NotFound();
+
+            int utenteId = historico.UtenteBalnearioId;
+
+            _context.HistoricosMedicos.Remove(historico);
+            _context.SaveChanges();
+
+            TempData["Success"] = "Registo clínico removido.";
+            return RedirectToAction("Details", new { id = utenteId });
+        }
+
 
 
 
@@ -89,6 +203,8 @@ namespace HealthWellbeing.Controllers
             var utente = await _context.UtenteBalnearios
                 .Include(u => u.Genero)
                 .Include(u => u.SeguroSaude)
+                .Include(u => u.HistoricosMedicos)
+                .ThenInclude(h => h.CriadoPorUser)
                 .FirstOrDefaultAsync(u => u.UtenteBalnearioId == id);
 
 
