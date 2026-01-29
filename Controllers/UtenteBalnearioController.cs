@@ -56,6 +56,9 @@ namespace HealthWellbeing.Controllers
 
             // Paginação
             var totalItems = await query.CountAsync();
+            ViewBag.TotalAtivos = await query.CountAsync(u => u.Ativo);
+            ViewBag.TotalInativos = await query.CountAsync(u => !u.Ativo);
+
             var utentes = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)

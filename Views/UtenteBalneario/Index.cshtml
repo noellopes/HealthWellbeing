@@ -22,6 +22,38 @@
         </div>
     }
 
+    <!--Dashboard-->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Total</h6>
+                    <h3>@ViewBag.TotalItems</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm border-success">
+                <div class="card-body">
+                    <h6 class="text-muted">Ativos</h6>
+                    <h3 class="text-success">@ViewBag.TotalAtivos</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm border-danger">
+                <div class="card-body">
+                    <h6 class="text-muted">Inativos</h6>
+                    <h3 class="text-danger">@ViewBag.TotalInativos</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     <!-- Pesquisa + Filtros -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
