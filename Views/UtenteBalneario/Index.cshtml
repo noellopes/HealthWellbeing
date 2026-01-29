@@ -53,6 +53,21 @@
         </div>
     </div>
 
+    <!--Mostrar x Atributos-->
+    @if (ViewBag.TotalItems > 0)
+    {
+        <div class="text-muted mb-2">
+            A mostrar
+            @((ViewBag.CurrentPage - 1) * ViewBag.PageSize + 1)
+            –
+            @(Math.Min(ViewBag.CurrentPage * ViewBag.PageSize, ViewBag.TotalItems))
+            de
+            @ViewBag.TotalItems
+            utentes
+        </div>
+    }
+
+
     <!-- Tabela -->
     <div class="card shadow-sm">
         <div class="card-body p-0">

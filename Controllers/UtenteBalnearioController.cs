@@ -67,6 +67,9 @@ namespace HealthWellbeing.Controllers
             ViewBag.Sort = sort;
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            ViewBag.TotalItems = totalItems;
+            ViewBag.PageSize = pageSize;
+
 
             return View(utentes);
         }
