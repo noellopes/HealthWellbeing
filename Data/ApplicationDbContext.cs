@@ -20,6 +20,9 @@ namespace HealthWellbeing.Data
 
         public DbSet<SatisfacaoCliente> SatisfacoesClientes { get; set; }
 
+        public DbSet<HistoricoPontos> HistoricoPontos { get; set; }
+
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -52,6 +55,11 @@ namespace HealthWellbeing.Data
                 .HasOne(s => s.ClienteBalneario)
                 .WithMany(c => c.Satisfacoes)
                 .HasForeignKey(s => s.ClienteBalnearioId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<HistoricoPontos>()
+                .HasOne(h => h.ClienteBalneario)
+                .WithMany(c => c.HistoricoPontos)
+                .HasForeignKey(h => h.ClienteBalnearioId)
                 .OnDelete(DeleteBehavior.Cascade);
 
 

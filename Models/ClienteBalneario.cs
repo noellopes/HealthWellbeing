@@ -41,8 +41,9 @@ namespace HealthWellbeing.Models
         // FIDELIZAÇÃO
         // =========================
 
-        [Range(0, int.MaxValue)]
-        public int Pontos { get; set; } = 0;
+        public ICollection<HistoricoPontos> HistoricoPontos { get; set; }
+        = new List<HistoricoPontos>();
+
 
 
         // =========================

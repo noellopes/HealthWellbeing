@@ -1,4 +1,5 @@
 ﻿@model HealthWellbeing.Models.ClienteBalneario
+@using System.Linq
 
 @{
     ViewData["Title"] = "Detalhes do Cliente";
@@ -6,58 +7,76 @@
 
 <div class="container mt-4">
 
-    <h2><i class="bi bi-person"></i> Detalhes do Cliente</h2>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>
+            <i class="bi bi-person"></i> Detalhes do Cliente
+        </h2>
+
+        <a asp-controller="SatisfacaoCliente"
+           asp-action="Create"
+           asp-route-clienteId="@Model.ClienteBalnearioId"
+           class="btn btn-outline-primary">
+            <i class="bi bi-star"></i> Avaliar Cliente
+        </a>
+    </div>
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success mt-2">@TempData["Success"]</div>
+        <div class="alert alert-success">@TempData["Success"]</div>
     }
 
-    <a asp-controller="SatisfacaoCliente"
-       asp-action="Create"
-       asp-route-clienteId="@Model.ClienteBalnearioId"
-       class="btn btn-outline-primary">
-        <i class="bi bi-star"></i> Avaliar Cliente
-    </a>
-
-
-    <!-- Dados do Cliente -->
+    <!-- 📄 Dados do Cliente -->
     <div class="card shadow-sm mb-4">
         <div class="card-header fw-bold">
             <i class="bi bi-card-list"></i> Dados do Cliente
         </div>
         <div class="card-body">
-            <p><strong>Nome:</strong> @Model.Nome</p>
-            <p><strong>Email:</strong> @Model.Email</p>
-            <p><strong>Telemóvel:</strong> @Model.Telemovel</p>
-            <p><strong>Data de Registo:</strong> @Model.DataRegisto.ToString("dd/MM/yyyy")</p>
-            <p>
-                <strong>Estado:</strong>
-                <span class="badge @(Model.Ativo ? "bg-success" : "bg-danger")">
-                    @(Model.Ativo ? "Ativo" : "Inativo")
+            <div class="row">
+                <div class="col-md-6"><strong>Nome:</strong> @Model.Nome</div>
+                <div class="col-md-6"><strong>Email:</strong> @Model.Email</div>
+            </div>
+
+            <div class="row mt-2">
+                <div class="col-md-4"><strong>Telemóvel:</strong> @Model.Telemovel</div>
+                <div class="col-md-4">
+                    <strong>Data de Registo:</strong>
+                    @Model.DataRegisto.ToString("dd/MM/yyyy")
+                </div>
+                <div class="col-md-4">
+                    <strong>Estado:</strong>
+                    <span class="badge @(Model.Ativo ? "bg-success" : "bg-danger")">
+                        @(Model.Ativo ? "Ativo" : "Inativo")
+                    </span>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <strong>Pontos:</strong>
+                <span class="badge bg-info fs-6">
+                    @(Model.HistoricoPontos?.Sum(p => p.Pontos) ?? 0)
                 </span>
-            </p>
-            <p><strong>Pontos:</strong> <span class="badge bg-info">@Model.Pontos</span></p>
+            </div>
         </div>
     </div>
 
-    <!-- Utentes Associados -->
+    <!-- 👥 Utentes Associados -->
     <div class="card shadow-sm mb-4">
         <div class="card-header fw-bold">
             <i class="bi bi-people"></i> Utentes Associados
         </div>
         <div class="card-body">
-            @if (Model.Utentes.Any())
+            @if (Model.Utentes != null && Model.Utentes.Any())
             {
-                <ul class="list-group">
+                <ul class="list-group list-group-flush">
                     @foreach (var u in Model.Utentes)
                     {
-                        <li class="list-group-item d-flex justify-content-between">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
                             @u.Nome
                             <a asp-controller="UtenteBalneario"
                                asp-action="Details"
                                asp-route-id="@u.UtenteBalnearioId"
-                               class="btn btn-sm btn-outline-primary">
+                               class="btn btn-sm btn-outline-primary"
+                               title="Ver utente">
                                 <i class="bi bi-eye"></i>
                             </a>
                         </li>
@@ -71,7 +90,38 @@
         </div>
     </div>
 
-    <!-- Botões -->
+    <!-- 🏅 Histórico de Pontos -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-bold">
+            <i class="bi bi-award"></i> Histórico de Pontos
+        </div>
+        <div class="card-body">
+            @if (Model.HistoricoPontos != null && Model.HistoricoPontos.Any())
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var p in Model.HistoricoPontos
+                                    .OrderByDescending(p => p.Data))
+                    {
+                        <li class="list-group-item">
+                            <strong>
+                                @p.Data.ToString("dd/MM/yyyy HH:mm")
+                            </strong>
+                            — @p.Motivo
+                            <span class="badge @(p.Pontos > 0 ? "bg-success" : "bg-danger") float-end">
+                                @p.Pontos
+                            </span>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <span class="text-muted">Sem movimentos de pontos.</span>
+            }
+        </div>
+    </div>
+
+    <!-- 🔘 Botões -->
     <div class="d-flex gap-2">
         <a asp-action="Edit"
            asp-route-id="@Model.ClienteBalnearioId"
@@ -82,12 +132,13 @@
         <form asp-action="ToggleAtivo" method="post">
             <input type="hidden" name="id" value="@Model.ClienteBalnearioId" />
             <button class="btn @(Model.Ativo ? "btn-danger" : "btn-success")">
+                <i class="bi @(Model.Ativo ? "bi-x-circle" : "bi-check-circle")"></i>
                 @(Model.Ativo ? "Desativar" : "Ativar")
             </button>
         </form>
 
         <a asp-action="Index" class="btn btn-secondary">
-            Voltar
+            <i class="bi bi-arrow-left"></i> Voltar
         </a>
     </div>
 
