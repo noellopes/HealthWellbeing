@@ -61,6 +61,22 @@
                     </div>
                 </div>
 
+                <!-- ========================= -->
+                <!-- 👥 Clientes -->
+                <!-- ========================= -->
+
+
+                <h5> Cliente (opcional)</h5>
+
+                <div class="mb-3">
+                    <label class="form-label">Cliente associado</label>
+                    <select asp-for="ClienteBalnearioId"
+                            asp-items="ViewBag.Clientes"
+                            class="form-control">
+                        <option value="">-- Sem cliente --</option>
+                    </select>
+                </div>
+
                 <!-- 🩺 Dados Médicos -->
                 <h5 class="fw-bold mt-4">
                     <i class="bi bi-heart-pulse"></i> Dados Médicos

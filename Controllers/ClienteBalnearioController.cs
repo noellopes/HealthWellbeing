@@ -2,6 +2,7 @@
 using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -129,5 +130,22 @@ namespace HealthWellbeing.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        // =========================
+        // HELPER
+        // =========================
+
+        private void LoadUtentes(int? selected = null)
+        {
+            ViewBag.Utentes = new SelectList(
+                _context.UtenteBalnearios
+                    .OrderBy(u => u.Nome),
+                "UtenteBalnearioId",
+                "Nome",
+                selected
+            );
+        }
     }
 }
+
+    

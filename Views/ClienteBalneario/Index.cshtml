@@ -1,5 +1,62 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<HealthWellbeing.Models.ClienteBalneario>
+
 @{
+    ViewData["Title"] = "Clientes do Balneário";
 }
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-people"></i> Clientes do Balneário</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Novo Cliente
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">Ainda não existem clientes registados.</div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Telemóvel</th>
+                            <th>Pontos</th>
+                            <th>Estado</th>
+                            <th class="text-end"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var c in Model)
+                        {
+                            <tr class="@(c.Ativo ? "" : "table-secondary")">
+                                <td>@c.Nome</td>
+                                <td>@c.Email</td>
+                                <td>@c.Telemovel</td>
+                                <td>@c.Pontos</td>
+                                <td>
+                                    <span class="badge @(c.Ativo ? "bg-success" : "bg-danger")">
+                                        @(c.Ativo ? "Ativo" : "Inativo")
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <a asp-action="Edit"
+                                       asp-route-id="@c.ClienteBalnearioId"
+                                       class="btn btn-sm btn-outline-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

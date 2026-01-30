@@ -37,6 +37,15 @@ namespace HealthWellbeing.Data
                  .HasForeignKey(u => u.ClienteBalnearioId)
                  .OnDelete(DeleteBehavior.SetNull);
 
+            modelBuilder.Entity<ClienteBalneario>()
+                 .HasIndex(c => c.Email)
+                 .IsUnique();
+
+            modelBuilder.Entity<ClienteBalneario>()
+                .HasIndex(c => c.Telemovel)
+                .IsUnique();
+
+
 
 
 

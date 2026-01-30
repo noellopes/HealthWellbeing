@@ -215,14 +215,27 @@ namespace HealthWellbeing.Controllers
         }
 
         // =========================
-        // CREATE
+        // CREATE GET
         // =========================
         public IActionResult Create()
         {
             LoadGeneros();
             LoadSeguros();
+
+            ViewBag.Clientes = new SelectList(
+                _context.ClientesBalneario
+                    .Where(c => c.Ativo),
+                "ClienteBalnearioId",
+                "Nome"
+            );
+
             return View();
         }
+
+        // =========================
+        // CREATE POST
+        // =========================
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -246,19 +259,31 @@ namespace HealthWellbeing.Controllers
         }
 
         // =========================
-        // EDIT
+        // EDIT GET
         // =========================
         public async Task<IActionResult> Edit(int id)
         {
             var utente = await _context.UtenteBalnearios.FindAsync(id);
-
             if (utente == null)
                 return NotFound();
 
             LoadGeneros(utente.GeneroId);
             LoadSeguros(utente.SeguroSaudeId);
+
+            ViewBag.Clientes = new SelectList(
+                _context.ClientesBalneario
+                    .Where(c => c.Ativo),
+                "ClienteBalnearioId",
+                "Nome",
+                utente.ClienteBalnearioId
+            );
+
             return View(utente);
         }
+
+        // =========================
+        // EDIT POST
+        // =========================
 
 
         [HttpPost]

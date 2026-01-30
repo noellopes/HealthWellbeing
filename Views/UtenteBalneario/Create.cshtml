@@ -59,11 +59,28 @@
                         <span asp-validation-for="Contacto" class="text-danger"></span>
                     </div>
 
+
                     <div class="col-md-4 mb-3">
                         <label asp-for="Morada"></label>
                         <input asp-for="Morada" class="form-control" />
                         <span asp-validation-for="Morada" class="text-danger"></span>
                     </div>
+                </div>
+
+                <!-- ========================= -->
+                <!-- Clientes -->
+                <!-- ========================= -->
+
+
+                <h5> Cliente (opcional)</h5>
+
+                <div class="mb-3">
+                    <label class="form-label">Cliente associado</label>
+                    <select asp-for="ClienteBalnearioId"
+                            asp-items="ViewBag.Clientes"
+                            class="form-control">
+                        <option value="">-- Sem cliente --</option>
+                    </select>
                 </div>
 
                 <!-- ========================= -->
