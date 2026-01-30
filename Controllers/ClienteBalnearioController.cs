@@ -26,6 +26,7 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Index()
         {
             var clientes = await _context.ClientesBalneario
+                .Include(c => c.HistoricoPontos)
                 .OrderBy(c => c.Nome)
                 .ToListAsync();
 
