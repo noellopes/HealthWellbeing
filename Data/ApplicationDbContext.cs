@@ -16,6 +16,7 @@ namespace HealthWellbeing.Data
 
         public DbSet<HistoricoMedico> HistoricosMedicos { get; set; }
 
+        public DbSet<ClienteBalneario> ClientesBalneario { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,7 +31,16 @@ namespace HealthWellbeing.Data
                 .HasIndex(u => u.Contacto)
                 .IsUnique();
 
-            
+            modelBuilder.Entity<UtenteBalneario>()
+                 .HasOne(u => u.ClienteBalneario)
+                 .WithMany(c => c.Utentes)
+                 .HasForeignKey(u => u.ClienteBalnearioId)
+                 .OnDelete(DeleteBehavior.SetNull);
+
+
+
+
+
 
             modelBuilder.Entity<Genero>().HasData(
                 new Genero { GeneroId = 1, Nome = "Masculino" },
@@ -44,6 +54,8 @@ namespace HealthWellbeing.Data
                 new SeguroSaude { SeguroSaudeId = 3, Nome = "Médis" },
                 new SeguroSaude { SeguroSaudeId = 4, Nome = "Particular" }
             );
+
+
         }
 
 

@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 
 namespace HealthWellbeing.Models
@@ -90,6 +91,17 @@ namespace HealthWellbeing.Models
         // =========================
         public ICollection<HistoricoMedico> HistoricosMedicos { get; set; }
         = new List<HistoricoMedico>();
+
+
+
+        // =========================
+        // Cliente Balneario
+        // =========================
+        public int? ClienteBalnearioId { get; set; }
+
+        public ClienteBalneario? ClienteBalneario { get; set; }
+
+
 
     }
 }
