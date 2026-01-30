@@ -33,16 +33,18 @@ namespace HealthWellbeing.Controllers
         }
 
         // =========================
-        // DETAILS
+        // DETAILS  
         // =========================
         public async Task<IActionResult> Details(int id)
         {
             var cliente = await _context.ClientesBalneario
                 .Include(c => c.Utentes)
                 .Include(c => c.HistoricoPontos)
+                .Include(c => c.Satisfacoes)
+                .Include(c => c.Vouchers)
                 .Include(c => c.NivelCliente)
+                .AsNoTracking() // 👈 evita estados antigos e bugs visuais
                 .FirstOrDefaultAsync(c => c.ClienteBalnearioId == id);
-
 
             if (cliente == null)
                 return NotFound();
@@ -62,7 +64,6 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ClienteBalneario cliente)
         {
-            // Verificar email duplicado
             bool emailExiste = await _context.ClientesBalneario
                 .AnyAsync(c => c.Email == cliente.Email);
 
@@ -83,7 +84,6 @@ namespace HealthWellbeing.Controllers
             TempData["Success"] = "Cliente criado com sucesso.";
             return RedirectToAction(nameof(Index));
         }
-
 
         // =========================
         // EDIT
@@ -106,15 +106,13 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
 
             bool emailDuplicado = await _context.ClientesBalneario
-                .AnyAsync(c => c.Email == cliente.Email
-                && c.ClienteBalnearioId != cliente.ClienteBalnearioId);
+                .AnyAsync(c => c.Email == cliente.Email &&
+                               c.ClienteBalnearioId != cliente.ClienteBalnearioId);
 
             if (emailDuplicado)
             {
                 ModelState.AddModelError("Email", "Este email já está associado a outro cliente.");
             }
-
-
 
             if (!ModelState.IsValid)
                 return View(cliente);
@@ -158,12 +156,10 @@ namespace HealthWellbeing.Controllers
         // =========================
         // HELPER
         // =========================
-
         private void LoadUtentes(int? selected = null)
         {
             ViewBag.Utentes = new SelectList(
-                _context.UtenteBalnearios
-                    .OrderBy(u => u.Nome),
+                _context.UtenteBalnearios.OrderBy(u => u.Nome),
                 "UtenteBalnearioId",
                 "Nome",
                 selected
@@ -171,5 +167,3 @@ namespace HealthWellbeing.Controllers
         }
     }
 }
-
-    

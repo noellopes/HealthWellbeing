@@ -32,7 +32,7 @@ namespace HealthWellbeing.Services
 
             cliente.NivelClienteId = nivel?.NivelClienteId;
 
-            await _context.SaveChangesAsync();
+           // await _context.SaveChangesAsync();
         }
     }
 }

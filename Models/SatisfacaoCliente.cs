@@ -14,7 +14,7 @@ namespace HealthWellbeing.Models
         [Required]
         public int ClienteBalnearioId { get; set; }
 
-        public ClienteBalneario ClienteBalneario { get; set; }
+        public ClienteBalneario? ClienteBalneario { get; set; }
 
         // =========================
         // AVALIAÇÃO

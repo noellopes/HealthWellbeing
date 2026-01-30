@@ -81,6 +81,7 @@ namespace HealthWellbeing.Data
 
 
 
+
             modelBuilder.Entity<Genero>().HasData(
                 new Genero { GeneroId = 1, Nome = "Masculino" },
                 new Genero { GeneroId = 2, Nome = "Feminino" },

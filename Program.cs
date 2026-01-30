@@ -12,8 +12,11 @@ builder.Services.AddDefaultIdentity<IdentityUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(); 
 builder.Services.AddScoped<ClienteService>();
+builder.Services.AddScoped<VoucherService>();
+
+
 
 
 

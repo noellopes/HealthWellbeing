@@ -9,19 +9,21 @@ using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
-    [Authorize(Roles = "Admin,Rececionista")]
+    //[Authorize(Roles = "Admin,Rececionista")]
     public class SatisfacaoClienteController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly ClienteService _clienteService;
+        private readonly VoucherService _voucherService;
 
-        
         public SatisfacaoClienteController(
             ApplicationDbContext context,
-            ClienteService clienteService)
+            ClienteService clienteService,
+            VoucherService voucherService)
         {
             _context = context;
             _clienteService = clienteService;
+            _voucherService = voucherService;
         }
 
         // =========================
@@ -46,27 +48,40 @@ namespace HealthWellbeing.Controllers
         // =========================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(SatisfacaoCliente satisfacao)
+        public async Task<IActionResult> Create(
+         [Bind("ClienteBalnearioId,Avaliacao,Comentario")]
+            SatisfacaoCliente satisfacao)
         {
-            if (!ModelState.IsValid)
-            {
-                ViewBag.Cliente = await _context.ClientesBalneario
-                    .FindAsync(satisfacao.ClienteBalnearioId);
-
-                return View(satisfacao);
-            }
-
             var cliente = await _context.ClientesBalneario
                 .FirstOrDefaultAsync(c => c.ClienteBalnearioId == satisfacao.ClienteBalnearioId);
 
             if (cliente == null)
                 return NotFound();
 
-            // ✅ Registar satisfação
+            // ❌ Impedir mais do que uma avaliação por dia
+            bool jaAvaliadoHoje = await _context.SatisfacoesClientes.AnyAsync(s =>
+                s.ClienteBalnearioId == satisfacao.ClienteBalnearioId &&
+                s.DataRegisto.Date == DateTime.Today
+            );
+
+            if (jaAvaliadoHoje)
+            {
+                ModelState.AddModelError("", "Este cliente já foi avaliado hoje.");
+                ViewBag.Cliente = cliente;
+                return View(satisfacao);
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Cliente = cliente;
+                return View(satisfacao);
+            }
+
+            // ✅ Avaliação
             satisfacao.DataRegisto = DateTime.Now;
             _context.SatisfacoesClientes.Add(satisfacao);
 
-            // ✅ Atribuir pontos
+            // ✅ Pontos
             _context.HistoricoPontos.Add(new HistoricoPontos
             {
                 ClienteBalnearioId = cliente.ClienteBalnearioId,
@@ -75,8 +90,12 @@ namespace HealthWellbeing.Controllers
                 Data = DateTime.Now
             });
 
-            // ✅ Atualizar nível do cliente (SERVICE)
+            // Guardar avaliação + pontos
+            await _context.SaveChangesAsync();
+
+            // Serviços
             await _clienteService.AtualizarNivelClienteAsync(cliente.ClienteBalnearioId);
+            await _voucherService.VerificarECriarVoucherAsync(cliente.ClienteBalnearioId);
 
             await _context.SaveChangesAsync();
 
@@ -88,5 +107,6 @@ namespace HealthWellbeing.Controllers
                 new { id = cliente.ClienteBalnearioId }
             );
         }
+
     }
 }

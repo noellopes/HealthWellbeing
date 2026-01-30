@@ -10,15 +10,9 @@ namespace HealthWellbeing.Models
         public int VoucherClienteId { get; set; }
 
         // =========================
-        // RELAÇÃO COM CLIENTE
-        // =========================
-        [Required]
-        public int ClienteBalnearioId { get; set; }
-        public ClienteBalneario ClienteBalneario { get; set; }
-
-        // =========================
         // DADOS DO VOUCHER
         // =========================
+
         [Required]
         [StringLength(100)]
         public string Titulo { get; set; }
@@ -35,8 +29,18 @@ namespace HealthWellbeing.Models
         public decimal Valor { get; set; }
 
         public DateTime DataCriacao { get; set; } = DateTime.Now;
+
         public DateTime DataValidade { get; set; }
 
         public bool Usado { get; set; } = false;
+
+        public DateTime? DataUtilizacao { get; set; }
+
+        // =========================
+        // RELAÇÃO
+        // =========================
+
+        public int ClienteBalnearioId { get; set; }
+        public ClienteBalneario ClienteBalneario { get; set; }
     }
 }

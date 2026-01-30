@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
@@ -18,7 +19,9 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // Criar voucher a partir de pontos
+        // =========================
+        // CRIAR VOUCHER A PARTIR DE PONTOS
+        // =========================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Criar(int clienteId, int pontos)
@@ -30,33 +33,67 @@ namespace HealthWellbeing.Controllers
             if (cliente == null)
                 return NotFound();
 
-            if (cliente.HistoricoPontos.Sum(p => p.Pontos) < pontos)
+            int totalPontos = cliente.HistoricoPontos.Sum(p => p.Pontos);
+
+            if (totalPontos < pontos)
             {
                 TempData["Error"] = "Pontos insuficientes.";
                 return RedirectToAction("Details", "ClienteBalneario", new { id = clienteId });
             }
 
-            var valor = pontos / 10m; // regra simples: 10 pontos = 1€
+            decimal valor = pontos / 10m; // 10 pontos = 1€
 
             cliente.HistoricoPontos.Add(new HistoricoPontos
             {
+                ClienteBalnearioId = clienteId,
                 Pontos = -pontos,
-                Motivo = "Conversão em voucher"
+                Motivo = "Conversão em voucher",
+                Data = DateTime.Now
             });
 
             _context.VouchersCliente.Add(new VoucherCliente
             {
                 ClienteBalnearioId = clienteId,
                 Descricao = $"Voucher de {valor:0.00}€",
-                Valor = valor
+                Valor = valor,
+                DataCriacao = DateTime.Now,
+                Usado = false
             });
 
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "Voucher criado com sucesso.";
-            return RedirectToClub();
+            return RedirectToAction("Details", "ClienteBalneario", new { id = clienteId });
         }
 
-        private IActionResult RedirectToClub() => RedirectToAction("Index", "ClienteBalneario");
+        // =========================
+        // USAR VOUCHER
+        // =========================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Usar(int id)
+        {
+            var voucher = await _context.VouchersCliente.FindAsync(id);
+            if (voucher == null)
+                return NotFound();
+
+            if (voucher.Usado)
+            {
+                TempData["Error"] = "Este voucher já foi utilizado.";
+                return RedirectToAction("Details", "ClienteBalneario",
+                    new { id = voucher.ClienteBalnearioId });
+            }
+
+            voucher.Usado = true;
+            voucher.DataUtilizacao = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Voucher utilizado com sucesso.";
+
+            return RedirectToAction("Details", "ClienteBalneario",
+                new { id = voucher.ClienteBalnearioId });
+        }
+
     }
 }
