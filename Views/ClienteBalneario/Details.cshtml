@@ -157,17 +157,26 @@
     <!--Nível Cliente-->
     <div class="mt-2">
         <strong>Nível:</strong>
+
         @if (Model.NivelCliente != null)
         {
-            <span class="badge @Model.NivelCliente.CorBadge fs-6">
-                @Model.NivelCliente.Nome
-            </span>
-        }
+            <span class="badge
+                @(Model.NivelCliente.Nome == "Premium" ? "bg-primary" :
+                                Model.NivelCliente.Nome == "Ouro" ? "bg-warning text-dark" :
+                                Model.NivelCliente.Nome == "Prata" ? "bg-secondary" :
+                                "bg-bronze")">
+
+            <i class="bi bi-award-fill"></i>
+            @Model.NivelCliente.Nome
+        </span>
+                }
         else
         {
-            <span class="text-muted">—</span>
+            <span class="text-muted">Sem nível</span>
         }
     </div>
+
+
 
 
 

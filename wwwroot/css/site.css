@@ -20,3 +20,7 @@ html {
 body {
   margin-bottom: 60px;
 }
+.bg-bronze {
+    background-color: #cd7f32;
+    color: white;
+}
