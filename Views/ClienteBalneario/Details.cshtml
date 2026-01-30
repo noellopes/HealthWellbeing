@@ -121,6 +121,40 @@
         </div>
     </div>
 
+    <!-- 🎟️ Vouchers -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-bold">
+            <i class="bi bi-ticket-perforated"></i> Vouchers
+        </div>
+        <div class="card-body">
+            @if (Model.Vouchers.Any())
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var v in Model.Vouchers)
+                    {
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>
+                                @v.Descricao
+                                <small class="text-muted">
+                                    (@v.DataCriacao.ToString("dd/MM/yyyy"))
+                                </small>
+                            </span>
+
+                            <span class="badge @(v.Usado ? "bg-secondary" : "bg-success")">
+                                @v.Valor € @(v.Usado ? "Usado" : "Disponível")
+                            </span>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <span class="text-muted">Sem vouchers.</span>
+            }
+        </div>
+    </div>
+
+
     <!-- 🔘 Botões -->
     <div class="d-flex gap-2">
         <a asp-action="Edit"
