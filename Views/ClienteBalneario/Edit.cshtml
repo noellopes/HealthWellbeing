@@ -6,9 +6,8 @@
 
 <div class="container mt-4">
     <h2><i class="bi bi-pencil"></i> Editar Cliente</h2>
-    <hr />
 
-    <div class="card shadow-sm">
+    <div class="card shadow-sm mt-3">
         <div class="card-body">
 
             <form asp-action="Edit" method="post">
@@ -32,20 +31,16 @@
                     <input asp-for="Telemovel" class="form-control" />
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Pontos" class="form-label"></label>
-                    <input asp-for="Pontos" class="form-control" />
-                </div>
-
                 <div class="form-check mb-3">
                     <input asp-for="Ativo" class="form-check-input" />
                     <label asp-for="Ativo" class="form-check-label"></label>
                 </div>
 
-                <div class="text-end">
+                <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-save"></i> Guardar
                     </button>
+
                     <a asp-action="Index" class="btn btn-secondary">
                         Cancelar
                     </a>

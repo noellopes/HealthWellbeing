@@ -1,0 +1,86 @@
+﻿@model HealthWellbeing.Models.ClienteBalneario
+
+@{
+    ViewData["Title"] = "Detalhes do Cliente";
+}
+
+<div class="container mt-4">
+
+    <h2><i class="bi bi-person"></i> Detalhes do Cliente</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success mt-2">@TempData["Success"]</div>
+    }
+
+    <!-- Dados do Cliente -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-bold">
+            <i class="bi bi-card-list"></i> Dados do Cliente
+        </div>
+        <div class="card-body">
+            <p><strong>Nome:</strong> @Model.Nome</p>
+            <p><strong>Email:</strong> @Model.Email</p>
+            <p><strong>Telemóvel:</strong> @Model.Telemovel</p>
+            <p><strong>Data de Registo:</strong> @Model.DataRegisto.ToString("dd/MM/yyyy")</p>
+            <p>
+                <strong>Estado:</strong>
+                <span class="badge @(Model.Ativo ? "bg-success" : "bg-danger")">
+                    @(Model.Ativo ? "Ativo" : "Inativo")
+                </span>
+            </p>
+            <p><strong>Pontos:</strong> <span class="badge bg-info">@Model.Pontos</span></p>
+        </div>
+    </div>
+
+    <!-- Utentes Associados -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-bold">
+            <i class="bi bi-people"></i> Utentes Associados
+        </div>
+        <div class="card-body">
+            @if (Model.Utentes.Any())
+            {
+                <ul class="list-group">
+                    @foreach (var u in Model.Utentes)
+                    {
+                        <li class="list-group-item d-flex justify-content-between">
+                            @u.Nome
+                            <a asp-controller="UtenteBalneario"
+                               asp-action="Details"
+                               asp-route-id="@u.UtenteBalnearioId"
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <span class="text-muted">Sem utentes associados.</span>
+            }
+        </div>
+    </div>
+
+    <!-- Botões -->
+    <div class="d-flex gap-2">
+        <a asp-action="Edit"
+           asp-route-id="@Model.ClienteBalnearioId"
+           class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Editar
+        </a>
+
+        <form asp-action="ToggleAtivo" method="post">
+            <input type="hidden" name="id" value="@Model.ClienteBalnearioId" />
+            <button class="btn @(Model.Ativo ? "btn-danger" : "btn-success")">
+                @(Model.Ativo ? "Desativar" : "Ativar")
+            </button>
+        </form>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Voltar
+        </a>
+    </div>
+
+</div>
