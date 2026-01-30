@@ -2,15 +2,13 @@
 using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Rececionista")]
     public class SatisfacaoClienteController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -21,17 +19,25 @@ namespace HealthWellbeing.Controllers
         }
 
         // =========================
-        // CREATE
+        // CREATE (GET)
         // =========================
-        public IActionResult Create(int clienteId)
+        public async Task<IActionResult> Create(int clienteId)
         {
-            ViewBag.Cliente = _context.ClientesBalneario.Find(clienteId);
+            var cliente = await _context.ClientesBalneario.FindAsync(clienteId);
+            if (cliente == null)
+                return NotFound();
+
+            ViewBag.Cliente = cliente;
+
             return View(new SatisfacaoCliente
             {
                 ClienteBalnearioId = clienteId
             });
         }
 
+        // =========================
+        // CREATE (POST)
+        // =========================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SatisfacaoCliente satisfacao)
@@ -44,15 +50,36 @@ namespace HealthWellbeing.Controllers
                 return View(satisfacao);
             }
 
-            satisfacao.DataRegisto = DateTime.Now;
+            var cliente = await _context.ClientesBalneario
+                .FirstOrDefaultAsync(c => c.ClienteBalnearioId == satisfacao.ClienteBalnearioId);
 
+            if (cliente == null)
+                return NotFound();
+
+            // Registar satisfação
+            satisfacao.DataRegisto = DateTime.Now;
             _context.SatisfacoesClientes.Add(satisfacao);
+
+            // Atribuir pontos
+            cliente.Pontos += 10;
+
+            _context.HistoricoPontos.Add(new HistoricoPontos
+            {
+                ClienteBalnearioId = cliente.ClienteBalnearioId,
+                Pontos = 10,
+                Motivo = "Avaliação de satisfação",
+                Data = DateTime.Now
+            });
+
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Avaliação registada com sucesso.";
+            TempData["Success"] = "Avaliação registada e pontos atribuídos com sucesso.";
 
-            return RedirectToAction("Details", "ClienteBalneario",
-                new { id = satisfacao.ClienteBalnearioId });
+            return RedirectToAction(
+                "Details",
+                "ClienteBalneario",
+                new { id = cliente.ClienteBalnearioId }
+            );
         }
     }
 }

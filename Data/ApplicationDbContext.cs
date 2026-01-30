@@ -22,6 +22,8 @@ namespace HealthWellbeing.Data
 
         public DbSet<HistoricoPontos> HistoricoPontos { get; set; }
 
+        public DbSet<VoucherCliente> VouchersCliente { get; set; }
+
 
 
 
@@ -62,6 +64,16 @@ namespace HealthWellbeing.Data
                 .HasForeignKey(h => h.ClienteBalnearioId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+
+            modelBuilder.Entity<VoucherCliente>()
+                .HasOne(v => v.ClienteBalneario)
+                .WithMany(c => c.Vouchers)
+                .HasForeignKey(v => v.ClienteBalnearioId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<VoucherCliente>()
+                .Property(v => v.Valor)
+                .HasPrecision(10, 2);
 
 
 

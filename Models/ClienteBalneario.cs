@@ -40,7 +40,7 @@ namespace HealthWellbeing.Models
         // =========================
         // FIDELIZAÇÃO
         // =========================
-
+        public int Pontos { get; set; } = 0;
         public ICollection<HistoricoPontos> HistoricoPontos { get; set; }
         = new List<HistoricoPontos>();
 
@@ -51,6 +51,13 @@ namespace HealthWellbeing.Models
         // =========================
         public ICollection<SatisfacaoCliente> Satisfacoes { get; set; }
             = new List<SatisfacaoCliente>();
+
+        // =========================
+        // VOUCHERS
+        // =========================
+        public ICollection<VoucherCliente> Vouchers { get; set; }
+            = new List<VoucherCliente>();
+
 
 
         // =========================
