@@ -59,6 +59,13 @@ namespace HealthWellbeing.Models
             = new List<VoucherCliente>();
 
 
+        // =========================
+        // NIVEL CLIENTE
+        // =========================
+        public int? NivelClienteId { get; set; }
+        public NivelCliente? NivelCliente { get; set; }
+
+
 
         // =========================
         // RELAÇÕES

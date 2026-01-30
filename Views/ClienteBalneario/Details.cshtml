@@ -154,6 +154,23 @@
         </div>
     </div>
 
+    <!--Nível Cliente-->
+    <div class="mt-2">
+        <strong>Nível:</strong>
+        @if (Model.NivelCliente != null)
+        {
+            <span class="badge @Model.NivelCliente.CorBadge fs-6">
+                @Model.NivelCliente.Nome
+            </span>
+        }
+        else
+        {
+            <span class="text-muted">—</span>
+        }
+    </div>
+
+
+
 
     <!-- 🔘 Botões -->
     <div class="d-flex gap-2">

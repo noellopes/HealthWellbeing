@@ -1,5 +1,6 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +13,15 @@ namespace HealthWellbeing.Controllers
     public class SatisfacaoClienteController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ClienteService _clienteService;
 
-        public SatisfacaoClienteController(ApplicationDbContext context)
+        
+        public SatisfacaoClienteController(
+            ApplicationDbContext context,
+            ClienteService clienteService)
         {
             _context = context;
+            _clienteService = clienteService;
         }
 
         // =========================
@@ -56,13 +62,11 @@ namespace HealthWellbeing.Controllers
             if (cliente == null)
                 return NotFound();
 
-            // Registar satisfação
+            // ✅ Registar satisfação
             satisfacao.DataRegisto = DateTime.Now;
             _context.SatisfacoesClientes.Add(satisfacao);
 
-            // Atribuir pontos
-            cliente.Pontos += 10;
-
+            // ✅ Atribuir pontos
             _context.HistoricoPontos.Add(new HistoricoPontos
             {
                 ClienteBalnearioId = cliente.ClienteBalnearioId,
@@ -70,6 +74,9 @@ namespace HealthWellbeing.Controllers
                 Motivo = "Avaliação de satisfação",
                 Data = DateTime.Now
             });
+
+            // ✅ Atualizar nível do cliente (SERVICE)
+            await _clienteService.AtualizarNivelClienteAsync(cliente.ClienteBalnearioId);
 
             await _context.SaveChangesAsync();
 

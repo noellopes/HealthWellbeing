@@ -32,35 +32,41 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var c in Model)
+                    @foreach (var cliente in Model)
                     {
-                        <tr class="@(c.Ativo ? "" : "table-secondary")">
-                            <td>@c.Nome</td>
-                            <td>@c.Email</td>
-                            <td>@c.Telemovel</td>
+                        <tr>
+                            <td>@cliente.Nome</td>
+                            <td>@cliente.Email</td>
+                            <td>@cliente.Telemovel</td>
+
                             <td>
-                                <span class="badge bg-info">@c.HistoricoPontos</span>
-                            </td>
-                            <td>
-                                <span class="badge @(c.Ativo ? "bg-success" : "bg-danger")">
-                                    @(c.Ativo ? "Ativo" : "Inativo")
+                                <span class="badge bg-info">
+                                    @(cliente.HistoricoPontos?.Sum(p => p.Pontos) ?? 0)
                                 </span>
                             </td>
+
+                            <td>
+                                <span class="badge @(cliente.Ativo ? "bg-success" : "bg-danger")">
+                                    @(cliente.Ativo ? "Ativo" : "Inativo")
+                                </span>
+                            </td>
+
                             <td class="text-end">
                                 <a asp-action="Details"
-                                   asp-route-id="@c.ClienteBalnearioId"
+                                   asp-route-id="@cliente.ClienteBalnearioId"
                                    class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-eye"></i>
                                 </a>
 
                                 <a asp-action="Edit"
-                                   asp-route-id="@c.ClienteBalnearioId"
+                                   asp-route-id="@cliente.ClienteBalnearioId"
                                    class="btn btn-sm btn-outline-warning">
                                     <i class="bi bi-pencil"></i>
                                 </a>
                             </td>
                         </tr>
                     }
+
                 </tbody>
             </table>
         </div>

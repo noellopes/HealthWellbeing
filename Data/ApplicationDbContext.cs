@@ -24,6 +24,7 @@ namespace HealthWellbeing.Data
 
         public DbSet<VoucherCliente> VouchersCliente { get; set; }
 
+        public DbSet<NivelCliente> NiveisCliente { get; set; }
 
 
 
@@ -92,6 +93,13 @@ namespace HealthWellbeing.Data
                 new SeguroSaude { SeguroSaudeId = 3, Nome = "Médis" },
                 new SeguroSaude { SeguroSaudeId = 4, Nome = "Particular" }
             );
+
+            modelBuilder.Entity<NivelCliente>().HasData(
+                new NivelCliente { NivelClienteId = 1, Nome = "Bronze", PontosMinimos = 0, CorBadge = "bg-secondary" },
+                new NivelCliente { NivelClienteId = 2, Nome = "Prata", PontosMinimos = 100, CorBadge = "bg-info" },
+                new NivelCliente { NivelClienteId = 3, Nome = "Ouro", PontosMinimos = 300, CorBadge = "bg-warning" },
+                new NivelCliente { NivelClienteId = 4, Nome = "Platinum", PontosMinimos = 600, CorBadge = "bg-success" }
+);
 
 
         }

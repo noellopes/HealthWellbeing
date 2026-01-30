@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
 {
@@ -30,7 +31,7 @@ namespace HealthWellbeing.Models
         public int PontosNecessarios { get; set; }
 
         [Required]
-        [Range(0.01, 10000)]
+        [Column(TypeName = "decimal(10,2)")]
         public decimal Valor { get; set; }
 
         public DateTime DataCriacao { get; set; } = DateTime.Now;

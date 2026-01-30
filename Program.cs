@@ -1,4 +1,5 @@
 ﻿using HealthWellbeing.Data;
+using HealthWellbeing.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,9 @@ builder.Services.AddDefaultIdentity<IdentityUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<ClienteService>();
+
+
 
 var app = builder.Build();
 
