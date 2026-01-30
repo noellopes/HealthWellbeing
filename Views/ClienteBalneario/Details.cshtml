@@ -13,6 +13,14 @@
         <div class="alert alert-success mt-2">@TempData["Success"]</div>
     }
 
+    <a asp-controller="SatisfacaoCliente"
+       asp-action="Create"
+       asp-route-clienteId="@Model.ClienteBalnearioId"
+       class="btn btn-outline-primary">
+        <i class="bi bi-star"></i> Avaliar Cliente
+    </a>
+
+
     <!-- Dados do Cliente -->
     <div class="card shadow-sm mb-4">
         <div class="card-header fw-bold">

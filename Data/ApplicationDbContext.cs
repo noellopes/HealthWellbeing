@@ -18,6 +18,9 @@ namespace HealthWellbeing.Data
 
         public DbSet<ClienteBalneario> ClientesBalneario { get; set; }
 
+        public DbSet<SatisfacaoCliente> SatisfacoesClientes { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -44,6 +47,12 @@ namespace HealthWellbeing.Data
             modelBuilder.Entity<ClienteBalneario>()
                 .HasIndex(c => c.Telemovel)
                 .IsUnique();
+
+            modelBuilder.Entity<SatisfacaoCliente>()
+                .HasOne(s => s.ClienteBalneario)
+                .WithMany(c => c.Satisfacoes)
+                .HasForeignKey(s => s.ClienteBalnearioId)
+                .OnDelete(DeleteBehavior.Cascade);
 
 
 

@@ -44,6 +44,14 @@ namespace HealthWellbeing.Models
         [Range(0, int.MaxValue)]
         public int Pontos { get; set; } = 0;
 
+
+        // =========================
+        // SATISFAÇÃO
+        // =========================
+        public ICollection<SatisfacaoCliente> Satisfacoes { get; set; }
+            = new List<SatisfacaoCliente>();
+
+
         // =========================
         // RELAÇÕES
         // =========================
