@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+
+<!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="utf-8" />
@@ -12,7 +16,7 @@
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- CSS do site -->
+    <!-- CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/HealthWellbeing.styles.css" asp-append-version="true" />
 </head>
@@ -37,11 +41,11 @@
 
                 <div class="collapse navbar-collapse" id="navbarMain">
 
-                    <!-- MENU ESQUERDO -->
-                    <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+                    <!-- MENU -->
+                    <ul class="navbar-nav me-auto">
 
                         <li class="nav-item">
-                            <a class="nav-link"
+                            <a class="nav-link @(controller == "Home" ? "active fw-bold" : "")"
                                asp-controller="Home"
                                asp-action="Index">
                                 <i class="bi bi-house"></i> Home
@@ -49,7 +53,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link"
+                            <a class="nav-link @(controller == "UtenteBalneario" ? "active fw-bold" : "")"
                                asp-controller="UtenteBalneario"
                                asp-action="Index">
                                 <i class="bi bi-people"></i> Utentes
@@ -57,18 +61,18 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link"
-                               asp-controller="Alimento"
+                            <a class="nav-link @(controller == "Terapeuta" ? "active fw-bold" : "")"
+                               asp-controller="Terapeuta"
                                asp-action="Index">
-                                <i class="bi bi-egg-fried"></i> Alimentos
+                                <i class="bi bi-person-badge"></i> Terapeutas
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link"
-                               asp-controller="ComponentesAlimento"
+                            <a class="nav-link @(controller == "ClienteBalneario" ? "active fw-bold" : "")"
+                               asp-controller="ClienteBalneario"
                                asp-action="Index">
-                                <i class="bi bi-list-check"></i> Componentes
+                                <i class="bi bi-person-heart"></i> Cliente Balneário
                             </a>
                         </li>
 
@@ -94,7 +98,7 @@
     <!-- FOOTER -->
     <footer class="border-top footer text-muted bg-white">
         <div class="container text-center py-3">
-            &copy; 2025 - HealthWellbeing ·
+            &copy; 2026 - HealthWellbeing ·
             <a asp-controller="Home" asp-action="Privacy">Privacidade</a>
         </div>
     </footer>
