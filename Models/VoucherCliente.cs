@@ -15,7 +15,7 @@ namespace HealthWellbeing.Models
 
         [Required]
         [StringLength(100)]
-        public string Titulo { get; set; }
+        public string? Titulo { get; set; }
 
         [StringLength(250)]
         public string? Descricao { get; set; }

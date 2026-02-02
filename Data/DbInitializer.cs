@@ -10,106 +10,76 @@ namespace HealthWellbeing.Data
         public static void Seed(ApplicationDbContext context)
         {
             // =========================
-            // PROTEÇÃO
+            // PROTEÇÃO (DEV)
             // =========================
-            if (context.UtenteBalnearios.Any())
+            if (context.ClientesBalneario.Any())
                 return;
 
             var random = new Random();
 
             // =========================
-            // DADOS BASE
+            // SEGUROS DE SAÚDE
+            // =========================
+            if (!context.SegurosSaude.Any())
+            {
+                context.SegurosSaude.AddRange(
+                    new SeguroSaude { Nome = "SNS" },
+                    new SeguroSaude { Nome = "Médis" },
+                    new SeguroSaude { Nome = "Multicare" },
+                    new SeguroSaude { Nome = "ADSE" }
+                );
+                context.SaveChanges();
+            }
+
+            var seguros = context.SegurosSaude.ToList();
+
+            // =========================
+            // DADOS AUXILIARES
             // =========================
             var moradas = new[]
             {
                 "Rua da Igreja, Lisboa",
                 "Rua das Flores, Porto",
                 "Avenida da Liberdade, Lisboa",
-                "Rua de São Bento, Lisboa",
                 "Rua Dom João IV, Braga",
-                "Rua da Alegria, Porto",
                 "Rua da República, Faro",
-                "Rua do Comércio, Setúbal",
-                "Rua da Saudade, Coimbra",
-                "Avenida 25 de Abril, Aveiro"
+                "Rua da Saudade, Coimbra"
             };
 
-            var homens = new[] { "João", "Pedro", "Miguel", "Tiago", "Rui", "André", "Bruno", "Daniel" };
-            var mulheres = new[] { "Ana", "Maria", "Sofia", "Inês", "Joana", "Rita", "Marta", "Carla" };
+            var homens = new[] { "João", "Pedro", "Miguel", "Tiago", "Rui", "André", "Carlos", "Bruno" };
+            var mulheres = new[] { "Ana", "Maria", "Sofia", "Inês", "Joana", "Rita", "Mariana", "Carla" };
             var apelidos = new[] { "Silva", "Santos", "Ferreira", "Pereira", "Costa", "Oliveira" };
 
-            var historicosClinicos = new[]
-            {
-                "Sem antecedentes clínicos relevantes.",
-                "Hipertensão arterial controlada.",
-                "Lombalgia crónica.",
-                "Recuperação pós-cirúrgica.",
-                "Diabetes tipo II controlada."
-            };
-
-            var indicacoes = new[]
-            {
-                "Hidroterapia para reabilitação muscular.",
-                "Relaxamento muscular.",
-                "Fisioterapia aquática.",
-                "Mobilidade articular.",
-                "Reeducação postural."
-            };
-
-            var contraIndicacoes = new[]
-            {
-                "Nenhuma.",
-                "Alergia ao cloro.",
-                "Hipertensão não controlada.",
-                "Problemas respiratórios.",
-                "Feridas abertas."
-            };
-
             // =========================
-            // CLIENTES DE BALNEÁRIO
+            // CLIENTES DO BALNEÁRIO (25)
             // =========================
-            var clientes = new List<ClienteBalneario>
+            var clientes = new List<ClienteBalneario>();
+
+            for (int i = 1; i <= 25; i++)
             {
-                new ClienteBalneario
+                clientes.Add(new ClienteBalneario
                 {
-                    Nome = "Antonio Marques",
-                    Email = "antonio@balneario.pt",
-                    Telemovel = "935678123",
-                    DataRegisto = DateTime.Today.AddDays(-30),
+                    Nome = $"Cliente {i}",
+                    Email = $"cliente{i}@balneario.pt",
+                    Telemovel = $"9{random.Next(10000000, 99999999)}",
+                    DataRegisto = DateTime.Today.AddDays(-random.Next(10, 400)),
                     Ativo = true
-                },
-                new ClienteBalneario
-                {
-                    Nome = "Zulmira Silva",
-                    Email = "zulmira@balneario.pt",
-                    Telemovel = "914576559",
-                    DataRegisto = DateTime.Today.AddDays(-20),
-                    Ativo = true
-                },
-                new ClienteBalneario
-                {
-                    Nome = "Juvenaldo Ramos",
-                    Email = "juvenaldo@balneario.pt",
-                    Telemovel = "968782555",
-                    DataRegisto = DateTime.Today.AddDays(-10),
-                    Ativo = true
-                }
-            };
+                });
+            }
 
             context.ClientesBalneario.AddRange(clientes);
             context.SaveChanges();
 
             var clientesDb = context.ClientesBalneario.ToList();
-            var seguros = context.SegurosSaude.ToList();
 
             // =========================
-            // UTENTES
+            // UTENTES (55)
             // =========================
             var utentes = new List<UtenteBalneario>();
 
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 55; i++)
             {
-                bool feminino = i % 2 == 0;
+                bool feminino = random.Next(0, 2) == 0;
 
                 var nome = feminino
                     ? mulheres[random.Next(mulheres.Length)]
@@ -118,27 +88,28 @@ namespace HealthWellbeing.Data
                 var apelido = apelidos[random.Next(apelidos.Length)];
                 var seguro = seguros[random.Next(seguros.Count)];
 
-                var clienteAssociado = random.Next(0, 2) == 0
+                
+                var clienteAssociado = random.Next(100) < 65
                     ? clientesDb[random.Next(clientesDb.Count)]
                     : null;
 
                 utentes.Add(new UtenteBalneario
                 {
                     Nome = $"{nome} {apelido}",
-                    DataNascimento = DateTime.Today.AddYears(-random.Next(18, 80)),
+                    DataNascimento = DateTime.Today.AddYears(-random.Next(18, 85)),
                     GeneroId = feminino ? 2 : 1,
                     NIF = random.Next(100000000, 999999999).ToString(),
                     Contacto = $"9{random.Next(10000000, 99999999)}",
                     Morada = moradas[random.Next(moradas.Length)],
 
-                    HistoricoClinico = historicosClinicos[random.Next(historicosClinicos.Length)],
-                    IndicacoesTerapeuticas = indicacoes[random.Next(indicacoes.Length)],
-                    ContraIndicacoes = contraIndicacoes[random.Next(contraIndicacoes.Length)],
+                    HistoricoClinico = null, // opcional
+                    IndicacoesTerapeuticas = "Acompanhamento terapêutico.",
+                    ContraIndicacoes = "Nenhuma.",
 
                     SeguroSaudeId = seguro.SeguroSaudeId,
                     ClienteBalnearioId = clienteAssociado?.ClienteBalnearioId,
 
-                    DataInscricao = DateTime.Today.AddDays(-random.Next(0, 365)),
+                    DataInscricao = DateTime.Today.AddDays(-random.Next(0, 500)),
                     Ativo = true
                 });
             }
@@ -146,68 +117,76 @@ namespace HealthWellbeing.Data
             context.UtenteBalnearios.AddRange(utentes);
             context.SaveChanges();
 
+            var utentesDb = context.UtenteBalnearios.ToList();
+
             // =========================
-            // HISTÓRICO MÉDICO
+            // HISTÓRICO MÉDICO (só alguns)
             // =========================
-            foreach (var utente in context.UtenteBalnearios.Take(20))
+            foreach (var utente in utentesDb.Where(u => random.Next(100) < 60))
             {
-                context.HistoricosMedicos.AddRange(
-                    new HistoricoMedico
+                int entradas = random.Next(1, 4);
+
+                for (int i = 0; i < entradas; i++)
+                {
+                    context.HistoricosMedicos.Add(new HistoricoMedico
                     {
                         UtenteBalnearioId = utente.UtenteBalnearioId,
-                        DataRegisto = utente.DataInscricao.AddDays(5),
-                        Descricao = "Avaliação inicial e plano terapêutico definido."
-                    },
-                    new HistoricoMedico
-                    {
-                        UtenteBalnearioId = utente.UtenteBalnearioId,
-                        DataRegisto = utente.DataInscricao.AddDays(15),
-                        Descricao = "Sessão de hidroterapia com evolução positiva."
-                    }
-                );
+                        Titulo = "Sessão Clínica",
+                        Descricao = "Sessão de acompanhamento terapêutico.",
+                        DataRegisto = utente.DataInscricao.AddDays(random.Next(5, 150))
+                    });
+                }
             }
 
             context.SaveChanges();
 
             // =========================
-            // AVALIAÇÕES + PONTOS
+            // SATISFAÇÃO + PONTOS
             // =========================
             foreach (var cliente in clientesDb)
             {
-                int avaliacao = random.Next(1, 6);
+                int avaliacoes = random.Next(1, 5);
 
-                context.SatisfacoesClientes.Add(new SatisfacaoCliente
+                for (int i = 0; i < avaliacoes; i++)
                 {
-                    ClienteBalnearioId = cliente.ClienteBalnearioId,
-                    Avaliacao = avaliacao,
-                    Comentario = avaliacao >= 4
-                        ? "Excelente atendimento e acompanhamento."
-                        : "Serviço aceitável, pode melhorar.",
-                    DataRegisto = DateTime.Today.AddDays(-random.Next(1, 10))
-                });
+                    int rating = random.Next(2, 6);
 
-                context.HistoricoPontos.Add(new HistoricoPontos
-                {
-                    ClienteBalnearioId = cliente.ClienteBalnearioId,
-                    Pontos = avaliacao * 5,
-                    Motivo = "Avaliação de satisfação",
-                    Data = DateTime.Now
-                });
+                    context.SatisfacoesClientes.Add(new SatisfacaoCliente
+                    {
+                        ClienteBalnearioId = cliente.ClienteBalnearioId,
+                        Avaliacao = rating,
+                        Comentario = rating >= 4
+                            ? "Excelente atendimento."
+                            : "Serviço aceitável.",
+                        DataRegisto = DateTime.Today.AddDays(-random.Next(1, 200))
+                    });
+
+                    context.HistoricoPontos.Add(new HistoricoPontos
+                    {
+                        ClienteBalnearioId = cliente.ClienteBalnearioId,
+                        Pontos = rating * 5,
+                        Motivo = "Avaliação de satisfação",
+                        Data = DateTime.Now
+                    });
+                }
             }
 
             context.SaveChanges();
 
             // =========================
-            // VOUCHERS
+            // VOUCHERS (alguns clientes)
             // =========================
-            context.VouchersCliente.Add(new VoucherCliente
+            foreach (var cliente in clientesDb.Where(c => random.Next(100) < 40))
             {
-                ClienteBalnearioId = clientesDb.First().ClienteBalnearioId,
-                Descricao = "Voucher de desconto",
-                Valor = 5,
-                DataCriacao = DateTime.Now,
-                Usado = false
-            });
+                context.VouchersCliente.Add(new VoucherCliente
+                {
+                    ClienteBalnearioId = cliente.ClienteBalnearioId,
+                    Descricao = "Voucher promocional",
+                    Valor = random.Next(5, 20),
+                    DataCriacao = DateTime.Now,
+                    Usado = false
+                });
+            }
 
             context.SaveChanges();
         }

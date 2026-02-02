@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
-    [Authorize]
+    
     public class ClienteBalnearioController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -26,11 +26,12 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Index()
         {
             var clientes = await _context.ClientesBalneario
-                .Include(c => c.HistoricoPontos)
-                .OrderBy(c => c.Nome)
-                .ToListAsync();
+             .Include(c => c.HistoricoPontos)
+            .OrderBy(c => c.Nome)
+            .ToListAsync();
 
             return View(clientes);
+
         }
 
         // =========================

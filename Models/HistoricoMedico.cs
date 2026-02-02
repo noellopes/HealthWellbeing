@@ -21,6 +21,10 @@ namespace HealthWellbeing.Models
         public DateTime DataRegisto { get; set; } = DateTime.Now;
 
         [Required]
+        [StringLength(100)]
+        public string Titulo { get; set; }
+
+        [Required]
         [StringLength(500)]
         public string Descricao { get; set; } = string.Empty;
 

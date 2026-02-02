@@ -8,13 +8,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddDefaultIdentity<IdentityUser>()
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddControllersWithViews(); 
 builder.Services.AddScoped<ClienteService>();
 builder.Services.AddScoped<VoucherService>();
+builder.Services.AddRazorPages();
 
 
 
@@ -28,6 +29,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+    var context = services.GetRequiredService<ApplicationDbContext>();
 
     string[] roles = { "Admin", "Medico", "Rececionista" };
 
@@ -48,6 +50,8 @@ using (var scope = app.Services.CreateScope())
         await userManager.CreateAsync(admin, "Admin123!");
         await userManager.AddToRoleAsync(admin, "Admin");
     }
+
+    DbInitializer.Seed(context);
 }
 
 if (!app.Environment.IsDevelopment())
