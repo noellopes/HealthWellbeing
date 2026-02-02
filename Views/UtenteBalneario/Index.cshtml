@@ -72,38 +72,59 @@
     </div>
 
     <!-- =========================
-     DASHBOARD
-        ========================== -->
-        <div class="row mb-4">
+     DASHBOARD CLICÁVEL
+========================== -->
+<div class="row mb-4">
 
-            <div class="col-md-4">
-                 <div class="card shadow-sm text-center">
-                     <div class="card-body">
-                      <h6 class="text-muted">Total de Utentes</h6>
-                        <h2 class="fw-bold">@ViewBag.TotalUtentes</h2>
-                     </div>
-                 </div>
-             </div>
+    <!-- TOTAL -->
+    <div class="col-md-4">
+        <a asp-action="Index"
+           class="text-decoration-none text-dark">
 
-         <div class="col-md-4">
-            <div class="card shadow-sm text-center border-success">
-                 <div class="card-body">
-                     <h6 class="text-success">Utentes Ativos</h6>
-                     <h2 class="fw-bold text-success">@ViewBag.TotalAtivos</h2>
-                 </div>
-              </div>
-         </div>
+            <div class="card shadow-sm text-center hover-shadow">
+                <div class="card-body">
+                    <h6 class="text-muted">Total de Utentes</h6>
+                    <h2 class="fw-bold">@ViewBag.TotalUtentes</h2>
+                </div>
+            </div>
 
-         <div class="col-md-4">
-             <div class="card shadow-sm text-center border-danger">
-                 <div class="card-body">
+        </a>
+    </div>
+
+    <!-- ATIVOS -->
+    <div class="col-md-4">
+        <a asp-action="Index"
+           asp-route-ativos="true"
+           class="text-decoration-none text-dark">
+
+            <div class="card shadow-sm text-center border-success hover-shadow">
+                <div class="card-body">
+                    <h6 class="text-success">Utentes Ativos</h6>
+                    <h2 class="fw-bold text-success">@ViewBag.TotalAtivos</h2>
+                </div>
+            </div>
+
+        </a>
+    </div>
+
+    <!-- INATIVOS -->
+    <div class="col-md-4">
+        <a asp-action="Index"
+           asp-route-ativos="false"
+           class="text-decoration-none text-dark">
+
+            <div class="card shadow-sm text-center border-danger hover-shadow">
+                <div class="card-body">
                     <h6 class="text-danger">Utentes Inativos</h6>
                     <h2 class="fw-bold text-danger">@ViewBag.TotalInativos</h2>
                 </div>
             </div>
-         </div>
 
-        </div>
+        </a>
+    </div>
+
+</div>
+
 
 
 
