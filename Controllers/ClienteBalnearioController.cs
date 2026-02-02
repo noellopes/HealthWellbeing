@@ -24,10 +24,11 @@ namespace HealthWellbeing.Controllers
         // INDEX
         // =========================
         public async Task<IActionResult> Index(
-             string? search,
-             bool? ativos,
-             string? sort,
-             int page = 1)
+    string? search,
+    bool? ativos,
+    string? sort,
+    int? minPontos,
+    int page = 1)
         {
             int pageSize = 10;
 
@@ -35,20 +36,47 @@ namespace HealthWellbeing.Controllers
                 .Include(c => c.HistoricoPontos)
                 .AsQueryable();
 
+            // =========================
+            // FILTROS
+            // =========================
+
             if (!string.IsNullOrWhiteSpace(search))
                 query = query.Where(c => c.Nome.Contains(search));
 
             if (ativos.HasValue)
                 query = query.Where(c => c.Ativo == ativos.Value);
 
+            if (minPontos.HasValue)
+                query = query.Where(c =>
+                    c.HistoricoPontos.Sum(p => p.Pontos) >= minPontos.Value);
+
+            // =========================
+            // DASHBOARD (CONTADORES)
+            // =========================
+
+            ViewBag.TotalClientes = await _context.ClientesBalneario.CountAsync();
+            ViewBag.TotalAtivos = await _context.ClientesBalneario.CountAsync(c => c.Ativo);
+            ViewBag.TotalInativos = await _context.ClientesBalneario.CountAsync(c => !c.Ativo);
+
+            ViewBag.TotalCom50Pontos = await _context.ClientesBalneario
+                .Where(c => c.HistoricoPontos.Sum(p => p.Pontos) >= 50)
+                .CountAsync();
+
+            // =========================
+            // ORDENAÇÃO
+            // =========================
+
             query = sort switch
             {
                 "nome_desc" => query.OrderByDescending(c => c.Nome),
+                "pontos" => query.OrderBy(c => c.HistoricoPontos.Sum(p => p.Pontos)),
+                "pontos_desc" => query.OrderByDescending(c => c.HistoricoPontos.Sum(p => p.Pontos)),
                 _ => query.OrderBy(c => c.Nome)
             };
 
-            ViewBag.Sort = sort;
-
+            // =========================
+            // PAGINAÇÃO
+            // =========================
 
             var totalItems = await query.CountAsync();
 
@@ -57,14 +85,21 @@ namespace HealthWellbeing.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
+            // =========================
+            // VIEWBAGS
+            // =========================
+
             ViewBag.Search = search;
             ViewBag.Ativos = ativos;
             ViewBag.Sort = sort;
+            ViewBag.MinPontos = minPontos;
+
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
             return View(clientes);
         }
+
 
 
         // =========================

@@ -6,6 +6,7 @@
 
 <div class="container mt-4">
 
+    <!-- Cabeçalho -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class="bi bi-people"></i> Clientes do Balneário</h2>
         <a asp-action="Create" class="btn btn-primary">
@@ -18,6 +19,71 @@
         <div class="alert alert-success">@TempData["Success"]</div>
     }
 
+    <!-- =========================
+         DASHBOARD (CLICÁVEL)
+    ========================== -->
+    <div class="row g-3 mb-4">
+
+        <!-- TOTAL -->
+        <div class="col-md-3">
+            <a asp-action="Index"
+               class="text-decoration-none text-dark">
+                <div class="card shadow-sm text-center h-100">
+                    <div class="card-body">
+                        <small>Total</small>
+                        <h2 class="fw-bold">@ViewBag.TotalClientes</h2>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- ATIVOS -->
+        <div class="col-md-3">
+            <a asp-action="Index"
+               asp-route-ativos="true"
+               class="text-decoration-none">
+                <div class="card shadow-sm text-center h-100 border-success">
+                    <div class="card-body text-success">
+                        <small>Ativos</small>
+                        <h2 class="fw-bold">@ViewBag.TotalAtivos</h2>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- INATIVOS -->
+        <div class="col-md-3">
+            <a asp-action="Index"
+               asp-route-ativos="false"
+               class="text-decoration-none">
+                <div class="card shadow-sm text-center h-100 border-danger">
+                    <div class="card-body text-danger">
+                        <small>Inativos</small>
+                        <h2 class="fw-bold">@ViewBag.TotalInativos</h2>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- >= 50 PONTOS -->
+        <div class="col-md-3">
+            <a asp-action="Index"
+               asp-route-minPontos="50"
+               class="text-decoration-none">
+                <div class="card shadow-sm text-center h-100 border-warning">
+                    <div class="card-body text-warning">
+                        <small>≥ 50 Pontos</small>
+                        <h2 class="fw-bold">@ViewBag.TotalCom50Pontos</h2>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+    </div>
+
+    <!-- =========================
+         TABELA
+    ========================== -->
     <div class="card shadow-sm">
         <div class="card-body p-0">
             <table class="table table-hover mb-0">
@@ -26,45 +92,49 @@
                         <th>
                             <a asp-action="Index"
                                asp-route-sort="@(ViewBag.Sort == "nome_desc" ? "" : "nome_desc")"
-                               asp-route-search="@ViewBag.Search"
                                asp-route-ativos="@ViewBag.Ativos"
+                               asp-route-minPontos="@ViewBag.MinPontos"
                                asp-route-page="@ViewBag.CurrentPage"
                                class="text-decoration-none text-dark">
-
                                 Nome
-                                @if (ViewBag.Sort == "nome_desc")
-                                {
-                                    <i class="bi bi-sort-down"></i>
-                                }
-                                else
-                                {
-                                    <i class="bi bi-sort-up"></i>
-                                }
+                                <i class="bi bi-arrow-down-up ms-1"></i>
                             </a>
                         </th>
-
                         <th>Email</th>
                         <th>Telemóvel</th>
-                        <th>Pontos</th>
+                        <th>
+                            <a asp-action="Index"
+                               asp-route-sort="@(ViewBag.Sort == "pontos_desc" ? "pontos" : "pontos_desc")"
+                               asp-route-ativos="@ViewBag.Ativos"
+                               asp-route-minPontos="@ViewBag.MinPontos"
+                               asp-route-page="@ViewBag.CurrentPage"
+                               class="text-decoration-none text-dark">
+                                Pontos
+                                <i class="bi bi-arrow-down-up ms-1"></i>
+                            </a>
+                        </th>
                         <th>Estado</th>
                         <th class="text-end"></th>
                     </tr>
                 </thead>
+
                 <tbody>
                     @foreach (var cliente in Model)
                     {
+                        var pontos = cliente.HistoricoPontos?.Sum(p => p.Pontos) ?? 0;
+
                         <tr>
                             <td>@cliente.Nome</td>
                             <td>@cliente.Email</td>
                             <td>@cliente.Telemovel</td>
 
                             <td>
-                                <span class="badge bg-info">
-                                    @(cliente.HistoricoPontos?.Sum(p => p.Pontos) ?? 0)
-
-                                </span>
-                            </td>
-
+                                <span class="badge
+                                        @(pontos >= 50 ? "bg-warning text-dark" :
+                                                                            pontos >= 25 ? "bg-primary" : "bg-secondary")">
+                                @pontos
+                            </span>
+                        </td>
 
                             <td>
                                 <span class="badge @(cliente.Ativo ? "bg-success" : "bg-danger")">
@@ -86,80 +156,75 @@
                                 </a>
                             </td>
                         </tr>
-                    }
-
+                                        }
                 </tbody>
+
             </table>
         </div>
     </div>
 
     <!-- =========================
-            PAGINAÇÃO
-       ========================== -->
+         PAGINAÇÃO
+    ========================== -->
     @if (ViewBag.TotalPages > 1)
     {
         <nav class="mt-4">
             <ul class="pagination justify-content-center">
 
-                <!-- Primeira -->
                 <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
                     <a class="page-link"
                        asp-action="Index"
                        asp-route-page="1"
-                       asp-route-search="@ViewBag.Search"
+                       asp-route-sort="@ViewBag.Sort"
                        asp-route-ativos="@ViewBag.Ativos"
-                       asp-route-sort="@ViewBag.Sort">
+                       asp-route-minPontos="@ViewBag.MinPontos">
                         ⏮
                     </a>
                 </li>
 
-                <!-- Anterior -->
                 <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
                     <a class="page-link"
                        asp-action="Index"
                        asp-route-page="@(ViewBag.CurrentPage - 1)"
-                       asp-route-search="@ViewBag.Search"
+                       asp-route-sort="@ViewBag.Sort"
                        asp-route-ativos="@ViewBag.Ativos"
-                       asp-route-sort="@ViewBag.Sort">
+                       asp-route-minPontos="@ViewBag.MinPontos">
                         ◀
                     </a>
                 </li>
 
-                <!-- Páginas -->
                 @for (int i = 1; i <= ViewBag.TotalPages; i++)
                 {
                     <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
                         <a class="page-link"
                            asp-action="Index"
                            asp-route-page="@i"
-                           asp-route-search="@ViewBag.Search"
+                           asp-route-sort="@ViewBag.Sort"
                            asp-route-ativos="@ViewBag.Ativos"
-                           asp-route-sort="@ViewBag.Sort">
+                           asp-route-minPontos="@ViewBag.MinPontos">
                             @i
                         </a>
                     </li>
                 }
 
-                <!-- Seguinte -->
                 <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
                     <a class="page-link"
                        asp-action="Index"
                        asp-route-page="@(ViewBag.CurrentPage + 1)"
-                       asp-route-search="@ViewBag.Search"
+                       asp-route-sort="@ViewBag.Sort"
                        asp-route-ativos="@ViewBag.Ativos"
-                       asp-route-sort="@ViewBag.Sort">
+                       asp-route-minPontos="@ViewBag.MinPontos">
                         ▶
                     </a>
                 </li>
 
-                <!-- Última -->
                 <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
                     <a class="page-link"
                        asp-action="Index"
                        asp-route-page="@ViewBag.TotalPages"
-                       asp-route-search="@ViewBag.Search"
+                       asp-route-sort="@ViewBag.Sort"
                        asp-route-ativos="@ViewBag.Ativos"
-                       asp-route-sort="@ViewBag.Sort">
+                       asp-route-minPontos="@ViewBag.MinPontos">
                         ⏭
                     </a>
                 </li>
@@ -167,4 +232,5 @@
             </ul>
         </nav>
     }
+
 </div>
