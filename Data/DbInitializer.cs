@@ -53,17 +53,27 @@ namespace HealthWellbeing.Data
             // =========================
             // CLIENTES DO BALNEÁRIO (25)
             // =========================
+
+            var nomesClientes = new[]
+            {
+                "António Marques", "Zulmira Silva", "João Pereira", "Sofia Costa",
+                "Rui Ferreira", "Ana Oliveira", "Carlos Santos", "Inês Rodrigues",
+                "Miguel Lopes", "Mariana Alves", "Pedro Gomes", "Rita Martins",
+                "Bruno Rocha", "Carla Fonseca", "Tiago Neves", "Andreia Pires",
+                "Paulo Teixeira", "Helena Coelho", "Nuno Batista", "Patrícia Afonso"
+            };
+
             var clientes = new List<ClienteBalneario>();
 
             for (int i = 1; i <= 25; i++)
             {
                 clientes.Add(new ClienteBalneario
                 {
-                    Nome = $"Cliente {i}",
+                    Nome = nomesClientes[random.Next(nomesClientes.Length)],
                     Email = $"cliente{i}@balneario.pt",
                     Telemovel = $"9{random.Next(10000000, 99999999)}",
                     DataRegisto = DateTime.Today.AddDays(-random.Next(10, 400)),
-                    Ativo = true
+                    Ativo = random.Next(100) >= 10
                 });
             }
 
@@ -110,7 +120,8 @@ namespace HealthWellbeing.Data
                     ClienteBalnearioId = clienteAssociado?.ClienteBalnearioId,
 
                     DataInscricao = DateTime.Today.AddDays(-random.Next(0, 500)),
-                    Ativo = true
+                    Ativo = random.Next(100) >= 35 
+
                 });
             }
 

@@ -80,6 +80,15 @@ namespace HealthWellbeing.Controllers
             ViewBag.TotalItems = totalItems;
             ViewBag.PageSize = pageSize;
 
+            // Dashboard
+            var totalUtentes = await _context.UtenteBalnearios.CountAsync();
+            var totalAtivos = await _context.UtenteBalnearios.CountAsync(u => u.Ativo);
+            var totalInativos = await _context.UtenteBalnearios.CountAsync(u => !u.Ativo);
+
+            ViewBag.TotalUtentes = totalUtentes;
+            ViewBag.TotalAtivos = totalAtivos;
+            ViewBag.TotalInativos = totalInativos;
+
 
             return View(utentes);
         }

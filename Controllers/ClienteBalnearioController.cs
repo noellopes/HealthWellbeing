@@ -23,16 +23,49 @@ namespace HealthWellbeing.Controllers
         // =========================
         // INDEX
         // =========================
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+             string? search,
+             bool? ativos,
+             string? sort,
+             int page = 1)
         {
-            var clientes = await _context.ClientesBalneario
-             .Include(c => c.HistoricoPontos)
-            .OrderBy(c => c.Nome)
-            .ToListAsync();
+            int pageSize = 10;
+
+            var query = _context.ClientesBalneario
+                .Include(c => c.HistoricoPontos)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+                query = query.Where(c => c.Nome.Contains(search));
+
+            if (ativos.HasValue)
+                query = query.Where(c => c.Ativo == ativos.Value);
+
+            query = sort switch
+            {
+                "nome_desc" => query.OrderByDescending(c => c.Nome),
+                _ => query.OrderBy(c => c.Nome)
+            };
+
+            ViewBag.Sort = sort;
+
+
+            var totalItems = await query.CountAsync();
+
+            var clientes = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            ViewBag.Search = search;
+            ViewBag.Ativos = ativos;
+            ViewBag.Sort = sort;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
             return View(clientes);
-
         }
+
 
         // =========================
         // DETAILS  
