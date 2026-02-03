@@ -1,0 +1,254 @@
+﻿@model HealthWellbeing.Models.ClienteBalneario
+@using System.Linq
+
+@{
+    ViewData["Title"] = "Detalhes do Cliente";
+
+    int pontosAtuais = Model.HistoricoPontos?.Sum(p => p.Pontos) ?? 0;
+    int pontosMinNivelAtual = Model.NivelCliente?.PontosMinimos ?? 0;
+    int pontosFaltam = pontosMinNivelAtual > pontosAtuais
+        ? pontosMinNivelAtual - pontosAtuais
+        : 0;
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>
+            <i class="bi bi-person"></i> Detalhes do Cliente
+        </h2>
+
+        <a asp-controller="SatisfacaoCliente"
+           asp-action="Create"
+           asp-route-clienteId="@Model.ClienteBalnearioId"
+           class="btn btn-outline-primary">
+            <i class="bi bi-star"></i> Avaliar Cliente
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <!-- 📄 Dados do Cliente -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-bold">
+            <i class="bi bi-card-list"></i> Dados do Cliente
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6"><strong>Nome:</strong> @Model.Nome</div>
+                <div class="col-md-6"><strong>Email:</strong> @Model.Email</div>
+            </div>
+
+            <div class="row mt-2">
+                <div class="col-md-4"><strong>Telemóvel:</strong> @Model.Telemovel</div>
+                <div class="col-md-4">
+                    <strong>Data de Registo:</strong>
+                    @Model.DataRegisto.ToString("dd/MM/yyyy")
+                </div>
+                <div class="col-md-4">
+                    <strong>Estado:</strong>
+                    <span class="badge @(Model.Ativo ? "bg-success" : "bg-danger")">
+                        @(Model.Ativo ? "Ativo" : "Inativo")
+                    </span>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <strong>Pontos:</strong>
+                <span class="badge bg-info fs-6">@pontosAtuais</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 👥 Utentes Associados -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-bold">
+            <i class="bi bi-people"></i> Utentes Associados
+        </div>
+        <div class="card-body">
+            @if (Model.Utentes != null && Model.Utentes.Any())
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var u in Model.Utentes)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            @u.Nome
+                            <a asp-controller="UtenteBalneario"
+                               asp-action="Details"
+                               asp-route-id="@u.UtenteBalnearioId"
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <span class="text-muted">Sem utentes associados.</span>
+            }
+        </div>
+    </div>
+
+    <!-- 🏅 Histórico de Pontos -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-bold">
+            <i class="bi bi-award"></i> Histórico de Pontos
+        </div>
+        <div class="card-body">
+            @if (Model.HistoricoPontos != null && Model.HistoricoPontos.Any())
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var p in Model.HistoricoPontos.OrderByDescending(p => p.Data))
+                    {
+                        <li class="list-group-item">
+                            <strong>@p.Data.ToString("dd/MM/yyyy HH:mm")</strong>
+                            — @p.Motivo
+                            <span class="badge @(p.Pontos > 0 ? "bg-success" : "bg-danger") float-end">
+                                @p.Pontos
+                            </span>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <span class="text-muted">Sem movimentos de pontos.</span>
+            }
+        </div>
+    </div>
+
+    <!-- ⭐ Avaliações -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-bold">
+            <i class="bi bi-star-fill"></i> Avaliações de Satisfação
+        </div>
+        <div class="card-body">
+            @if (Model.Satisfacoes != null && Model.Satisfacoes.Any())
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var s in Model.Satisfacoes.OrderByDescending(s => s.DataRegisto))
+                    {
+                        <li class="list-group-item">
+                            <strong>@s.DataRegisto.ToString("dd/MM/yyyy HH:mm")</strong>
+                            —
+                            @for (int i = 0; i < s.Avaliacao; i++)
+                            {
+                                <i class="bi bi-star-fill text-warning"></i>
+                            }
+
+                            @if (!string.IsNullOrEmpty(s.Comentario))
+                            {
+                                <div class="text-muted small mt-1">
+                                    “@s.Comentario”
+                                </div>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <span class="text-muted">Sem avaliações registadas.</span>
+            }
+        </div>
+    </div>
+
+    <!-- 🎟️ Vouchers -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-bold">
+            <i class="bi bi-ticket-perforated"></i> Vouchers
+        </div>
+        <div class="card-body">
+            @if (Model.Vouchers != null && Model.Vouchers.Any())
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var v in Model.Vouchers)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>@v.Descricao</strong><br />
+                                <small class="text-muted">
+                                    Criado em @v.DataCriacao.ToString("dd/MM/yyyy")
+                                </small>
+                            </div>
+
+                            @if (v.Usado)
+                            {
+                                <span class="badge bg-secondary">Usado</span>
+                            }
+                            else
+                            {
+                                <form asp-controller="VoucherCliente"
+                                      asp-action="Usar"
+                                      method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@v.VoucherClienteId" />
+                                    <button class="btn btn-sm btn-success">
+                                        <i class="bi bi-check-circle"></i> Usar
+                                    </button>
+                                </form>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <span class="text-muted">Sem vouchers disponíveis.</span>
+            }
+        </div>
+    </div>
+
+    <!-- 🏆 Nível do Cliente -->
+    <div class="mt-3">
+        <strong>Nível:</strong>
+
+        @if (Model.NivelCliente != null)
+        {
+            <span class="badge
+                    @(Model.NivelCliente.Nome == "Premium" ? "bg-primary" :
+                                    Model.NivelCliente.Nome == "Ouro" ? "bg-warning text-dark" :
+                                    Model.NivelCliente.Nome == "Prata" ? "bg-secondary" :
+                                    "bg-bronze")">
+            <i class="bi bi-award-fill"></i> @Model.NivelCliente.Nome
+        </span>
+
+        @if (pontosFaltam > 0)
+            {
+                <div class="text-muted small mt-1">
+                    Faltam <strong>@pontosFaltam</strong> pontos para o próximo nível
+                </div>
+            }
+        }
+        else
+        {
+            <span class="text-muted">Sem nível</span>
+        }
+    </div>
+
+    <!-- 🔘 Botões -->
+    <div class="d-flex gap-2 mt-4">
+        <a asp-action="Edit"
+           asp-route-id="@Model.ClienteBalnearioId"
+           class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Editar
+        </a>
+
+        <form asp-action="ToggleAtivo" method="post">
+            <input type="hidden" name="id" value="@Model.ClienteBalnearioId" />
+            <button class="btn @(Model.Ativo ? "btn-danger" : "btn-success")">
+                <i class="bi @(Model.Ativo ? "bi-x-circle" : "bi-check-circle")"></i>
+                @(Model.Ativo ? "Desativar" : "Ativar")
+            </button>
+        </form>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+</div>

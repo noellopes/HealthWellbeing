@@ -1,0 +1,58 @@
+﻿@model HealthWellbeing.Models.SatisfacaoCliente
+@{
+    ViewData["Title"] = "Avaliação de Satisfação";
+}
+
+<div class="container mt-4">
+
+    <h2>⭐ Avaliação de Satisfação</h2>
+
+    <p class="text-muted">
+        Cliente: <strong>@ViewBag.Cliente?.Nome</strong>
+    </p>
+
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="ClienteBalnearioId" />
+
+        <div class="mb-3">
+            <label asp-for="Avaliacao" class="form-label"></label>
+            <select asp-for="Avaliacao" class="form-select">
+                <option value="">-- Selecionar avaliação --</option>
+                @for (int i = 1; i <= 5; i++)
+                {
+                    <option value="@i">@i ⭐</option>
+                }
+            </select>
+
+            <span asp-validation-for="Avaliacao" class="text-danger"></span>
+
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Comentario" class="form-label"></label>
+            <textarea asp-for="Comentario"
+                      class="form-control"
+                      rows="4"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-star"></i> Guardar Avaliação
+        </button>
+
+        <a asp-controller="ClienteBalneario"
+           asp-action="Details"
+           asp-route-id="@Model.ClienteBalnearioId"
+           class="btn btn-secondary">
+            Cancelar
+        </a>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

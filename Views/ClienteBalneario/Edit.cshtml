@@ -1,0 +1,60 @@
+﻿@model HealthWellbeing.Models.ClienteBalneario
+
+@{
+    ViewData["Title"] = "Editar Cliente";
+}
+
+<div class="container mt-4">
+    <h2><i class="bi bi-pencil"></i> Editar Cliente</h2>
+
+    <div class="card shadow-sm mt-3">
+        <div class="card-body">
+
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="ClienteBalnearioId" />
+
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Nome" class="form-label"></label>
+                    <input asp-for="Nome" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+
+                <div class="mb-3">
+                    <label asp-for="Telemovel" class="form-label"></label>
+                    <input asp-for="Telemovel" class="form-control" />
+                </div>
+
+                <div class="form-check mb-3">
+                    <input asp-for="Ativo" class="form-check-input" />
+                    <label asp-for="Ativo" class="form-check-label"></label>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Guardar
+                    </button>
+
+                    <a asp-action="Index" class="btn btn-secondary">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

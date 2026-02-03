@@ -1,0 +1,282 @@
+﻿@model IEnumerable<HealthWellbeing.Models.UtenteBalneario>
+
+@{
+    ViewData["Title"] = "Utentes do Balneário";
+}
+
+<div class="container mt-4">
+
+    <!-- =========================
+         CABEÇALHO
+    ========================== -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Utentes do Balneário</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            + Criar Utente
+        </a>
+    </div>
+
+    <!-- =========================
+         MENSAGEM SUCESSO
+    ========================== -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    <!-- =========================
+         PESQUISA + FILTROS
+    ========================== -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-center">
+
+                <div class="col-md-6">
+                    <input type="text"
+                           name="search"
+                           value="@ViewBag.Search"
+                           class="form-control"
+                           placeholder="Pesquisar por nome..." />
+                </div>
+
+                <div class="col-md-2">
+                    <button type="submit"
+                            class="btn btn-outline-primary w-100">
+                        Pesquisar
+                    </button>
+                </div>
+
+                <div class="col-md-4 text-end">
+                    <div class="btn-group">
+                        <a asp-action="Index"
+                           class="btn btn-outline-secondary">
+                            Todos
+                        </a>
+                        <a asp-action="Index"
+                           asp-route-ativos="true"
+                           class="btn btn-outline-success">
+                            Ativos
+                        </a>
+                        <a asp-action="Index"
+                           asp-route-ativos="false"
+                           class="btn btn-outline-danger">
+                            Inativos
+                        </a>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- =========================
+     DASHBOARD CLICÁVEL
+========================== -->
+<div class="row mb-4">
+
+    <!-- TOTAL -->
+    <div class="col-md-4">
+        <a asp-action="Index"
+           class="text-decoration-none text-dark">
+
+            <div class="card shadow-sm text-center hover-shadow">
+                <div class="card-body">
+                    <h6 class="text-muted">Total de Utentes</h6>
+                    <h2 class="fw-bold">@ViewBag.TotalUtentes</h2>
+                </div>
+            </div>
+
+        </a>
+    </div>
+
+    <!-- ATIVOS -->
+    <div class="col-md-4">
+        <a asp-action="Index"
+           asp-route-ativos="true"
+           class="text-decoration-none text-dark">
+
+            <div class="card shadow-sm text-center border-success hover-shadow">
+                <div class="card-body">
+                    <h6 class="text-success">Utentes Ativos</h6>
+                    <h2 class="fw-bold text-success">@ViewBag.TotalAtivos</h2>
+                </div>
+            </div>
+
+        </a>
+    </div>
+
+    <!-- INATIVOS -->
+    <div class="col-md-4">
+        <a asp-action="Index"
+           asp-route-ativos="false"
+           class="text-decoration-none text-dark">
+
+            <div class="card shadow-sm text-center border-danger hover-shadow">
+                <div class="card-body">
+                    <h6 class="text-danger">Utentes Inativos</h6>
+                    <h2 class="fw-bold text-danger">@ViewBag.TotalInativos</h2>
+                </div>
+            </div>
+
+        </a>
+    </div>
+
+</div>
+
+
+
+
+
+    <!-- =========================
+         TABELA
+    ========================== -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>
+                                <a asp-action="Index"
+                                asp-route-sort="@(ViewBag.Sort == "nome_desc" ? "" : "nome_desc")"
+                                asp-route-search="@ViewBag.Search"
+                                asp-route-ativos="@ViewBag.Ativos"
+                                asp-route-page="@ViewBag.CurrentPage"
+                                class="text-decoration-none text-dark">
+
+        Nome
+        @if (ViewBag.Sort == "nome_desc")
+        {
+            <i class="bi bi-sort-down"></i> <!-- Z-A -->
+        }
+        else
+        {
+            <i class="bi bi-sort-up"></i> <!-- A-Z -->
+        }
+    </a>
+</th>
+
+                        <th>Género</th>
+                        <th>Contacto</th>
+                        <th>Data de Inscrição</th>
+                        <th>Estado</th>
+                        <th class="text-end"></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                Nenhum utente encontrado.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr class="@(item.Ativo ? "" : "table-secondary")">
+                                <td>@item.Nome</td>
+                                <td>@item.Genero?.Nome</td>
+                                <td>@item.Contacto</td>
+                                <td>@item.DataInscricao.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <span class="badge @(item.Ativo ? "bg-success" : "bg-danger")">
+                                        @(item.Ativo ? "Ativo" : "Inativo")
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <a asp-action="Details"
+                                       asp-route-id="@item.UtenteBalnearioId"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i> Detalhes
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- =========================
+            PAGINAÇÃO
+       ========================== -->
+    @if (ViewBag.TotalPages > 1)
+{
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+
+            <!-- Primeira -->
+            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="1"
+                   asp-route-search="@ViewBag.Search"
+                   asp-route-ativos="@ViewBag.Ativos"
+                   asp-route-sort="@ViewBag.Sort">
+                    ⏮
+                </a>
+            </li>
+
+            <!-- Anterior -->
+            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(ViewBag.CurrentPage - 1)"
+                   asp-route-search="@ViewBag.Search"
+                   asp-route-ativos="@ViewBag.Ativos"
+                   asp-route-sort="@ViewBag.Sort">
+                    ◀
+                </a>
+            </li>
+
+            <!-- Páginas -->
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@i"
+                       asp-route-search="@ViewBag.Search"
+                       asp-route-ativos="@ViewBag.Ativos"
+                       asp-route-sort="@ViewBag.Sort">
+                        @i
+                    </a>
+                </li>
+            }
+
+            <!-- Seguinte -->
+            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(ViewBag.CurrentPage + 1)"
+                   asp-route-search="@ViewBag.Search"
+                   asp-route-ativos="@ViewBag.Ativos"
+                   asp-route-sort="@ViewBag.Sort">
+                    ▶
+                </a>
+            </li>
+
+            <!-- Última -->
+            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@ViewBag.TotalPages"
+                   asp-route-search="@ViewBag.Search"
+                   asp-route-ativos="@ViewBag.Ativos"
+                   asp-route-sort="@ViewBag.Sort">
+                    ⏭
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+}
+
+
+</div>

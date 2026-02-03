@@ -1,82 +1,108 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace HealthWellbeing.Models
 {
+
+    [Index(nameof(NIF), IsUnique = true)]
+    [Index(nameof(Contacto), IsUnique = true)]
     public class UtenteBalneario
     {
         [Key]
-        //Infos Utente
         public int UtenteBalnearioId { get; set; }
 
-        [Required(ErrorMessage = "O nome é obrigatório")]
-        [StringLength(100, ErrorMessage = "O nome não pode exceder 100 caracteres.")]
-        public string NomeCompleto { get; set; } = string.Empty;
+        // =========================
+        // Dados Pessoais
+        // =========================
 
-        [Required(ErrorMessage = "A data de nascimento é obrigatória")]
+        [Required(ErrorMessage = "O nome completo é obrigatório.")]
+        [StringLength(150)]
+        [Display(Name = "Nome Completo")]
+        public string Nome { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "A data de nascimento é obrigatória.")]
         [DataType(DataType.Date)]
+        [Display(Name = "Data de Nascimento")]
         public DateTime DataNascimento { get; set; }
 
-        [Required(ErrorMessage = "O sexo é obrigatório")]
-        public  Sexo Sexo { get; set; }
+        [Required(ErrorMessage = "Selecione o género.")]
+        [Display(Name = "Género")]
+        public int GeneroId { get; set; }
 
-        [StringLength(9, ErrorMessage = "O NIF deve ter 9 caracteres.")]
+        public Genero? Genero { get; set; } = null!;
+
+        [Required(ErrorMessage = "O NIF é obrigatório.")]
+        [RegularExpression(@"^[1-9][0-9]{8}$", ErrorMessage = "NIF inválido.")]
         public string NIF { get; set; } = string.Empty;
 
-        [Phone]
-        [StringLength(15)]
+        [Required(ErrorMessage = "O contacto é obrigatório.")]
+        [RegularExpression(@"^(91|92|93|96)[0-9]{7}$",
+            ErrorMessage = "Número inválido. Deve começar por 91, 92, 93 ou 96.")]
         public string Contacto { get; set; } = string.Empty;
 
         [StringLength(200)]
-        public string Morada { get; set; } = string.Empty;
+        public string? Morada { get; set; }
+
+        // =========================
+        // Dados Médicos
+        // =========================
+
+        [Display(Name = "Histórico Clínico")]
+        public string? HistoricoClinico { get; set; }
+
+        [Display(Name = "Indicações Terapêuticas")]
+        public string? IndicacoesTerapeuticas { get; set; }
+
+        [Display(Name = "Contraindicações / Alergias")]
+        public string? ContraIndicacoes { get; set; }
 
 
+        [Display(Name = "Terapeuta Responsável")]
+        public string? TerapeutaResponsavel { get; set; }
 
-        //DadosMedicos
-        public DadosMedicos DadosMedicos { get; set; } = new DadosMedicos();
+
+        //Sem haver BD dos Terapeutas
+        /*
+        public int? FisioterapeutaId { get; set; }
+        public Fisioterapeuta? Fisioterapeuta { get; set; }
+        */
 
 
-        //Dados administrativos
-        [Required]
+        // =========================
+        // Dados Administrativos
+        // =========================
         [DataType(DataType.Date)]
-        public DateTime DataInscricao { get; set; }
+        public DateTime DataInscricao { get; set; } = DateTime.Now;
 
-        public  SeguroSaude SeguroSaude { get; set; } = new SeguroSaude();
 
-        public bool Ativo { get; set; }
+        [Display(Name = "Seguro de Saúde")]
+        public int? SeguroSaudeId { get; set; }
 
-    }
-    
-        public enum Sexo
-        {
-             Masculino,
-             Feminino,
-             Outro
-        }
+        public SeguroSaude? SeguroSaude { get; set; }
 
-        public class DadosMedicos
-        
-        {
-            [Key]
-             public int DadosMedicosId { get; set; }
-             
-             public string HistoricoClinico { get; set; } = string.Empty;
+
+        public bool Ativo { get; set; } = true;
+
+        // =========================
+        // Histórico Médico
+        // =========================
+        public ICollection<HistoricoMedico> HistoricosMedicos { get; set; }
+        = new List<HistoricoMedico>();
+
 
              public string IndicacoesTerapeuticas { get; set; } = string.Empty;
 
-             public  string ContraIndicacoes {  get; set; } = string.Empty;
+        // =========================
+        // Cliente Balneario
+        // =========================
+        public int? ClienteBalnearioId { get; set; }
 
-            [StringLength(100)]
-             public string MedicoResponsavel { get; set; } = string.Empty;
-    }
-        public class SeguroSaude
+        public ClienteBalneario? ClienteBalneario { get; set; }
 
-        {
-             [Key]
-              public int SeguroSaudeId { get; set; }
 
-             [Required(ErrorMessage = "O nome da seguradora é obrigatório")]
-             [StringLength(100)]
-              public string NomeSeguradora { get; set; } = string.Empty;
 
              [StringLength(50)]
               public string NumeroApolice { get; set; } = string.Empty;

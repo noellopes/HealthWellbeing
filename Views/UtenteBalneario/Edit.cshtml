@@ -1,0 +1,144 @@
+﻿@model HealthWellbeing.Models.UtenteBalneario
+
+@{
+    ViewData["Title"] = "Editar Utente do Balneário";
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-3">Editar Utente do Balneário</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="UtenteBalnearioId" />
+
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <!-- 👤 Dados Pessoais -->
+                <h5 class="fw-bold">
+                    <i class="bi bi-person"></i> Dados Pessoais
+                </h5>
+                <hr />
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Nome"></label>
+                        <input asp-for="Nome" class="form-control" />
+                        <span asp-validation-for="Nome" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="DataNascimento"></label>
+                        <input asp-for="DataNascimento" type="date" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="GeneroId">Género</label>
+                        <select asp-for="GeneroId"
+                                asp-items="ViewBag.Generos"
+                                class="form-control">
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="NIF"></label>
+                        <input asp-for="NIF" class="form-control" />
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Contacto"></label>
+                        <input asp-for="Contacto" class="form-control" />
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Morada"></label>
+                        <input asp-for="Morada" class="form-control" />
+                    </div>
+                </div>
+
+                <!-- ========================= -->
+                <!-- 👥 Clientes -->
+                <!-- ========================= -->
+
+
+                <h5> Cliente (opcional)</h5>
+
+                <div class="mb-3">
+                    <label class="form-label">Cliente associado</label>
+                    <select asp-for="ClienteBalnearioId"
+                            asp-items="ViewBag.Clientes"
+                            class="form-control">
+                        <option value="">-- Sem cliente --</option>
+                    </select>
+                </div>
+
+                <!-- 🩺 Dados Médicos -->
+                <h5 class="fw-bold mt-4">
+                    <i class="bi bi-heart-pulse"></i> Dados Médicos
+                </h5>
+                <hr />
+
+                <div class="mb-3">
+                    <label asp-for="HistoricoClinico"></label>
+                    <textarea asp-for="HistoricoClinico" class="form-control"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="IndicacoesTerapeuticas"></label>
+                    <textarea asp-for="IndicacoesTerapeuticas" class="form-control"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ContraIndicacoes"></label>
+                    <textarea asp-for="ContraIndicacoes" class="form-control"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="TerapeutaResponsavel"></label>
+                    <input asp-for="TerapeutaResponsavel" class="form-control" />
+                </div>
+
+                <!-- 📄 Dados Administrativos -->
+                <h5 class="fw-bold mt-4">
+                    <i class="bi bi-clipboard"></i> Dados Administrativos
+                </h5>
+                <hr />
+
+                <div class="col-md-4 mb-3">
+                    <label asp-for="SeguroSaudeId"></label>
+                    <select asp-for="SeguroSaudeId"
+                            asp-items="ViewBag.Seguros"
+                            class="form-control">
+                        <option value="">-- Sem seguro --</option>
+                    </select>
+                </div>
+
+                <!-- Botões -->
+                <div class="text-end mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Guardar Alterações
+                    </button>
+
+                    <a asp-action="Details"
+                       asp-route-id="@Model.UtenteBalnearioId"
+                       class="btn btn-secondary ms-2">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

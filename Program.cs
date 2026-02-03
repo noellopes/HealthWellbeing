@@ -1,79 +1,68 @@
 ﻿using HealthWellbeing.Data;
+using HealthWellbeing.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 // Add services to the container.
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
-	options.UseSqlServer(builder.Configuration.GetConnectionString("HealthWellbeingConnection") ?? throw new InvalidOperationException("Connection string 'HealthWellbeingConnection' not found.")));
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(
-    options =>
-    {
-        // Sign in
-        options.SignIn.RequireConfirmedAccount = false;
-
-        // Password
-        options.Password.RequireDigit = true;
-        options.Password.RequireLowercase = true;
-        options.Password.RequireUppercase = true;
-        options.Password.RequiredLength = 8;
-        options.Password.RequiredUniqueChars = 6;
-        options.Password.RequireNonAlphanumeric = true;
-
-        // Lockout
-        options.Lockout.AllowedForNewUsers = true;
-        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
-        options.Lockout.MaxFailedAccessAttempts = 5;
-    })
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultUI();
-builder.Services.AddControllersWithViews();
+    .AddDefaultTokenProviders();
+
+builder.Services.AddControllersWithViews(); 
+builder.Services.AddScoped<ClienteService>();
+builder.Services.AddScoped<VoucherService>();
+builder.Services.AddRazorPages();
+
+
+
+
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Seed roles + admin
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+    var context = services.GetRequiredService<ApplicationDbContext>();
+
+    string[] roles = { "Admin", "Medico", "Rececionista" };
+
+    foreach (var role in roles)
+        if (!await roleManager.RoleExistsAsync(role))
+            await roleManager.CreateAsync(new IdentityRole(role));
+
+    var adminEmail = "admin@local.pt";
+    if (await userManager.FindByEmailAsync(adminEmail) == null)
+    {
+        var admin = new IdentityUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            EmailConfirmed = true
+        };
+
+        await userManager.CreateAsync(admin, "Admin123!");
+        await userManager.AddToRoleAsync(admin, "Admin");
+    }
+
+    DbInitializer.Seed(context);
+}
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-else
-{
-    using (var scope = app.Services.CreateScope())
-    {
-        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        SeedData.SeedRoles(roleManager);
-
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-        SeedData.SeedDefaultAdmin(userManager);
-
-        SeedData.SeedUsers(userManager);
-
-        var context = scope.ServiceProvider.GetRequiredService<HealthWellbeingDbContext>();
-        SeedData.Populate(context);
-    }
-
-	using (var serviceScope = app.Services.CreateScope())
-	{
-        var dbContext = serviceScope.ServiceProvider.GetService<HealthWellbeingDbContext>();
-        SeedData.Populate(dbContext);
-        SeedDataExercicio.Populate(dbContext);
-        SeedDataTipoExercicio.Populate(dbContext);
-        SeedDataProblemaSaude.Populate(dbContext);
-	}
-}
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -81,6 +70,6 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapRazorPages();
 
+app.MapRazorPages();
 app.Run();
