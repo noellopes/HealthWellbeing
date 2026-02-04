@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.Models
@@ -7,9 +7,9 @@ namespace HealthWellbeing.Models
     {
         public int GeneroId { get; set; }
 
-        [Required(ErrorMessage = "O nome do gênero é obrigatório.")]
-        [StringLength(50, ErrorMessage = "O nome do gênero não pode exceder 50 caracteres.")]
-        public string NomeGenero { get; set; }
+        [Required(ErrorMessage = "O nome do género é obrigatório.")]
+        [StringLength(50)]
+        public required string NomeGenero { get; set; }
 
         public ICollection<Exercicio>? Exercicio { get; set; }
     }

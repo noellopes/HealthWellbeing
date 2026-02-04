@@ -5,7 +5,7 @@
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class FixGeneroNullable : Migration
+    public partial class CreateClientesBalneario : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

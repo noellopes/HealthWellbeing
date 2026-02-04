@@ -25,9 +25,9 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.NomeCompleto</td>
+                <td>@item.Nome</td>
                 <td>@item.DataNascimento.ToShortDateString()</td>
-                <td>@item.Sexo</td>
+                <td>@item.Genero</td>
                 <td>@item.Contacto</td>
                 <td>@(item.Ativo ? "Sim" : "Não")</td>
                 <td>
