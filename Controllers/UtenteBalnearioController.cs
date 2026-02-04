@@ -78,7 +78,7 @@ namespace HealthWellbeing.Controllers
                 .Include(u => u.Genero)
                 .Include(u => u.SeguroSaude)
                 .Include(u => u.HistoricosMedicos)
-                .ThenInclude(h => h.CriadoPorUser)
+                .Include(u => u.Terapeuta)
                 .FirstOrDefaultAsync(u => u.UtenteBalnearioId == id);
 
             if (utente == null)
@@ -95,6 +95,8 @@ namespace HealthWellbeing.Controllers
         {
             LoadGeneros();
             LoadSeguros();
+            LoadClientes();
+            LoadTerapeutas();
             return View();
         }
 
@@ -135,6 +137,7 @@ namespace HealthWellbeing.Controllers
 
             LoadGeneros(utente.GeneroId);
             LoadSeguros(utente.SeguroSaudeId);
+            LoadTerapeutas(utente.TerapeutaId);
 
             return View(utente);
         }
@@ -178,7 +181,7 @@ namespace HealthWellbeing.Controllers
             utenteDb.HistoricoClinico = utente.HistoricoClinico;
             utenteDb.IndicacoesTerapeuticas = utente.IndicacoesTerapeuticas;
             utenteDb.ContraIndicacoes = utente.ContraIndicacoes;
-            utenteDb.TerapeutaResponsavel = utente.TerapeutaResponsavel;
+            utenteDb.TerapeutaId = utente.TerapeutaId;
             utenteDb.SeguroSaudeId = utente.SeguroSaudeId;
 
             await _context.SaveChangesAsync();
@@ -225,5 +228,33 @@ namespace HealthWellbeing.Controllers
                 selecionado
             );
         }
+
+
+        private void LoadClientes(int? selecionado = null)
+        {
+            ViewBag.Clientes = new SelectList(
+                _context.ClientesBalneario
+                    .Where(c => c.Ativo)
+                    .OrderBy(c => c.Nome),
+                "ClienteBalnearioId",
+                "Nome",
+                selecionado
+            );
+        }
+
+        private void LoadTerapeutas(int? selecionado = null)
+        {
+            ViewBag.Terapeutas = new SelectList(
+                _context.Terapeutas
+                    .Where(t => t.Ativo)
+                    .OrderBy(t => t.Nome),
+                "TerapeutaId",
+                "Nome",
+                selecionado
+            );
+        }
+
+
+
     }
 }

@@ -43,7 +43,13 @@
         <div class="card-body">
             <p><strong>Indicações Terapêuticas:</strong> @(string.IsNullOrWhiteSpace(Model.IndicacoesTerapeuticas) ? "Nada a registar." : Model.IndicacoesTerapeuticas)</p>
             <p><strong>Contraindicações:</strong> @(string.IsNullOrWhiteSpace(Model.ContraIndicacoes) ? "Nada a registar." : Model.ContraIndicacoes)</p>
-            <p><strong>Terapeuta Responsável:</strong> @(string.IsNullOrWhiteSpace(Model.TerapeutaResponsavel) ? "—" : Model.TerapeutaResponsavel)</p>
+            <p>
+                <strong>Terapeuta Responsável:</strong>
+                @(Model.Terapeuta != null
+                                ? Model.Terapeuta.Nome
+                                : "--")
+            </p>
+
         </div>
     </div>
 

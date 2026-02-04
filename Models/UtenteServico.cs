@@ -20,7 +20,8 @@ namespace HealthWellbeing.Models
                 HistoricoClinico = "Hipertensão controlada.",
                 IndicacoesTerapeuticas = "Banhos termais 2x por semana.",
                 ContraIndicacoes = "Evitar longas exposições ao calor.",
-                TerapeutaResponsavel = "Dr. João Costa",
+                //TerapeutaId = terapeutasDb[random.Next(terapeutasDb.Count)].TerapeutaId,
+
                 SeguroSaudeId = 1,
                 Ativo = true,
                 DataInscricao = new DateTime(2024, 5, 10)
@@ -37,7 +38,7 @@ namespace HealthWellbeing.Models
                 HistoricoClinico = "Asma leve.",
                 IndicacoesTerapeuticas = "Inalações termais semanais.",
                 ContraIndicacoes = "Nenhuma.",
-                TerapeutaResponsavel = "Dra. Ana Marques",
+                //TerapeutaResponsavel = "Dra. Ana Marques",
                 SeguroSaudeId = 2,
                 Ativo = false,
                 DataInscricao = new DateTime(2023, 3, 15)
@@ -54,7 +55,7 @@ namespace HealthWellbeing.Models
                 HistoricoClinico = "Artrite reumatoide.",
                 IndicacoesTerapeuticas = "Massagens e banhos minerais.",
                 ContraIndicacoes = "Exercícios intensos.",
-                TerapeutaResponsavel = "Dr. João Costa",
+                //TerapeutaResponsavel = "Dr. João Costa",
                 SeguroSaudeId = 3,
                 Ativo = true,
                 DataInscricao = new DateTime(2022, 9, 20)

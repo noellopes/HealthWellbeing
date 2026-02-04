@@ -105,9 +105,15 @@
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="TerapeutaResponsavel"></label>
-                    <input asp-for="TerapeutaResponsavel" class="form-control" />
+                    <label asp-for="TerapeutaId"></label>
+                    <select asp-for="TerapeutaId"
+                            asp-items="ViewBag.Terapeutas"
+                            class="form-control">
+                        <option value="">-- Selecione o terapeuta --</option>
+                    </select>
+                    <span asp-validation-for="TerapeutaId" class="text-danger"></span>
                 </div>
+
 
                 <!-- ========================= -->
                 <!-- Dados Administrativos -->

@@ -57,7 +57,9 @@ namespace HealthWellbeing.Models
         public string? ContraIndicacoes { get; set; }
 
         [Display(Name = "Terapeuta Responsável")]
-        public string? TerapeutaResponsavel { get; set; }
+        public int? TerapeutaId { get; set; }
+        public Terapeuta? Terapeuta { get; set; }
+
 
         // =========================
         // Dados Administrativos

@@ -45,7 +45,10 @@
         <dd class="col-sm-9">@Model.ContraIndicacoes</dd>
 
         <dt class="col-sm-3">Terapeuta Responsável</dt>
-        <dd class="col-sm-9">@Model.TerapeutaResponsavel</dd>
+        <dd class="col-sm-9">
+            @(Model.Terapeuta != null ? Model.Terapeuta.Nome : "--")
+        </dd>
+
     </dl>
 </div>
 
