@@ -37,6 +37,32 @@ namespace HealthWellbeing.Data
             return sb.ToString().ToLower().Replace(" ", ".");
         }
 
+        private static DateTime GerarDataComHora(Random rnd, int diasAtras = 300)
+        {
+            var data = DateTime.Today.AddDays(-rnd.Next(1, diasAtras));
+            var hora = new TimeSpan(
+                rnd.Next(9, 17),   // entre 09h e 17h
+                rnd.Next(0, 60),
+                rnd.Next(0, 60)
+            );
+
+            return data.Add(hora);
+        }
+
+        private static string ComentarioPorRating(int rating)
+        {
+            return rating switch
+            {
+                5 => "Excelente atendimento, recomendo vivamente.",
+                4 => "Muito bom serviço, profissionais atenciosos.",
+                3 => "Serviço satisfatório, sem problemas.",
+                2 => "Serviço razoável, pode melhorar.",
+                _ => "Experiência pouco satisfatória."
+            };
+        }
+
+
+
         // =========================
         // SEED
         // =========================
@@ -223,6 +249,10 @@ namespace HealthWellbeing.Data
             // =========================
             // HISTÓRICO CLÍNICO (COM HORAS)
             // =========================
+
+            // Buscar um utilizador para associar aos registos clínicos (Admin)
+            var adminUser = context.Users.FirstOrDefault();
+
             var utentesDb = context.UtenteBalnearios.ToList();
 
             foreach (var utente in utentesDb.Where(u => rnd.Next(100) < 50))
@@ -247,8 +277,10 @@ namespace HealthWellbeing.Data
                         UtenteBalnearioId = utente.UtenteBalnearioId,
                         Titulo = "Sessão de acompanhamento",
                         Descricao = "Sessão clínica realizada com sucesso.",
-                        DataRegisto = dataComHora
+                        DataRegisto = dataComHora,
+                        CriadoPorUserId = adminUser?.Id
                     });
+
                 }
             }
 
@@ -260,20 +292,21 @@ namespace HealthWellbeing.Data
             foreach (var cliente in clientesDb)
             {
                 int totalPontos = 0;
-                int entradas = rnd.Next(1, 5);
+                int entradas = rnd.Next(2, 6);
 
                 for (int i = 0; i < entradas; i++)
                 {
                     int rating = rnd.Next(1, 6);
                     int pontos = rating * 10;
-                    totalPontos += pontos;
+
+                    var dataBase = GerarDataComHora(rnd);
 
                     context.SatisfacoesClientes.Add(new SatisfacaoCliente
                     {
                         ClienteBalnearioId = cliente.ClienteBalnearioId,
                         Avaliacao = rating,
-                        Comentario = rating >= 4 ? "Excelente atendimento." : "Serviço a melhorar.",
-                        DataRegisto = DateTime.Today.AddDays(-rnd.Next(1, 300))
+                        Comentario = ComentarioPorRating(rating),
+                        DataRegisto = dataBase
                     });
 
                     context.HistoricoPontos.Add(new HistoricoPontos
@@ -281,13 +314,18 @@ namespace HealthWellbeing.Data
                         ClienteBalnearioId = cliente.ClienteBalnearioId,
                         Pontos = pontos,
                         Motivo = "Avaliação de satisfação",
-                        Data = DateTime.Now
+                        Data = dataBase.AddMinutes(rnd.Next(1, 30)) // ligeiramente depois
                     });
+
+                    totalPontos += pontos;
                 }
 
                 cliente.Pontos = totalPontos;
-                cliente.NivelClienteId = niveis.Last(n => totalPontos >= n.PontosMinimos).NivelClienteId;
+                cliente.NivelClienteId = niveis
+                    .Last(n => totalPontos >= n.PontosMinimos)
+                    .NivelClienteId;
             }
+
 
             context.SaveChanges();
 
