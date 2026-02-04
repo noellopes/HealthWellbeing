@@ -1,0 +1,31 @@
+﻿@model HealthWellbeing.Models.Terapeuta
+
+@{
+    ViewData["Title"] = "Detalhes do Terapeuta";
+}
+
+<h1>@Model.Nome</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <ul class="list-group mb-3">
+            <li class="list-group-item"><strong>Especialidade:</strong> @Model.Especialidade</li>
+            <li class="list-group-item"><strong>Email:</strong> @Model.Email</li>
+            <li class="list-group-item"><strong>Telefone:</strong> @Model.Telefone</li>
+            <li class="list-group-item"><strong>Ano de Entrada:</strong> @Model.AnoEntrada</li>
+            <li class="list-group-item"><strong>Experiência:</strong> @Model.AnosExperiencia anos</li>
+            <li class="list-group-item">
+                <strong>Estado:</strong>
+                @(Model.Ativo ? "Ativo" : "Inativo")
+            </li>
+        </ul>
+
+        <a asp-action="Edit" asp-route-id="@Model.TerapeutaId" class="btn btn-warning">
+            Editar
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            Voltar
+        </a>
+    </div>
+</div>

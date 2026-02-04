@@ -19,6 +19,7 @@ namespace HealthWellbeing.Data
 
         // CLÍNICO
         public DbSet<HistoricoMedico> HistoricosMedicos { get; set; }
+        public DbSet<Terapeuta> Terapeutas { get; set; }
 
         // APOIO
         public DbSet<Genero> Generos { get; set; }

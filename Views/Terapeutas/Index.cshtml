@@ -1,0 +1,155 @@
+﻿@model IEnumerable<HealthWellbeing.Models.Terapeuta>
+
+@{
+    ViewData["Title"] = "Terapeutas";
+}
+
+<h1 class="mb-4">Equipa de Terapeutas</h1>
+
+@if (User.IsInRole("Admin") || User.IsInRole("Funcionario"))
+{
+    <div class="mb-3 text-end">
+        <a asp-action="Create" class="btn btn-success">
+            + Adicionar Terapeuta
+        </a>
+    </div>
+}
+
+<!-- FILTROS -->
+<form method="get" class="row g-2 mb-4">
+
+    <div class="col-md-4">
+        <input type="text"
+               name="nome"
+               value="@ViewBag.Nome"
+               class="form-control"
+               placeholder="Filtrar por nome" />
+    </div>
+
+    <div class="col-md-4">
+        <select name="especialidade" class="form-select">
+            <option value="">-- Todas as especialidades --</option>
+            @foreach (var esp in ViewBag.Especialidades as List<string>)
+            {
+                <option value="@esp"
+                        selected="@(esp == ViewBag.EspecialidadeSelecionada)">
+                    @esp
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <select name="ativo" class="form-select">
+            <option value="">Todos</option>
+            <option value="true" selected="@(ViewBag.Ativo?.ToString() == "True")">Ativos</option>
+            <option value="false" selected="@(ViewBag.Ativo?.ToString() == "False")">Inativos</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">
+            Filtrar
+        </button>
+    </div>
+
+</form>
+
+<table class="table table-striped table-hover align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Nome</th>
+            <th>Especialidade</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>Experiência</th>
+            <th>Estado</th>
+            <th class="text-end">Ações</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var t in Model)
+        {
+            <tr>
+                <td>@t.Nome</td>
+                <td>@t.Especialidade</td>
+                <td>
+                    <a href="mailto:@t.Email">@t.Email</a>
+                </td>
+                <td>@t.Telefone</td>
+                <td>@t.AnosExperiencia anos</td>
+                <td>
+                    <span class="badge @(t.Ativo ? "bg-success" : "bg-secondary")">
+                        @(t.Ativo ? "Ativo" : "Inativo")
+                    </span>
+                </td>
+                <td class="text-end">
+                    <a asp-action="Details"
+                       asp-route-id="@t.TerapeutaId"
+                       class="btn btn-sm btn-outline-info">
+                        Ver
+                    </a>
+
+                    @if (User.IsInRole("Admin") || User.IsInRole("Funcionario"))
+                    {
+                        <a asp-action="Edit"
+                           asp-route-id="@t.TerapeutaId"
+                           class="btn btn-sm btn-outline-warning">
+                            Editar
+                        </a>
+
+                        <a asp-action="Delete"
+                           asp-route-id="@t.TerapeutaId"
+                           class="btn btn-sm btn-outline-danger">
+                            Remover
+                        </a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- PAGINAÇÃO -->
+<nav class="d-flex justify-content-center mt-4">
+    <ul class="pagination">
+
+        <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+            <a class="page-link"
+               asp-action="Index"
+               asp-route-page="@(ViewBag.CurrentPage - 1)"
+               asp-route-nome="@ViewBag.Nome"
+               asp-route-especialidade="@ViewBag.EspecialidadeSelecionada"
+               asp-route-ativo="@ViewBag.Ativo">
+                Anterior
+            </a>
+        </li>
+
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@i"
+                   asp-route-nome="@ViewBag.Nome"
+                   asp-route-especialidade="@ViewBag.EspecialidadeSelecionada"
+                   asp-route-ativo="@ViewBag.Ativo">
+                    @i
+                </a>
+            </li>
+        }
+
+        <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+            <a class="page-link"
+               asp-action="Index"
+               asp-route-page="@(ViewBag.CurrentPage + 1)"
+               asp-route-nome="@ViewBag.Nome"
+               asp-route-especialidade="@ViewBag.EspecialidadeSelecionada"
+               asp-route-ativo="@ViewBag.Ativo">
+                Seguinte
+            </a>
+        </li>
+
+    </ul>
+</nav>

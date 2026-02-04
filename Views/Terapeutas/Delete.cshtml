@@ -1,0 +1,20 @@
+﻿@model HealthWellbeing.Models.Terapeuta
+
+@{
+    ViewData["Title"] = "Remover Terapeuta";
+}
+
+<h1>Remover Terapeuta</h1>
+<hr />
+
+<div class="alert alert-danger">
+    Tens a certeza que queres remover o terapeuta
+    <strong>@Model.Nome</strong>?
+</div>
+
+<form asp-action="Delete">
+    <input type="hidden" asp-for="TerapeutaId" />
+
+    <button type="submit" class="btn btn-danger">Confirmar Remoção</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

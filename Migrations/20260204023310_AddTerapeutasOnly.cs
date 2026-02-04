@@ -4,16 +4,13 @@
 
 namespace HealthWellbeing.Migrations
 {
-    /// <inheritdoc />
-    public partial class CreateClientesBalneario : Migration
+    public partial class AddTerapeutasOnly : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
 
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
 
