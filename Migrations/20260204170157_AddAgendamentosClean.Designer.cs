@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260204023310_AddTerapeutasOnly")]
-    partial class AddTerapeutasOnly
+    [Migration("20260204170157_AddAgendamentosClean")]
+    partial class AddAgendamentosClean
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,7 +55,7 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("ExercicioGrupoMuscular");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.AgendamentoModel", b =>
+            modelBuilder.Entity("HealthWellbeing.Models.Agendamento", b =>
                 {
                     b.Property<int>("AgendamentoId")
                         .ValueGeneratedOnAdd()
@@ -71,7 +71,8 @@ namespace HealthWellbeing.Migrations
 
                     b.Property<string>("Estado")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<int>("ServicoId")
                         .HasColumnType("int");
@@ -90,7 +91,7 @@ namespace HealthWellbeing.Migrations
 
                     b.HasIndex("UtenteBalnearioId");
 
-                    b.ToTable("AgendamentoModel");
+                    b.ToTable("Agendamentos");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Client", b =>
@@ -881,7 +882,7 @@ namespace HealthWellbeing.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.AgendamentoModel", b =>
+            modelBuilder.Entity("HealthWellbeing.Models.Agendamento", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Servico", "Servico")
                         .WithMany()
