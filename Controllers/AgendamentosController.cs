@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
@@ -21,12 +20,11 @@ namespace HealthWellbeing.Controllers
         // =========================
         // LISTAGEM
         // =========================
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var agendamentos = _context.Agendamentos
-                .Include(a => a.Terapeuta)
-                .Include(a => a.UtenteBalneario)
-                .Include(a => a.Servico);
+                .Include(a => a.Terapeuta);
 
             return View(await agendamentos.ToListAsync());
         }
@@ -34,6 +32,7 @@ namespace HealthWellbeing.Controllers
         // =========================
         // DETALHES
         // =========================
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -41,8 +40,6 @@ namespace HealthWellbeing.Controllers
 
             var agendamento = await _context.Agendamentos
                 .Include(a => a.Terapeuta)
-                .Include(a => a.UtenteBalneario)
-                .Include(a => a.Servico)
                 .FirstOrDefaultAsync(a => a.AgendamentoId == id);
 
             if (agendamento == null)
@@ -57,9 +54,11 @@ namespace HealthWellbeing.Controllers
         [Authorize(Roles = "Admin,Funcionario")]
         public IActionResult Create()
         {
-            ViewData["TerapeutaId"] = new SelectList(_context.Terapeutas, "TerapeutaId", "Nome");
-            ViewData["UtenteBalnearioId"] = new SelectList(_context.UtenteBalnearios, "UtenteBalnearioId", "Nome");
-            ViewData["ServicoId"] = new SelectList(_context.Servico, "ServicoId", "Nome");
+            ViewData["TerapeutaId"] =
+                new SelectList(_context.Terapeutas, "TerapeutaId", "Nome");
+
+            ViewData["ServicoId"] =
+                new SelectList(_context.Servico, "ServicoId", "Nome");
 
             return View();
         }
@@ -71,14 +70,18 @@ namespace HealthWellbeing.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewData["TerapeutaId"] = new SelectList(_context.Terapeutas, "TerapeutaId", "Nome", agendamento.TerapeutaId);
-                ViewData["UtenteBalnearioId"] = new SelectList(_context.UtenteBalnearios, "UtenteBalnearioId", "Nome", agendamento.UtenteBalnearioId);
-                ViewData["ServicoId"] = new SelectList(_context.Servico, "ServicoId", "Nome", agendamento.ServicoId);
+                ViewData["TerapeutaId"] =
+                    new SelectList(_context.Terapeutas, "TerapeutaId", "Nome", agendamento.TerapeutaId);
+
+                ViewData["ServicoId"] =
+                    new SelectList(_context.Servico, "ServicoId", "Nome", agendamento.ServicoId);
+
                 return View(agendamento);
             }
 
-            _context.Add(agendamento);
+            _context.Agendamentos.Add(agendamento);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -96,9 +99,11 @@ namespace HealthWellbeing.Controllers
             if (agendamento == null)
                 return NotFound();
 
-            ViewData["TerapeutaId"] = new SelectList(_context.Terapeutas, "TerapeutaId", "Nome", agendamento.TerapeutaId);
-            ViewData["UtenteBalnearioId"] = new SelectList(_context.UtenteBalnearios, "UtenteBalnearioId", "Nome", agendamento.UtenteBalnearioId);
-            ViewData["ServicoId"] = new SelectList(_context.Servico, "ServicoId", "Nome", agendamento.ServicoId);
+            ViewData["TerapeutaId"] =
+                new SelectList(_context.Terapeutas, "TerapeutaId", "Nome", agendamento.TerapeutaId);
+
+            ViewData["ServicoId"] =
+                new SelectList(_context.Servico, "ServicoId", "Nome", agendamento.ServicoId);
 
             return View(agendamento);
         }
@@ -131,8 +136,6 @@ namespace HealthWellbeing.Controllers
 
             var agendamento = await _context.Agendamentos
                 .Include(a => a.Terapeuta)
-                .Include(a => a.UtenteBalneario)
-                .Include(a => a.Servico)
                 .FirstOrDefaultAsync(a => a.AgendamentoId == id);
 
             if (agendamento == null)

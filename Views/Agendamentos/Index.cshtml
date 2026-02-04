@@ -1,0 +1,53 @@
+﻿@model IEnumerable<HealthWellbeing.Models.Agendamento>
+
+@{
+    ViewData["Title"] = "Agendamentos";
+}
+
+<h1 class="mb-4">Agendamentos</h1>
+
+@if (User.IsInRole("Admin") || User.IsInRole("Funcionario"))
+{
+    <div class="mb-3 text-end">
+        <a asp-action="Create" class="btn btn-success">
+            + Novo Agendamento
+        </a>
+    </div>
+}
+
+<table class="table table-striped table-hover align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Data Início</th>
+            <th>Data Fim</th>
+            <th>Terapeuta</th>
+            <th>Serviço</th>
+            <th>Estado</th>
+            <th class="text-end">Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model)
+        {
+            <tr>
+                <td>@a.DataHoraInicio.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@a.DataHoraFim.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@a.Terapeuta?.Nome</td>
+                <td><span class="badge bg-secondary">@a.Estado</span></td>
+                <td class="text-end">
+                    <a asp-action="Details" asp-route-id="@a.AgendamentoId"
+                       class="btn btn-sm btn-outline-info">Ver</a>
+
+                    @if (User.IsInRole("Admin") || User.IsInRole("Funcionario"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@a.AgendamentoId"
+                           class="btn btn-sm btn-outline-warning">Editar</a>
+
+                        <a asp-action="Delete" asp-route-id="@a.AgendamentoId"
+                           class="btn btn-sm btn-outline-danger">Remover</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

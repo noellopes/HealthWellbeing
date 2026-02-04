@@ -5,30 +5,18 @@ namespace HealthWellbeing.Models
 {
     public class Agendamento
     {
-        [Key]
         public int AgendamentoId { get; set; }
 
-        [Required]
         public DateTime DataHoraInicio { get; set; }
-
-        [Required]
         public DateTime DataHoraFim { get; set; }
 
-        [Required]
-        [StringLength(30)]
         public string Estado { get; set; } = "Pendente";
 
-        // Relações
-        [Required]
+        // Terapeuta
         public int TerapeutaId { get; set; }
         public Terapeuta Terapeuta { get; set; }
 
-        [Required]
-        public int UtenteBalnearioId { get; set; }
-        public UtenteBalneario UtenteBalneario { get; set; }
-
-        [Required]
+        // Serviço
         public int ServicoId { get; set; }
-        public Servico Servico { get; set; }
     }
 }

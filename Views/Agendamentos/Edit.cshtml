@@ -1,0 +1,42 @@
+﻿@model HealthWellbeing.Models.Agendamento
+
+@{
+    ViewData["Title"] = "Editar Agendamento";
+}
+
+<h1>Editar Agendamento</h1>
+<hr />
+
+<form asp-action="Edit">
+    <input type="hidden" asp-for="AgendamentoId" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="DataHoraInicio" class="form-label"></label>
+        <input asp-for="DataHoraInicio" class="form-control" type="datetime-local" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DataHoraFim" class="form-label"></label>
+        <input asp-for="DataHoraFim" class="form-control" type="datetime-local" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="TerapeutaId" class="form-label"></label>
+        <select asp-for="TerapeutaId" class="form-select" asp-items="ViewBag.TerapeutaId"></select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ServicoId" class="form-label"></label>
+        <select asp-for="ServicoId" class="form-select" asp-items="ViewBag.ServicoId"></select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Estado" class="form-label"></label>
+        <input asp-for="Estado" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

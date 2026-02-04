@@ -1,5 +1,6 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("HealthWellbeingConnection")));
+
+// Identity
+builder.Services
+    .AddDefaultIdentity<IdentityUser>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -27,7 +33,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// app.UseAuthentication();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

@@ -68,8 +68,7 @@ namespace HealthWellbeing.Migrations
 
                     b.Property<string>("Estado")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ServicoId")
                         .HasColumnType("int");
@@ -77,16 +76,9 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("TerapeutaId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UtenteBalnearioId")
-                        .HasColumnType("int");
-
                     b.HasKey("AgendamentoId");
 
-                    b.HasIndex("ServicoId");
-
                     b.HasIndex("TerapeutaId");
-
-                    b.HasIndex("UtenteBalnearioId");
 
                     b.ToTable("Agendamentos");
                 });
@@ -796,10 +788,12 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -836,10 +830,12 @@ namespace HealthWellbeing.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -881,29 +877,13 @@ namespace HealthWellbeing.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.Agendamento", b =>
                 {
-                    b.HasOne("HealthWellbeing.Models.Servico", "Servico")
-                        .WithMany()
-                        .HasForeignKey("ServicoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("HealthWellbeing.Models.Terapeuta", "Terapeuta")
                         .WithMany("Agendamentos")
                         .HasForeignKey("TerapeutaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("HealthWellbeing.Models.UtenteBalneario", "UtenteBalneario")
-                        .WithMany()
-                        .HasForeignKey("UtenteBalnearioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Servico");
-
                     b.Navigation("Terapeuta");
-
-                    b.Navigation("UtenteBalneario");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.ClienteBalneario", b =>
