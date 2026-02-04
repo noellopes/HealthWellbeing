@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
@@ -12,21 +14,54 @@ namespace HealthWellbeing.Controllers
     {
         private readonly ApplicationDbContext _context;
 
+        private const int PageSize = 10;
+        private const int PageWindow = 5; // número máximo de páginas visíveis
+
         public AgendamentosController(ApplicationDbContext context)
         {
             _context = context;
         }
 
         // =========================
-        // LISTAGEM
+        // LISTAGEM (PAGINAÇÃO ESTILO TERAPEUTAS)
         // =========================
         [AllowAnonymous]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var agendamentos = _context.Agendamentos
-                .Include(a => a.Terapeuta);
+            if (page < 1) page = 1;
 
-            return View(await agendamentos.ToListAsync());
+            var query = _context.Agendamentos
+                .Include(a => a.Terapeuta)
+                .OrderBy(a => a.DataHoraInicio);
+
+            var totalItems = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)PageSize);
+
+            if (page > totalPages && totalPages > 0)
+                page = totalPages;
+
+            var agendamentos = await query
+                .Skip((page - 1) * PageSize)
+                .Take(PageSize)
+                .ToListAsync();
+
+            // cálculo da janela de páginas
+            var startPage = Math.Max(1, page - PageWindow / 2);
+            var endPage = Math.Min(totalPages, startPage + PageWindow - 1);
+
+            if (endPage - startPage + 1 < PageWindow)
+            {
+                startPage = Math.Max(1, endPage - PageWindow + 1);
+            }
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.StartPage = startPage;
+            ViewBag.EndPage = endPage;
+            ViewBag.HasPrevious = page > 1;
+            ViewBag.HasNext = page < totalPages;
+
+            return View(agendamentos);
         }
 
         // =========================
@@ -57,9 +92,6 @@ namespace HealthWellbeing.Controllers
             ViewData["TerapeutaId"] =
                 new SelectList(_context.Terapeutas, "TerapeutaId", "Nome");
 
-            ViewData["ServicoId"] =
-                new SelectList(_context.Servico, "ServicoId", "Nome");
-
             return View();
         }
 
@@ -72,9 +104,6 @@ namespace HealthWellbeing.Controllers
             {
                 ViewData["TerapeutaId"] =
                     new SelectList(_context.Terapeutas, "TerapeutaId", "Nome", agendamento.TerapeutaId);
-
-                ViewData["ServicoId"] =
-                    new SelectList(_context.Servico, "ServicoId", "Nome", agendamento.ServicoId);
 
                 return View(agendamento);
             }
@@ -101,9 +130,6 @@ namespace HealthWellbeing.Controllers
 
             ViewData["TerapeutaId"] =
                 new SelectList(_context.Terapeutas, "TerapeutaId", "Nome", agendamento.TerapeutaId);
-
-            ViewData["ServicoId"] =
-                new SelectList(_context.Servico, "ServicoId", "Nome", agendamento.ServicoId);
 
             return View(agendamento);
         }

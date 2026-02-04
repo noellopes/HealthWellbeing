@@ -22,6 +22,17 @@ builder.Services.AddScoped<VoucherService>();
 
 var app = builder.Build();
 
+// =====================
+// SEED DE AGENDAMENTOS
+// =====================
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<ApplicationDbContext>();
+
+    SeedAgendamentos.Seed(context);
+}
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");

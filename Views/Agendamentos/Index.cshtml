@@ -21,7 +21,6 @@
             <th>Data Início</th>
             <th>Data Fim</th>
             <th>Terapeuta</th>
-            <th>Serviço</th>
             <th>Estado</th>
             <th class="text-end">Ações</th>
         </tr>
@@ -33,21 +32,68 @@
                 <td>@a.DataHoraInicio.ToString("dd/MM/yyyy HH:mm")</td>
                 <td>@a.DataHoraFim.ToString("dd/MM/yyyy HH:mm")</td>
                 <td>@a.Terapeuta?.Nome</td>
-                <td><span class="badge bg-secondary">@a.Estado</span></td>
+                <td>
+                    <span class="badge bg-secondary">@a.Estado</span>
+                </td>
                 <td class="text-end">
-                    <a asp-action="Details" asp-route-id="@a.AgendamentoId"
-                       class="btn btn-sm btn-outline-info">Ver</a>
+                    <a asp-action="Details"
+                       asp-route-id="@a.AgendamentoId"
+                       class="btn btn-sm btn-outline-info">
+                        Ver
+                    </a>
 
                     @if (User.IsInRole("Admin") || User.IsInRole("Funcionario"))
                     {
-                        <a asp-action="Edit" asp-route-id="@a.AgendamentoId"
-                           class="btn btn-sm btn-outline-warning">Editar</a>
+                        <a asp-action="Edit"
+                           asp-route-id="@a.AgendamentoId"
+                           class="btn btn-sm btn-outline-warning">
+                            Editar
+                        </a>
 
-                        <a asp-action="Delete" asp-route-id="@a.AgendamentoId"
-                           class="btn btn-sm btn-outline-danger">Remover</a>
+                        <a asp-action="Delete"
+                           asp-route-id="@a.AgendamentoId"
+                           class="btn btn-sm btn-outline-danger">
+                            Remover
+                        </a>
                     }
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+@if (ViewBag.TotalPages > 1)
+{
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+
+            <li class="page-item @(ViewBag.HasPrevious ? "" : "disabled")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(ViewBag.CurrentPage - 1)">
+                    Anterior
+                </a>
+            </li>
+
+            @for (int i = ViewBag.StartPage; i <= ViewBag.EndPage; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@i">
+                        @i
+                    </a>
+                </li>
+            }
+
+            <li class="page-item @(ViewBag.HasNext ? "" : "disabled")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(ViewBag.CurrentPage + 1)">
+                    Seguinte
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+}
