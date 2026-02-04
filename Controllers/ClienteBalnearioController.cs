@@ -125,12 +125,15 @@ namespace HealthWellbeing.Controllers
         // =========================
         // CREATE
         // =========================
+
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ClienteBalneario cliente)
         {
@@ -158,6 +161,7 @@ namespace HealthWellbeing.Controllers
         // =========================
         // EDIT
         // =========================
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
             var cliente = await _context.ClientesBalneario.FindAsync(id);
@@ -169,6 +173,7 @@ namespace HealthWellbeing.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ClienteBalneario cliente)
         {

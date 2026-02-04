@@ -1,9 +1,10 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
@@ -85,6 +86,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Terapeutas/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -92,6 +94,7 @@ namespace HealthWellbeing.Controllers
 
         // POST: Terapeutas/Create
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Terapeuta terapeuta)
         {
@@ -106,6 +109,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Terapeutas/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -121,6 +125,7 @@ namespace HealthWellbeing.Controllers
 
         // POST: Terapeutas/Edit/5
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Terapeuta terapeuta)
         {
@@ -149,6 +154,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Terapeutas/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -165,6 +171,7 @@ namespace HealthWellbeing.Controllers
 
         // POST: Terapeutas/Delete/5
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

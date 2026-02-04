@@ -37,6 +37,50 @@ builder.Services.AddScoped<VoucherService>();
 var app = builder.Build();
 
 // =========================
+// SEED: ROLES + ADMIN + DADOS
+// =========================
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var context = services.GetRequiredService<ApplicationDbContext>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+
+    // Garantir BD criada
+    context.Database.Migrate();
+
+    // ROLES
+    string[] roles = { "Admin" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+            await roleManager.CreateAsync(new IdentityRole(role));
+    }
+
+    // ADMIN
+    var adminEmail = "admin@local.pt";
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+    if (adminUser == null)
+    {
+        adminUser = new IdentityUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            EmailConfirmed = true
+        };
+
+        await userManager.CreateAsync(adminUser, "Admin123!");
+        await userManager.AddToRoleAsync(adminUser, "Admin");
+    }
+
+    
+    DbInitializer.Seed(context);
+}
+
+// =========================
 // PIPELINE
 // =========================
 if (!app.Environment.IsDevelopment())
@@ -50,7 +94,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// 🔴 ESTES DOIS TÊM DE ESTAR OS DOIS
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -11,9 +11,11 @@
     ========================== -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Utentes do Balneário</h2>
+        @if (User.IsInRole("Admin")){
         <a asp-action="Create" class="btn btn-primary">
             + Criar Utente
         </a>
+        }
     </div>
 
     <!-- =========================

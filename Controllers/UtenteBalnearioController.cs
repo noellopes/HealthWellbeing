@@ -90,6 +90,7 @@ namespace HealthWellbeing.Controllers
         // =========================
         // CREATE GET
         // =========================
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             LoadGeneros();
@@ -101,6 +102,7 @@ namespace HealthWellbeing.Controllers
         // CREATE POST
         // =========================
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(UtenteBalneario utente)
         {
@@ -124,6 +126,7 @@ namespace HealthWellbeing.Controllers
         // =========================
         // EDIT GET
         // =========================
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
             var utente = await _context.UtenteBalnearios.FindAsync(id);
@@ -140,6 +143,7 @@ namespace HealthWellbeing.Controllers
         // EDIT POST
         // =========================
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, UtenteBalneario utente)
         {
