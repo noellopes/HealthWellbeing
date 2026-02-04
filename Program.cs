@@ -47,19 +47,25 @@ using (var scope = app.Services.CreateScope())
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
 
-    // Garantir BD criada
+    // Garantir BD atualizada
     context.Database.Migrate();
 
+    // =========================
     // ROLES
+    // =========================
     string[] roles = { "Admin" };
 
     foreach (var role in roles)
     {
         if (!await roleManager.RoleExistsAsync(role))
+        {
             await roleManager.CreateAsync(new IdentityRole(role));
+        }
     }
 
+    // =========================
     // ADMIN
+    // =========================
     var adminEmail = "admin@local.pt";
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
@@ -76,7 +82,9 @@ using (var scope = app.Services.CreateScope())
         await userManager.AddToRoleAsync(adminUser, "Admin");
     }
 
-    
+    // =========================
+    // DADOS DA APLICAÇÃO
+    // =========================
     DbInitializer.Seed(context);
 }
 

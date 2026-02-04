@@ -60,6 +60,10 @@ namespace HealthWellbeing.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
+            ViewBag.TotalUtentes = await _context.UtenteBalnearios.CountAsync();
+            ViewBag.TotalAtivos = await _context.UtenteBalnearios.CountAsync(u => u.Ativo);
+            ViewBag.TotalInativos = await _context.UtenteBalnearios.CountAsync(u => !u.Ativo);
+
             ViewBag.Search = search;
             ViewBag.Ativos = ativos;
             ViewBag.Sort = sort;

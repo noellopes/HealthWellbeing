@@ -7,29 +7,23 @@ namespace HealthWellbeing.Data
 {
     public static class DbInitializer
     {
-        // =========================
-        // HELPERS
-        // =========================
         private static string GerarTelemovel(Random rnd)
         {
             string[] prefixos = { "91", "92", "93", "96" };
             return prefixos[rnd.Next(prefixos.Length)] + rnd.Next(1000000, 9999999);
         }
 
-        private static string GerarNif(int baseNumber)
+        private static string GerarNif(int numero)
         {
-            return (100000000 + baseNumber).ToString();
+            return (100000000 + numero).ToString();
         }
 
-        // =========================
-        // SEED
-        // =========================
         public static void Seed(ApplicationDbContext context)
         {
             if (context.ClientesBalneario.Any())
                 return;
 
-            var random = new Random();
+            var rnd = new Random();
 
             // =========================
             // GÉNEROS
@@ -42,6 +36,9 @@ namespace HealthWellbeing.Data
                 );
                 context.SaveChanges();
             }
+
+            int generoMasc = context.Generos.First(g => g.NomeGenero == "Masculino").GeneroId;
+            int generoFem = context.Generos.First(g => g.NomeGenero == "Feminino").GeneroId;
 
             // =========================
             // SEGUROS
@@ -60,12 +57,33 @@ namespace HealthWellbeing.Data
             var seguros = context.SegurosSaude.ToList();
 
             // =========================
-            // NOMES PORTUGUESES
+            // NÍVEIS DE CLIENTE
             // =========================
-            var nomes = new[]
+            if (!context.NiveisCliente.Any())
             {
-                "João","Pedro","Miguel","Tiago","Rui","André","Carlos","Bruno","Paulo",
-                "Ana","Maria","Sofia","Inês","Joana","Rita","Mariana","Carla","Helena"
+                context.NiveisCliente.AddRange(
+                    new NivelCliente { Nome = "Bronze", PontosMinimos = 0, CorBadge = "bg-secondary" },
+                    new NivelCliente { Nome = "Prata", PontosMinimos = 50, CorBadge = "bg-info" },
+                    new NivelCliente { Nome = "Ouro", PontosMinimos = 150, CorBadge = "bg-warning" }
+                );
+                context.SaveChanges();
+            }
+
+            var niveis = context.NiveisCliente.OrderBy(n => n.PontosMinimos).ToList();
+
+            // =========================
+            // NOMES
+            // =========================
+            var nomesMasc = new[]
+            {
+                "João","Pedro","Miguel","Tiago","Rui","André","Carlos","Bruno",
+                "Paulo","Nuno","Ricardo","Daniel","Filipe","Hugo","Marco"
+            };
+
+            var nomesFem = new[]
+            {
+                "Ana","Maria","Sofia","Inês","Joana","Rita","Mariana","Carla",
+                "Helena","Patrícia","Andreia","Catarina","Beatriz","Cláudia"
             };
 
             var apelidos = new[]
@@ -90,13 +108,15 @@ namespace HealthWellbeing.Data
 
             for (int i = 1; i <= 35; i++)
             {
+                string nome = $"{nomesMasc[i % nomesMasc.Length]} {apelidos[i % apelidos.Length]}";
+
                 clientes.Add(new ClienteBalneario
                 {
-                    Nome = $"{nomes[i % nomes.Length]} {apelidos[i % apelidos.Length]}",
+                    Nome = nome,
                     Email = $"cliente{i}@balneario.pt",
-                    Telemovel = GerarTelemovel(random),
-                    DataRegisto = DateTime.Today.AddDays(-random.Next(30, 500)),
-                    Ativo = random.Next(100) > 10
+                    Telemovel = GerarTelemovel(rnd),
+                    DataRegisto = DateTime.Today.AddDays(-rnd.Next(30, 600)),
+                    Ativo = rnd.Next(100) > 15
                 });
             }
 
@@ -108,7 +128,7 @@ namespace HealthWellbeing.Data
             // =========================
             // TERAPEUTAS (47)
             // =========================
-            string[] especialidades =
+            var especialidades = new[]
             {
                 "Fisioterapia",
                 "Hidroterapia",
@@ -123,12 +143,12 @@ namespace HealthWellbeing.Data
             {
                 terapeutas.Add(new Terapeuta
                 {
-                    Nome = $"{nomes[i % nomes.Length]} {apelidos[(i + 3) % apelidos.Length]}",
+                    Nome = $"{nomesMasc[i % nomesMasc.Length]} {apelidos[(i + 3) % apelidos.Length]}",
                     Especialidade = especialidades[i % especialidades.Length],
                     Email = $"terapeuta{i}@clinica.pt",
-                    Telefone = GerarTelemovel(random),
-                    AnoEntrada = random.Next(2005, 2022),
-                    Ativo = random.Next(100) > 15
+                    Telefone = GerarTelemovel(rnd),
+                    AnoEntrada = rnd.Next(2005, 2022),
+                    Ativo = rnd.Next(100) > 10
                 });
             }
 
@@ -144,35 +164,33 @@ namespace HealthWellbeing.Data
 
             for (int i = 1; i <= 55; i++)
             {
-                bool feminino = i % 2 == 0;
+                bool feminino = rnd.Next(2) == 0;
 
                 string nome = feminino
-                    ? nomes[(i + 5) % nomes.Length]
-                    : nomes[(i + 2) % nomes.Length];
+                    ? nomesFem[i % nomesFem.Length]
+                    : nomesMasc[i % nomesMasc.Length];
 
                 utentes.Add(new UtenteBalneario
                 {
-                    Nome = $"{nome} {apelidos[(i + 7) % apelidos.Length]}",
-                    DataNascimento = DateTime.Today.AddYears(-random.Next(18, 85)),
-                    GeneroId = feminino ? 2 : 1,
+                    Nome = $"{nome} {apelidos[(i + 5) % apelidos.Length]}",
+                    DataNascimento = DateTime.Today.AddYears(-rnd.Next(18, 85)),
+                    GeneroId = feminino ? generoFem : generoMasc,
                     NIF = GerarNif(i),
-                    Contacto = GerarTelemovel(random),
-                    Morada = moradas[random.Next(moradas.Length)],
+                    Contacto = GerarTelemovel(rnd),
+                    Morada = moradas[rnd.Next(moradas.Length)],
 
                     IndicacoesTerapeuticas = "Acompanhamento terapêutico.",
                     ContraIndicacoes = "Nenhuma.",
 
-                    //FK
-                    TerapeutaId = terapeutasDb[random.Next(terapeutasDb.Count)].TerapeutaId,
-
-
-                    SeguroSaudeId = seguros[random.Next(seguros.Count)].SeguroSaudeId,
-                    ClienteBalnearioId = random.Next(100) < 70
-                        ? clientesDb[random.Next(clientesDb.Count)].ClienteBalnearioId
+                    SeguroSaudeId = seguros[rnd.Next(seguros.Count)].SeguroSaudeId,
+                    ClienteBalnearioId = rnd.Next(100) < 70
+                        ? clientesDb[rnd.Next(clientesDb.Count)].ClienteBalnearioId
                         : null,
 
-                    DataInscricao = DateTime.Today.AddDays(-random.Next(10, 600)),
-                    Ativo = random.Next(100) > 30
+                    TerapeutaId = terapeutasDb[rnd.Next(terapeutasDb.Count)].TerapeutaId,
+
+                    DataInscricao = DateTime.Today.AddDays(-rnd.Next(10, 700)),
+                    Ativo = rnd.Next(100) > 30
                 });
             }
 
@@ -180,34 +198,38 @@ namespace HealthWellbeing.Data
             context.SaveChanges();
 
             // =========================
-            // SATISFAÇÃO + PONTOS
+            // SATISFAÇÃO + PONTOS + NÍVEL
             // =========================
             foreach (var cliente in clientesDb)
             {
-                int entradas = random.Next(1, 5);
+                int totalPontos = 0;
+                int entradas = rnd.Next(1, 5);
 
                 for (int i = 0; i < entradas; i++)
                 {
-                    int rating = random.Next(1, 6);
+                    int rating = rnd.Next(1, 6);
+                    int pontos = rating * 10;
+                    totalPontos += pontos;
 
                     context.SatisfacoesClientes.Add(new SatisfacaoCliente
                     {
                         ClienteBalnearioId = cliente.ClienteBalnearioId,
                         Avaliacao = rating,
-                        Comentario = rating >= 4
-                            ? "Excelente atendimento."
-                            : "Serviço a melhorar.",
-                        DataRegisto = DateTime.Today.AddDays(-random.Next(1, 300))
+                        Comentario = rating >= 4 ? "Excelente atendimento." : "Serviço a melhorar.",
+                        DataRegisto = DateTime.Today.AddDays(-rnd.Next(1, 300))
                     });
 
                     context.HistoricoPontos.Add(new HistoricoPontos
                     {
                         ClienteBalnearioId = cliente.ClienteBalnearioId,
-                        Pontos = rating * 10,
+                        Pontos = pontos,
                         Motivo = "Avaliação de satisfação",
                         Data = DateTime.Now
                     });
                 }
+
+                cliente.Pontos = totalPontos;
+                cliente.NivelClienteId = niveis.Last(n => totalPontos >= n.PontosMinimos).NivelClienteId;
             }
 
             context.SaveChanges();
@@ -215,15 +237,15 @@ namespace HealthWellbeing.Data
             // =========================
             // VOUCHERS
             // =========================
-            foreach (var cliente in clientesDb.Where(c => random.Next(100) < 40))
+            foreach (var cliente in clientesDb.Where(c => rnd.Next(100) < 65))
             {
                 context.VouchersCliente.Add(new VoucherCliente
                 {
                     ClienteBalnearioId = cliente.ClienteBalnearioId,
                     Titulo = "Voucher Fidelização",
-                    Descricao = "Desconto em serviços",
+                    Descricao = "Desconto em serviços do balneário",
                     PontosNecessarios = 50,
-                    Valor = random.Next(5, 25),
+                    Valor = rnd.Next(5, 30),
                     DataCriacao = DateTime.Now,
                     DataValidade = DateTime.Now.AddMonths(6),
                     Usado = false
