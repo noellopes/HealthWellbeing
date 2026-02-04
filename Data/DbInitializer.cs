@@ -1,12 +1,17 @@
 ﻿using HealthWellbeing.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 
 namespace HealthWellbeing.Data
 {
     public static class DbInitializer
     {
+        // =========================
+        // HELPERS
+        // =========================
         private static string GerarTelemovel(Random rnd)
         {
             string[] prefixos = { "91", "92", "93", "96" };
@@ -15,9 +20,26 @@ namespace HealthWellbeing.Data
 
         private static string GerarNif(int numero)
         {
-            return (100000000 + numero).ToString();
+            return (100000000 + numero).ToString(); // simples e único
         }
 
+        private static string Normalizar(string texto)
+        {
+            var normalized = texto.Normalize(NormalizationForm.FormD);
+            var sb = new StringBuilder();
+
+            foreach (var c in normalized)
+            {
+                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                    sb.Append(c);
+            }
+
+            return sb.ToString().ToLower().Replace(" ", ".");
+        }
+
+        // =========================
+        // SEED
+        // =========================
         public static void Seed(ApplicationDbContext context)
         {
             if (context.ClientesBalneario.Any())
@@ -130,22 +152,27 @@ namespace HealthWellbeing.Data
             // =========================
             var especialidades = new[]
             {
+                "Acupuntura", 
+                "Estética",
                 "Fisioterapia",
-                "Hidroterapia",
-                "Massoterapia",
-                "Reabilitação",
-                "Terapia Manual"
+                "Massagem",
+                "Reiki", 
+                "Terapia da Fala"
+
             };
 
             var terapeutas = new List<Terapeuta>();
 
             for (int i = 1; i <= 47; i++)
             {
+                string nome = nomesMasc[i % nomesMasc.Length];
+                string apelido = apelidos[(i + 3) % apelidos.Length];
+
                 terapeutas.Add(new Terapeuta
                 {
-                    Nome = $"{nomesMasc[i % nomesMasc.Length]} {apelidos[(i + 3) % apelidos.Length]}",
+                    Nome = $"{nome} {apelido}",
                     Especialidade = especialidades[i % especialidades.Length],
-                    Email = $"terapeuta{i}@clinica.pt",
+                    Email = $"{Normalizar(nome)}.{Normalizar(apelido)}@balneario.pt",
                     Telefone = GerarTelemovel(rnd),
                     AnoEntrada = rnd.Next(2005, 2022),
                     Ativo = rnd.Next(100) > 10
@@ -178,23 +205,53 @@ namespace HealthWellbeing.Data
                     NIF = GerarNif(i),
                     Contacto = GerarTelemovel(rnd),
                     Morada = moradas[rnd.Next(moradas.Length)],
-
                     IndicacoesTerapeuticas = "Acompanhamento terapêutico.",
                     ContraIndicacoes = "Nenhuma.",
-
                     SeguroSaudeId = seguros[rnd.Next(seguros.Count)].SeguroSaudeId,
                     ClienteBalnearioId = rnd.Next(100) < 70
                         ? clientesDb[rnd.Next(clientesDb.Count)].ClienteBalnearioId
                         : null,
-
                     TerapeutaId = terapeutasDb[rnd.Next(terapeutasDb.Count)].TerapeutaId,
-
                     DataInscricao = DateTime.Today.AddDays(-rnd.Next(10, 700)),
                     Ativo = rnd.Next(100) > 30
                 });
             }
 
             context.UtenteBalnearios.AddRange(utentes);
+            context.SaveChanges();
+
+            // =========================
+            // HISTÓRICO CLÍNICO (COM HORAS)
+            // =========================
+            var utentesDb = context.UtenteBalnearios.ToList();
+
+            foreach (var utente in utentesDb.Where(u => rnd.Next(100) < 50))
+            {
+                int entradas = rnd.Next(1, 4);
+
+                for (int i = 0; i < entradas; i++)
+                {
+                    var baseDate = utente.DataInscricao.AddDays(rnd.Next(1, 180));
+
+                    var dataComHora = new DateTime(
+                        baseDate.Year,
+                        baseDate.Month,
+                        baseDate.Day,
+                        rnd.Next(8, 20),
+                        rnd.Next(0, 60),
+                        0
+                    );
+
+                    context.HistoricosMedicos.Add(new HistoricoMedico
+                    {
+                        UtenteBalnearioId = utente.UtenteBalnearioId,
+                        Titulo = "Sessão de acompanhamento",
+                        Descricao = "Sessão clínica realizada com sucesso.",
+                        DataRegisto = dataComHora
+                    });
+                }
+            }
+
             context.SaveChanges();
 
             // =========================
