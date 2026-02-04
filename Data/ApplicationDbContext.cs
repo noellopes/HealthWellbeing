@@ -33,5 +33,8 @@ namespace HealthWellbeing.Data
         public DbSet<HistoricoPontos> HistoricoPontos { get; set; }
         public DbSet<VoucherCliente> VouchersCliente { get; set; }
         public DbSet<NivelCliente> NiveisCliente { get; set; }
+
+        //SERVIÇOS
+        public DbSet<Servico> Servico { get; set; }
     }
 }
