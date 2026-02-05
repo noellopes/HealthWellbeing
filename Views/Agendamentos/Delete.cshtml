@@ -1,0 +1,21 @@
+﻿@model HealthWellbeing.Models.Agendamento
+
+@{
+    ViewData["Title"] = "Remover Agendamento";
+}
+
+<h1>Remover Agendamento</h1>
+<hr />
+
+<p>Tem a certeza que pretende remover este agendamento?</p>
+
+<ul class="list-group mb-3">
+    <li class="list-group-item">@Model.DataHoraInicio → @Model.DataHoraFim</li>
+    <li class="list-group-item">@Model.Terapeuta?.Nome</li>
+</ul>
+
+<form asp-action="Delete">
+    <input type="hidden" asp-for="AgendamentoId" />
+    <button type="submit" class="btn btn-danger">Remover</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

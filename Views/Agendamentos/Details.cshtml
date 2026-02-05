@@ -1,0 +1,22 @@
+﻿@model HealthWellbeing.Models.Agendamento
+
+@{
+    ViewData["Title"] = "Detalhes do Agendamento";
+}
+
+<h1>Detalhes do Agendamento</h1>
+<hr />
+
+<ul class="list-group mb-3">
+    <li class="list-group-item"><strong>Início:</strong> @Model.DataHoraInicio</li>
+    <li class="list-group-item"><strong>Fim:</strong> @Model.DataHoraFim</li>
+    <li class="list-group-item"><strong>Terapeuta:</strong> @Model.Terapeuta?.Nome</li>
+    <li class="list-group-item"><strong>Estado:</strong> @Model.Estado</li>
+</ul>
+
+<a asp-action="Index" class="btn btn-secondary">Voltar</a>
+
+@if (User.IsInRole("Admin") || User.IsInRole("Funcionario"))
+{
+    <a asp-action="Edit" asp-route-id="@Model.AgendamentoId" class="btn btn-warning">Editar</a>
+}

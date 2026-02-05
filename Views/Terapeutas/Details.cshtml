@@ -21,11 +21,19 @@
             </li>
         </ul>
 
-        <a asp-action="Edit" asp-route-id="@Model.TerapeutaId" class="btn btn-warning">
-            Editar
-        </a>
-        <a asp-action="Index" class="btn btn-secondary">
-            Voltar
-        </a>
+        <div class="mt-3">
+            <a asp-action="Index" class="btn btn-secondary">
+                Voltar
+            </a>
+
+            @if (User.IsInRole("Admin") || User.IsInRole("Funcionario"))
+            {
+                <a asp-action="Edit"
+                   asp-route-id="@Model.TerapeutaId"
+                   class="btn btn-warning">
+                    Editar
+                </a>
+            }
+        </div>
     </div>
 </div>

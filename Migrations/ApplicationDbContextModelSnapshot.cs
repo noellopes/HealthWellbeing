@@ -52,7 +52,7 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("ExercicioGrupoMuscular");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.AgendamentoModel", b =>
+            modelBuilder.Entity("HealthWellbeing.Models.Agendamento", b =>
                 {
                     b.Property<int>("AgendamentoId")
                         .ValueGeneratedOnAdd()
@@ -76,18 +76,11 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("TerapeutaId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UtenteBalnearioId")
-                        .HasColumnType("int");
-
                     b.HasKey("AgendamentoId");
-
-                    b.HasIndex("ServicoId");
 
                     b.HasIndex("TerapeutaId");
 
-                    b.HasIndex("UtenteBalnearioId");
-
-                    b.ToTable("AgendamentoModel");
+                    b.ToTable("Agendamentos");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Client", b =>
@@ -884,31 +877,15 @@ namespace HealthWellbeing.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.AgendamentoModel", b =>
+            modelBuilder.Entity("HealthWellbeing.Models.Agendamento", b =>
                 {
-                    b.HasOne("HealthWellbeing.Models.Servico", "Servico")
-                        .WithMany()
-                        .HasForeignKey("ServicoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("HealthWellbeing.Models.Terapeuta", "Terapeuta")
                         .WithMany("Agendamentos")
                         .HasForeignKey("TerapeutaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("HealthWellbeing.Models.UtenteBalneario", "UtenteBalneario")
-                        .WithMany()
-                        .HasForeignKey("UtenteBalnearioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Servico");
-
                     b.Navigation("Terapeuta");
-
-                    b.Navigation("UtenteBalneario");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.ClienteBalneario", b =>

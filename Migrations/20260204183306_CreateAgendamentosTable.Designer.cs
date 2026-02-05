@@ -12,13 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-<<<<<<<< HEAD:Migrations/20260204185621_InitialCreate.Designer.cs
-    [Migration("20260204185621_InitialCreate")]
-    partial class InitialCreate
-========
-    [Migration("20260204170107_BaselineExistingDb")]
-    partial class BaselineExistingDb
->>>>>>>> backup-geada:Migrations/20260204170107_BaselineExistingDb.Designer.cs
+    [Migration("20260204183306_CreateAgendamentosTable")]
+    partial class CreateAgendamentosTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

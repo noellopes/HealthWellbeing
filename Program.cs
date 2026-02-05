@@ -5,16 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// =========================
-// DATABASE
-// =========================
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("HealthWellbeingConnection")));
 
-// =========================
-// IDENTITY 
-// =========================
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
@@ -22,23 +16,14 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-// =========================
-// MVC + RAZOR
-// =========================
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-// =========================
-// SERVICES
-// =========================
 builder.Services.AddScoped<ClienteService>();
 builder.Services.AddScoped<VoucherService>();
 
 var app = builder.Build();
 
-// =========================
-// SEED: ROLES + ADMIN + DADOS
-// =========================
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -47,25 +32,11 @@ using (var scope = app.Services.CreateScope())
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
 
-    // Garantir BD atualizada
     context.Database.Migrate();
 
-    // =========================
-    // ROLES
-    // =========================
-    string[] roles = { "Admin" };
+    if (!await roleManager.RoleExistsAsync("Admin"))
+        await roleManager.CreateAsync(new IdentityRole("Admin"));
 
-    foreach (var role in roles)
-    {
-        if (!await roleManager.RoleExistsAsync(role))
-        {
-            await roleManager.CreateAsync(new IdentityRole(role));
-        }
-    }
-
-    // =========================
-    // ADMIN
-    // =========================
     var adminEmail = "admin@local.pt";
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
@@ -82,15 +53,9 @@ using (var scope = app.Services.CreateScope())
         await userManager.AddToRoleAsync(adminUser, "Admin");
     }
 
-    // =========================
-    // DADOS DA APLICAÇÃO
-    // =========================
     DbInitializer.Seed(context);
 }
 
-// =========================
-// PIPELINE
-// =========================
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
