@@ -2,21 +2,58 @@
 
 @{
     ViewData["Title"] = "Detalhes do Agendamento";
+
+    string badgeClass = Model.Estado switch
+    {
+        "Pendente" => "bg-warning text-dark",
+        "Marcado" => "bg-primary",
+        "Concluído" => "bg-success",
+        "Cancelado" => "bg-danger",
+        _ => "bg-secondary"
+    };
 }
 
-<h1>Detalhes do Agendamento</h1>
-<hr />
+<h1 class="mb-4">Detalhes do Agendamento</h1>
 
-<ul class="list-group mb-3">
-    <li class="list-group-item"><strong>Início:</strong> @Model.DataHoraInicio</li>
-    <li class="list-group-item"><strong>Fim:</strong> @Model.DataHoraFim</li>
-    <li class="list-group-item"><strong>Terapeuta:</strong> @Model.Terapeuta?.Nome</li>
-    <li class="list-group-item"><strong>Estado:</strong> @Model.Estado</li>
-</ul>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Início</dt>
+            <dd class="col-sm-9">
+                @Model.DataHoraInicio.ToString("dd/MM/yyyy HH:mm")
+            </dd>
 
-<a asp-action="Index" class="btn btn-secondary">Voltar</a>
+            <dt class="col-sm-3">Fim</dt>
+            <dd class="col-sm-9">
+                @Model.DataHoraFim.ToString("dd/MM/yyyy HH:mm")
+            </dd>
 
-@if (User.IsInRole("Admin") || User.IsInRole("Funcionario"))
-{
-    <a asp-action="Edit" asp-route-id="@Model.AgendamentoId" class="btn btn-warning">Editar</a>
-}
+            <dt class="col-sm-3">Terapeuta</dt>
+            <dd class="col-sm-9">
+                @Model.Terapeuta?.Nome
+            </dd>
+
+            <dt class="col-sm-3">Estado</dt>
+            <dd class="col-sm-9">
+                <span class="badge @badgeClass px-3 py-2">
+                    @Model.Estado
+                </span>
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary">
+        Voltar
+    </a>
+
+    @if (User.IsInRole("Admin") || User.IsInRole("Funcionario"))
+    {
+        <a asp-action="Edit"
+           asp-route-id="@Model.AgendamentoId"
+           class="btn btn-warning ms-2">
+            Editar
+        </a>
+    }
+</div>

@@ -4,42 +4,49 @@
     ViewData["Title"] = "Editar Agendamento";
 }
 
-<h1>Editar Agendamento</h1>
-<hr />
+<h1 class="mb-4">Editar Agendamento</h1>
 
-<form asp-action="Edit">
-    <input type="hidden" asp-for="AgendamentoId" />
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="AgendamentoId" />
 
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-    <div class="mb-3">
-        <label asp-for="DataHoraInicio" class="form-label"></label>
-        <input asp-for="DataHoraInicio" class="form-control" type="datetime-local" />
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="DataHoraInicio" class="form-label">Data e Hora de Início</label>
+                    <input asp-for="DataHoraInicio" class="form-control" type="datetime-local" />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="DataHoraFim" class="form-label">Data e Hora de Fim</label>
+                    <input asp-for="DataHoraFim" class="form-control" type="datetime-local" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Terapeuta</label>
+                <select asp-for="TerapeutaId"
+                        class="form-select"
+                        asp-items="ViewBag.TerapeutaId">
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Estado</label>
+                <select asp-for="Estado" class="form-select">
+                    <option value="Pendente">Pendente</option>
+                    <option value="Marcado">Marcado</option>
+                    <option value="Concluído">Concluído</option>
+                    <option value="Cancelado">Cancelado</option>
+                </select>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Guardar Alterações</button>
+            </div>
+        </form>
     </div>
-
-    <div class="mb-3">
-        <label asp-for="DataHoraFim" class="form-label"></label>
-        <input asp-for="DataHoraFim" class="form-control" type="datetime-local" />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Terapeuta</label>
-        <select asp-for="TerapeutaId"
-                class="form-select"
-                asp-items="ViewBag.TerapeutaId">
-        </select>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Estado</label>
-        <select asp-for="Estado" class="form-select">
-            <option value="Pendente">Pendente</option>
-            <option value="Marcado">Marcado</option>
-            <option value="Concluído">Concluído</option>
-            <option value="Cancelado">Cancelado</option>
-        </select>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Guardar</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-</form>
+</div>

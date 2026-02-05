@@ -4,18 +4,29 @@
     ViewData["Title"] = "Remover Agendamento";
 }
 
-<h1>Remover Agendamento</h1>
-<hr />
+<h1 class="mb-4 text-danger">Remover Agendamento</h1>
 
-<p>Tem a certeza que pretende remover este agendamento?</p>
+<div class="alert alert-warning">
+    Tem a certeza que pretende remover este agendamento?
+</div>
 
-<ul class="list-group mb-3">
-    <li class="list-group-item">@Model.DataHoraInicio → @Model.DataHoraFim</li>
-    <li class="list-group-item">@Model.Terapeuta?.Nome</li>
-</ul>
+<div class="card shadow-sm mb-3">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <strong>Horário:</strong>
+            @Model.DataHoraInicio.ToString("dd/MM/yyyy HH:mm")
+            →
+            @Model.DataHoraFim.ToString("dd/MM/yyyy HH:mm")
+        </li>
+        <li class="list-group-item">
+            <strong>Terapeuta:</strong>
+            @Model.Terapeuta?.Nome
+        </li>
+    </ul>
+</div>
 
-<form asp-action="Delete">
+<form asp-action="Delete" class="d-flex gap-2">
     <input type="hidden" asp-for="AgendamentoId" />
-    <button type="submit" class="btn btn-danger">Remover</button>
     <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    <button type="submit" class="btn btn-danger">Remover</button>
 </form>
