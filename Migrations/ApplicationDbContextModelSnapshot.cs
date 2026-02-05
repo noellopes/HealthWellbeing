@@ -165,6 +165,24 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("ClientesBalneario");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Especialidade", b =>
+                {
+                    b.Property<int>("EspecialidadeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EspecialidadeId"));
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.HasKey("EspecialidadeId");
+
+                    b.ToTable("Especialidades");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Exercicio", b =>
                 {
                     b.Property<int>("ExercicioId")
@@ -481,10 +499,8 @@ namespace HealthWellbeing.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Especialidade")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("nvarchar(40)");
+                    b.Property<int>("EspecialidadeId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -496,6 +512,8 @@ namespace HealthWellbeing.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("TerapeutaId");
+
+                    b.HasIndex("EspecialidadeId");
 
                     b.ToTable("Terapeutas");
                 });
@@ -969,6 +987,17 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("TipoServico");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Terapeuta", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Especialidade", "Especialidade")
+                        .WithMany("Terapeutas")
+                        .HasForeignKey("EspecialidadeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Especialidade");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.UtenteBalneario", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.ClienteBalneario", "ClienteBalneario")
@@ -1074,6 +1103,11 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Utentes");
 
                     b.Navigation("Vouchers");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Especialidade", b =>
+                {
+                    b.Navigation("Terapeutas");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.GrupoMuscular", b =>

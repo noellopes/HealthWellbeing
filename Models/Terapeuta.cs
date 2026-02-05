@@ -1,4 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
 {
@@ -12,10 +15,11 @@ namespace HealthWellbeing.Models
         [StringLength(100, ErrorMessage = "O nome não pode ter mais de 100 caracteres.")]
         public string Nome { get; set; } = string.Empty;
 
-        // Especialidade — obrigatória
+        // Especialidade — obrigatória (FK)
         [Required(ErrorMessage = "A especialidade é obrigatória.")]
-        [StringLength(40, ErrorMessage = "A especialidade não pode ter mais de 40 caracteres.")]
-        public string Especialidade { get; set; } = string.Empty;
+        public int EspecialidadeId { get; set; }
+
+        public Especialidade Especialidade { get; set; } = null!;
 
         // Telefone — obrigatório, exatamente 9 dígitos
         [Required(ErrorMessage = "O telefone é obrigatório.")]
@@ -33,7 +37,8 @@ namespace HealthWellbeing.Models
         [Range(1900, 9999, ErrorMessage = "O ano de entrada deve ser válido.")]
         public int AnoEntrada { get; set; }
 
-        // Cálculo dos anos de experiência
+        // Cálculo dos anos de experiência (NÃO mapeado na BD)
+        [NotMapped]
         public int AnosExperiencia
         {
             get

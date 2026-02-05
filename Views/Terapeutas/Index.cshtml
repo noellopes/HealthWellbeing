@@ -27,13 +27,13 @@
     </div>
 
     <div class="col-md-4">
-        <select name="especialidade" class="form-select">
+        <select name="especialidadeId" class="form-select">
             <option value="">-- Todas as especialidades --</option>
-            @foreach (var esp in ViewBag.Especialidades as List<string>)
+            @foreach (var esp in ViewBag.Especialidades as List<HealthWellbeing.Models.Especialidade>)
             {
-                <option value="@esp"
-                        selected="@(esp == ViewBag.EspecialidadeSelecionada)">
-                    @esp
+                <option value="@esp.EspecialidadeId"
+                        selected="@(esp.EspecialidadeId == ViewBag.EspecialidadeSelecionada)">
+                    @esp.Nome
                 </option>
             }
         </select>
@@ -73,7 +73,7 @@
         {
             <tr>
                 <td>@t.Nome</td>
-                <td>@t.Especialidade</td>
+                <td>@t.Especialidade.Nome</td>
                 <td>
                     <a href="mailto:@t.Email">@t.Email</a>
                 </td>
@@ -120,7 +120,7 @@
                asp-action="Index"
                asp-route-page="@(ViewBag.CurrentPage - 1)"
                asp-route-nome="@ViewBag.Nome"
-               asp-route-especialidade="@ViewBag.EspecialidadeSelecionada"
+               asp-route-especialidadeId="@ViewBag.EspecialidadeSelecionada"
                asp-route-ativo="@ViewBag.Ativo">
                 Anterior
             </a>
@@ -133,7 +133,7 @@
                    asp-action="Index"
                    asp-route-page="@i"
                    asp-route-nome="@ViewBag.Nome"
-                   asp-route-especialidade="@ViewBag.EspecialidadeSelecionada"
+                   asp-route-especialidadeId="@ViewBag.EspecialidadeSelecionada"
                    asp-route-ativo="@ViewBag.Ativo">
                     @i
                 </a>
@@ -145,7 +145,7 @@
                asp-action="Index"
                asp-route-page="@(ViewBag.CurrentPage + 1)"
                asp-route-nome="@ViewBag.Nome"
-               asp-route-especialidade="@ViewBag.EspecialidadeSelecionada"
+               asp-route-especialidadeId="@ViewBag.EspecialidadeSelecionada"
                asp-route-ativo="@ViewBag.Ativo">
                 Seguinte
             </a>

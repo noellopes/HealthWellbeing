@@ -21,6 +21,7 @@ namespace HealthWellbeing.Data
         public DbSet<HistoricoMedico> HistoricosMedicos { get; set; }
         public DbSet<Terapeuta> Terapeutas { get; set; }
         public DbSet<Agendamento> Agendamentos { get; set; }
+        public DbSet<Especialidade> Especialidades { get; set; }
 
         // APOIO
         public DbSet<Genero> Generos { get; set; }

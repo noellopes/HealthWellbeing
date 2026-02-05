@@ -20,7 +20,7 @@ namespace HealthWellbeing.Data
 
         private static string GerarNif(int numero)
         {
-            return (100000000 + numero).ToString(); // simples e único
+            return (100000000 + numero).ToString();
         }
 
         private static string Normalizar(string texto)
@@ -41,7 +41,7 @@ namespace HealthWellbeing.Data
         {
             var data = DateTime.Today.AddDays(-rnd.Next(1, diasAtras));
             var hora = new TimeSpan(
-                rnd.Next(9, 17),   // entre 09h e 17h
+                rnd.Next(9, 17),
                 rnd.Next(0, 60),
                 rnd.Next(0, 60)
             );
@@ -61,16 +61,11 @@ namespace HealthWellbeing.Data
             };
         }
 
-
-
         // =========================
         // SEED
         // =========================
         public static void Seed(ApplicationDbContext context)
         {
-            if (context.ClientesBalneario.Any())
-                return;
-
             var rnd = new Random();
 
             // =========================
@@ -120,6 +115,26 @@ namespace HealthWellbeing.Data
             var niveis = context.NiveisCliente.OrderBy(n => n.PontosMinimos).ToList();
 
             // =========================
+            // ESPECIALIDADES
+            // =========================
+            if (!context.Especialidades.Any())
+            {
+                context.Especialidades.AddRange(
+                    new Especialidade { Nome = "Acupuntura" },
+                    new Especialidade { Nome = "Estética" },
+                    new Especialidade { Nome = "Fisioterapia" },
+                    new Especialidade { Nome = "Massagem" },
+                    new Especialidade { Nome = "Reiki" },
+                    new Especialidade { Nome = "Terapia da Fala" }
+                );
+                context.SaveChanges();
+            }
+
+            var especialidadesDb = context.Especialidades
+                .OrderBy(e => e.EspecialidadeId)
+                .ToList();
+
+            // =========================
             // NOMES
             // =========================
             var nomesMasc = new[]
@@ -152,139 +167,128 @@ namespace HealthWellbeing.Data
             // =========================
             // CLIENTES (35)
             // =========================
-            var clientes = new List<ClienteBalneario>();
-
-            for (int i = 1; i <= 35; i++)
+            if (!context.ClientesBalneario.Any())
             {
-                string nome = $"{nomesMasc[i % nomesMasc.Length]} {apelidos[i % apelidos.Length]}";
+                var clientes = new List<ClienteBalneario>();
 
-                clientes.Add(new ClienteBalneario
+                for (int i = 1; i <= 35; i++)
                 {
-                    Nome = nome,
-                    Email = $"cliente{i}@balneario.pt",
-                    Telemovel = GerarTelemovel(rnd),
-                    DataRegisto = DateTime.Today.AddDays(-rnd.Next(30, 600)),
-                    Ativo = rnd.Next(100) > 15
-                });
-            }
+                    string nome = $"{nomesMasc[i % nomesMasc.Length]} {apelidos[i % apelidos.Length]}";
 
-            context.ClientesBalneario.AddRange(clientes);
-            context.SaveChanges();
+                    clientes.Add(new ClienteBalneario
+                    {
+                        Nome = nome,
+                        Email = $"cliente{i}@balneario.pt",
+                        Telemovel = GerarTelemovel(rnd),
+                        DataRegisto = DateTime.Today.AddDays(-rnd.Next(30, 600)),
+                        Ativo = rnd.Next(100) > 15
+                    });
+                }
+
+                context.ClientesBalneario.AddRange(clientes);
+                context.SaveChanges();
+            }
 
             var clientesDb = context.ClientesBalneario.ToList();
 
             // =========================
             // TERAPEUTAS (47)
             // =========================
-            var especialidades = new[]
+            if (!context.Terapeutas.Any())
             {
-                "Acupuntura", 
-                "Estética",
-                "Fisioterapia",
-                "Massagem",
-                "Reiki", 
-                "Terapia da Fala"
+                var terapeutas = new List<Terapeuta>();
 
-            };
-
-            var terapeutas = new List<Terapeuta>();
-
-            for (int i = 1; i <= 47; i++)
-            {
-                string nome = nomesMasc[i % nomesMasc.Length];
-                string apelido = apelidos[(i + 3) % apelidos.Length];
-
-                terapeutas.Add(new Terapeuta
+                for (int i = 1; i <= 47; i++)
                 {
-                    Nome = $"{nome} {apelido}",
-                    Especialidade = especialidades[i % especialidades.Length],
-                    Email = $"{Normalizar(nome)}.{Normalizar(apelido)}@balneario.pt",
-                    Telefone = GerarTelemovel(rnd),
-                    AnoEntrada = rnd.Next(2005, 2022),
-                    Ativo = rnd.Next(100) > 10
-                });
-            }
+                    string nome = nomesMasc[i % nomesMasc.Length];
+                    string apelido = apelidos[(i + 3) % apelidos.Length];
+                    var especialidade = especialidadesDb[i % especialidadesDb.Count];
 
-            context.Terapeutas.AddRange(terapeutas);
-            context.SaveChanges();
+                    terapeutas.Add(new Terapeuta
+                    {
+                        Nome = $"{nome} {apelido}",
+                        EspecialidadeId = especialidade.EspecialidadeId,
+                        Email = $"{Normalizar(nome)}.{Normalizar(apelido)}@balneario.pt",
+                        Telefone = GerarTelemovel(rnd),
+                        AnoEntrada = rnd.Next(2005, 2022),
+                        Ativo = rnd.Next(100) > 10
+                    });
+                }
+
+                context.Terapeutas.AddRange(terapeutas);
+                context.SaveChanges();
+            }
 
             var terapeutasDb = context.Terapeutas.ToList();
 
             // =========================
             // UTENTES (55)
             // =========================
-            var utentes = new List<UtenteBalneario>();
-
-            for (int i = 1; i <= 55; i++)
+            if (!context.UtenteBalnearios.Any())
             {
-                bool feminino = rnd.Next(2) == 0;
+                var utentes = new List<UtenteBalneario>();
 
-                string nome = feminino
-                    ? nomesFem[i % nomesFem.Length]
-                    : nomesMasc[i % nomesMasc.Length];
-
-                utentes.Add(new UtenteBalneario
+                for (int i = 1; i <= 55; i++)
                 {
-                    Nome = $"{nome} {apelidos[(i + 5) % apelidos.Length]}",
-                    DataNascimento = DateTime.Today.AddYears(-rnd.Next(18, 85)),
-                    GeneroId = feminino ? generoFem : generoMasc,
-                    NIF = GerarNif(i),
-                    Contacto = GerarTelemovel(rnd),
-                    Morada = moradas[rnd.Next(moradas.Length)],
-                    IndicacoesTerapeuticas = "Acompanhamento terapêutico.",
-                    ContraIndicacoes = "Nenhuma.",
-                    SeguroSaudeId = seguros[rnd.Next(seguros.Count)].SeguroSaudeId,
-                    ClienteBalnearioId = rnd.Next(100) < 70
-                        ? clientesDb[rnd.Next(clientesDb.Count)].ClienteBalnearioId
-                        : null,
-                    TerapeutaId = terapeutasDb[rnd.Next(terapeutasDb.Count)].TerapeutaId,
-                    DataInscricao = DateTime.Today.AddDays(-rnd.Next(10, 700)),
-                    Ativo = rnd.Next(100) > 30
-                });
+                    bool feminino = rnd.Next(2) == 0;
+
+                    string nome = feminino
+                        ? nomesFem[i % nomesFem.Length]
+                        : nomesMasc[i % nomesMasc.Length];
+
+                    utentes.Add(new UtenteBalneario
+                    {
+                        Nome = $"{nome} {apelidos[(i + 5) % apelidos.Length]}",
+                        DataNascimento = DateTime.Today.AddYears(-rnd.Next(18, 85)),
+                        GeneroId = feminino ? generoFem : generoMasc,
+                        NIF = GerarNif(i),
+                        Contacto = GerarTelemovel(rnd),
+                        Morada = moradas[rnd.Next(moradas.Length)],
+                        IndicacoesTerapeuticas = "Acompanhamento terapêutico.",
+                        ContraIndicacoes = "Nenhuma.",
+                        SeguroSaudeId = seguros[rnd.Next(seguros.Count)].SeguroSaudeId,
+                        ClienteBalnearioId = rnd.Next(100) < 70
+                            ? clientesDb[rnd.Next(clientesDb.Count)].ClienteBalnearioId
+                            : null,
+                        TerapeutaId = terapeutasDb[rnd.Next(terapeutasDb.Count)].TerapeutaId,
+                        DataInscricao = DateTime.Today.AddDays(-rnd.Next(10, 700)),
+                        Ativo = rnd.Next(100) > 30
+                    });
+                }
+
+                context.UtenteBalnearios.AddRange(utentes);
+                context.SaveChanges();
             }
 
-            context.UtenteBalnearios.AddRange(utentes);
-            context.SaveChanges();
-
             // =========================
-            // HISTÓRICO CLÍNICO (COM HORAS)
+            // HISTÓRICO CLÍNICO
             // =========================
-
-            // Buscar um utilizador para associar aos registos clínicos (Admin)
             var adminUser = context.Users.FirstOrDefault();
-
             var utentesDb = context.UtenteBalnearios.ToList();
 
-            foreach (var utente in utentesDb.Where(u => rnd.Next(100) < 50))
+            if (!context.HistoricosMedicos.Any())
             {
-                int entradas = rnd.Next(1, 4);
-
-                for (int i = 0; i < entradas; i++)
+                foreach (var utente in utentesDb.Where(u => rnd.Next(100) < 50))
                 {
-                    var baseDate = utente.DataInscricao.AddDays(rnd.Next(1, 180));
+                    int entradas = rnd.Next(1, 4);
 
-                    var dataComHora = new DateTime(
-                        baseDate.Year,
-                        baseDate.Month,
-                        baseDate.Day,
-                        rnd.Next(8, 20),
-                        rnd.Next(0, 60),
-                        0
-                    );
-
-                    context.HistoricosMedicos.Add(new HistoricoMedico
+                    for (int i = 0; i < entradas; i++)
                     {
-                        UtenteBalnearioId = utente.UtenteBalnearioId,
-                        Titulo = "Sessão de acompanhamento",
-                        Descricao = "Sessão clínica realizada com sucesso.",
-                        DataRegisto = dataComHora,
-                        CriadoPorUserId = adminUser?.Id
-                    });
+                        var baseDate = utente.DataInscricao.AddDays(rnd.Next(1, 180));
 
+                        context.HistoricosMedicos.Add(new HistoricoMedico
+                        {
+                            UtenteBalnearioId = utente.UtenteBalnearioId,
+                            Titulo = "Sessão de acompanhamento",
+                            Descricao = "Sessão clínica realizada com sucesso.",
+                            DataRegisto = baseDate,
+                            CriadoPorUserId = adminUser?.Id
+                        });
+                    }
                 }
-            }
 
-            context.SaveChanges();
+                context.SaveChanges();
+            }
 
             // =========================
             // SATISFAÇÃO + PONTOS + NÍVEL
@@ -314,40 +318,40 @@ namespace HealthWellbeing.Data
                         ClienteBalnearioId = cliente.ClienteBalnearioId,
                         Pontos = pontos,
                         Motivo = "Avaliação de satisfação",
-                        Data = dataBase.AddMinutes(rnd.Next(1, 30)) // ligeiramente depois
+                        Data = dataBase.AddMinutes(5)
                     });
 
                     totalPontos += pontos;
                 }
 
                 cliente.Pontos = totalPontos;
-                cliente.NivelClienteId = niveis
-                    .Last(n => totalPontos >= n.PontosMinimos)
-                    .NivelClienteId;
+                cliente.NivelClienteId = niveis.Last(n => totalPontos >= n.PontosMinimos).NivelClienteId;
             }
-
 
             context.SaveChanges();
 
             // =========================
             // VOUCHERS
             // =========================
-            foreach (var cliente in clientesDb.Where(c => rnd.Next(100) < 65))
+            if (!context.VouchersCliente.Any())
             {
-                context.VouchersCliente.Add(new VoucherCliente
+                foreach (var cliente in clientesDb.Where(c => rnd.Next(100) < 65))
                 {
-                    ClienteBalnearioId = cliente.ClienteBalnearioId,
-                    Titulo = "Voucher Fidelização",
-                    Descricao = "Desconto em serviços do balneário",
-                    PontosNecessarios = 50,
-                    Valor = rnd.Next(5, 30),
-                    DataCriacao = DateTime.Now,
-                    DataValidade = DateTime.Now.AddMonths(6),
-                    Usado = false
-                });
-            }
+                    context.VouchersCliente.Add(new VoucherCliente
+                    {
+                        ClienteBalnearioId = cliente.ClienteBalnearioId,
+                        Titulo = "Voucher Fidelização",
+                        Descricao = "Desconto em serviços do balneário",
+                        PontosNecessarios = 50,
+                        Valor = rnd.Next(5, 30),
+                        DataCriacao = DateTime.Now,
+                        DataValidade = DateTime.Now.AddMonths(6),
+                        Usado = false
+                    });
+                }
 
-            context.SaveChanges();
+                context.SaveChanges();
+            }
         }
     }
 }

@@ -19,28 +19,31 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
+        // =========================
+        // INDEX
+        // =========================
         [AllowAnonymous]
         public async Task<IActionResult> Index(
             string nome,
-            string especialidade,
+            int? especialidadeId,
             bool? ativo,
             int page = 1)
         {
-            var query = _context.Terapeutas.AsQueryable();
+            var query = _context.Terapeutas
+                .Include(t => t.Especialidade)
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(nome))
                 query = query.Where(t => t.Nome.Contains(nome));
 
-            if (!string.IsNullOrWhiteSpace(especialidade))
-                query = query.Where(t => t.Especialidade == especialidade);
+            if (especialidadeId.HasValue)
+                query = query.Where(t => t.EspecialidadeId == especialidadeId.Value);
 
             if (ativo.HasValue)
                 query = query.Where(t => t.Ativo == ativo.Value);
 
-            ViewBag.Especialidades = await _context.Terapeutas
-                .Select(t => t.Especialidade)
-                .Distinct()
-                .OrderBy(e => e)
+            ViewBag.Especialidades = await _context.Especialidades
+                .OrderBy(e => e.Nome)
                 .ToListAsync();
 
             int totalItems = await query.CountAsync();
@@ -53,7 +56,7 @@ namespace HealthWellbeing.Controllers
                 .ToListAsync();
 
             ViewBag.Nome = nome;
-            ViewBag.EspecialidadeSelecionada = especialidade;
+            ViewBag.EspecialidadeSelecionada = especialidadeId;
             ViewBag.Ativo = ativo;
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
@@ -61,6 +64,9 @@ namespace HealthWellbeing.Controllers
             return View(terapeutas);
         }
 
+        // =========================
+        // DETAILS
+        // =========================
         [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
@@ -68,6 +74,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
 
             var terapeuta = await _context.Terapeutas
+                .Include(t => t.Especialidade)
                 .FirstOrDefaultAsync(t => t.TerapeutaId == id);
 
             if (terapeuta == null)
@@ -76,9 +83,16 @@ namespace HealthWellbeing.Controllers
             return View(terapeuta);
         }
 
+        // =========================
+        // CREATE
+        // =========================
         [Authorize(Roles = "Admin,Funcionario")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            ViewBag.Especialidades = await _context.Especialidades
+                .OrderBy(e => e.Nome)
+                .ToListAsync();
+
             return View();
         }
 
@@ -88,13 +102,22 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Create(Terapeuta terapeuta)
         {
             if (!ModelState.IsValid)
+            {
+                ViewBag.Especialidades = await _context.Especialidades
+                    .OrderBy(e => e.Nome)
+                    .ToListAsync();
+
                 return View(terapeuta);
+            }
 
             _context.Add(terapeuta);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
+        // =========================
+        // EDIT
+        // =========================
         [Authorize(Roles = "Admin,Funcionario")]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -105,6 +128,10 @@ namespace HealthWellbeing.Controllers
 
             if (terapeuta == null)
                 return NotFound();
+
+            ViewBag.Especialidades = await _context.Especialidades
+                .OrderBy(e => e.Nome)
+                .ToListAsync();
 
             return View(terapeuta);
         }
@@ -118,7 +145,13 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
 
             if (!ModelState.IsValid)
+            {
+                ViewBag.Especialidades = await _context.Especialidades
+                    .OrderBy(e => e.Nome)
+                    .ToListAsync();
+
                 return View(terapeuta);
+            }
 
             try
             {
@@ -135,6 +168,9 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // =========================
+        // DELETE
+        // =========================
         [Authorize(Roles = "Admin,Funcionario")]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -142,6 +178,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
 
             var terapeuta = await _context.Terapeutas
+                .Include(t => t.Especialidade)
                 .FirstOrDefaultAsync(t => t.TerapeutaId == id);
 
             if (terapeuta == null)
