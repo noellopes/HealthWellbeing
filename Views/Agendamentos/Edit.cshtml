@@ -23,18 +23,21 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="TerapeutaId" class="form-label"></label>
-        <select asp-for="TerapeutaId" class="form-select" asp-items="ViewBag.TerapeutaId"></select>
+        <label class="form-label">Terapeuta</label>
+        <select asp-for="TerapeutaId"
+                class="form-select"
+                asp-items="ViewBag.TerapeutaId">
+        </select>
     </div>
 
     <div class="mb-3">
-        <label asp-for="ServicoId" class="form-label"></label>
-        <select asp-for="ServicoId" class="form-select" asp-items="ViewBag.ServicoId"></select>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Estado" class="form-label"></label>
-        <input asp-for="Estado" class="form-control" />
+        <label class="form-label">Estado</label>
+        <select asp-for="Estado" class="form-select">
+            <option value="Pendente">Pendente</option>
+            <option value="Marcado">Marcado</option>
+            <option value="Concluído">Concluído</option>
+            <option value="Cancelado">Cancelado</option>
+        </select>
     </div>
 
     <button type="submit" class="btn btn-primary">Guardar</button>

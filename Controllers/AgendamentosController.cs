@@ -15,7 +15,7 @@ namespace HealthWellbeing.Controllers
         private readonly ApplicationDbContext _context;
 
         private const int PageSize = 10;
-        private const int PageWindow = 5; // número máximo de páginas visíveis
+        private const int PageWindow = 5;
 
         public AgendamentosController(ApplicationDbContext context)
         {
@@ -23,7 +23,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // =========================
-        // LISTAGEM (PAGINAÇÃO ESTILO TERAPEUTAS)
+        // LISTAGEM
         // =========================
         [AllowAnonymous]
         public async Task<IActionResult> Index(int page = 1)
@@ -86,7 +86,7 @@ namespace HealthWellbeing.Controllers
         // =========================
         // CRIAR
         // =========================
-        [Authorize(Roles = "Admin,Funcionario")]
+        [AllowAnonymous]
         public IActionResult Create()
         {
             ViewData["TerapeutaId"] =
@@ -97,9 +97,12 @@ namespace HealthWellbeing.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,Funcionario")]
+        [AllowAnonymous]
         public async Task<IActionResult> Create(Agendamento agendamento)
         {
+            // estado fixo na criação
+            agendamento.Estado = "Pendente";
+
             if (!ModelState.IsValid)
             {
                 ViewData["TerapeutaId"] =
@@ -143,7 +146,12 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
 
             if (!ModelState.IsValid)
+            {
+                ViewData["TerapeutaId"] =
+                    new SelectList(_context.Terapeutas, "TerapeutaId", "Nome", agendamento.TerapeutaId);
+
                 return View(agendamento);
+            }
 
             _context.Update(agendamento);
             await _context.SaveChangesAsync();

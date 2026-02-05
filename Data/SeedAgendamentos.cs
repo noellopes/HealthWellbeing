@@ -16,34 +16,24 @@ namespace HealthWellbeing.Data
             if (!terapeutas.Any())
                 return;
 
-            // Serviços "manuais" (sem FK)
-            var servicos = new[]
-            {
-                new { Id = 1, Nome = "Massagem Relaxante" },
-                new { Id = 2, Nome = "Fisioterapia" },
-                new { Id = 3, Nome = "Hidroterapia" },
-                new { Id = 4, Nome = "Drenagem Linfática" },
-                new { Id = 5, Nome = "Reabilitação Funcional" }
-            };
-
             var estados = new[]
             {
                 "Pendente",
-                "Confirmado",
+                "Marcado",
+                "Concluído",
                 "Cancelado"
             };
 
             var inicioBase = DateTime.Today.AddHours(9);
-            var totalAgendamentos = 45;
+            var totalAgendamentos = 23; // número realista, como já tinhas definido
 
             for (int i = 0; i < totalAgendamentos; i++)
             {
                 var terapeuta = terapeutas[i % terapeutas.Count];
-                var servico = servicos[i % servicos.Length];
                 var estado = estados[i % estados.Length];
 
                 var inicio = inicioBase
-                    .AddDays(i / 6)          // espalha por dias
+                    .AddDays(i / 6)           // espalha por dias
                     .AddHours((i % 6) * 1.5); // horários diferentes
 
                 context.Agendamentos.Add(new Agendamento
@@ -51,8 +41,7 @@ namespace HealthWellbeing.Data
                     DataHoraInicio = inicio,
                     DataHoraFim = inicio.AddHours(1),
                     Estado = estado,
-                    TerapeutaId = terapeuta.TerapeutaId,
-                    ServicoId = servico.Id
+                    TerapeutaId = terapeuta.TerapeutaId
                 });
             }
 

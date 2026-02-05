@@ -13,7 +13,6 @@ namespace HealthWellbeing.Data
         }
 
         // CLIENTES
-        public DbSet<Client> Clientes { get; set; }
         public DbSet<ClienteBalneario> ClientesBalneario { get; set; }
         public DbSet<UtenteBalneario> UtenteBalnearios { get; set; }
 
@@ -22,12 +21,9 @@ namespace HealthWellbeing.Data
         public DbSet<Terapeuta> Terapeutas { get; set; }
         public DbSet<Agendamento> Agendamentos { get; set; }
         public DbSet<Especialidade> Especialidades { get; set; }
-        public DbSet<HorarioTerapeuta> HorariosTerapeuta { get; set; }
 
         // APOIO
         public DbSet<Genero> Generos { get; set; }
-        public DbSet<Exercicio> Exercicio { get; set; }
-        public DbSet<GrupoMuscular> GrupoMuscular { get; set; }
         public DbSet<SeguroSaude> SegurosSaude { get; set; }
 
         // FIDELIZAÇÃO
