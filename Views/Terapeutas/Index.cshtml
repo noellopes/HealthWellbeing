@@ -15,46 +15,6 @@
     </div>
 }
 
-<!-- FILTROS -->
-<form method="get" class="row g-2 mb-4">
-
-    <div class="col-md-4">
-        <input type="text"
-               name="nome"
-               value="@ViewBag.Nome"
-               class="form-control"
-               placeholder="Filtrar por nome" />
-    </div>
-
-    <div class="col-md-4">
-        <select name="especialidadeId" class="form-select">
-            <option value="">-- Todas as especialidades --</option>
-            @foreach (var esp in ViewBag.Especialidades as List<HealthWellbeing.Models.Especialidade>)
-            {
-                <option value="@esp.EspecialidadeId"
-                        selected="@(esp.EspecialidadeId == ViewBag.EspecialidadeSelecionada)">
-                    @esp.Nome
-                </option>
-            }
-        </select>
-    </div>
-
-    <div class="col-md-2">
-        <select name="ativo" class="form-select">
-            <option value="">Todos</option>
-            <option value="true" selected="@(ViewBag.Ativo?.ToString() == "True")">Ativos</option>
-            <option value="false" selected="@(ViewBag.Ativo?.ToString() == "False")">Inativos</option>
-        </select>
-    </div>
-
-    <div class="col-md-2">
-        <button type="submit" class="btn btn-primary w-100">
-            Filtrar
-        </button>
-    </div>
-
-</form>
-
 <table class="table table-striped table-hover align-middle">
     <thead class="table-dark">
         <tr>
@@ -73,14 +33,12 @@
         {
             <tr>
                 <td>@t.Nome</td>
-                <td>@t.Especialidade.Nome</td>
-                <td>
-                    <a href="mailto:@t.Email">@t.Email</a>
-                </td>
+                <td>@t.Especialidade?.Nome</td>
+                <td><a href="mailto:@t.Email">@t.Email</a></td>
                 <td>@t.Telefone</td>
                 <td>@t.AnosExperiencia anos</td>
                 <td>
-                    <span class="badge @(t.Ativo ? "bg-success" : "bg-secondary")">
+                    <span class="badge @(t.Ativo ? "bg-success" : "bg-danger")">
                         @(t.Ativo ? "Ativo" : "Inativo")
                     </span>
                 </td>
@@ -110,46 +68,3 @@
         }
     </tbody>
 </table>
-
-<!-- PAGINAÇÃO -->
-<nav class="d-flex justify-content-center mt-4">
-    <ul class="pagination">
-
-        <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
-            <a class="page-link"
-               asp-action="Index"
-               asp-route-page="@(ViewBag.CurrentPage - 1)"
-               asp-route-nome="@ViewBag.Nome"
-               asp-route-especialidadeId="@ViewBag.EspecialidadeSelecionada"
-               asp-route-ativo="@ViewBag.Ativo">
-                Anterior
-            </a>
-        </li>
-
-        @for (int i = 1; i <= ViewBag.TotalPages; i++)
-        {
-            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                <a class="page-link"
-                   asp-action="Index"
-                   asp-route-page="@i"
-                   asp-route-nome="@ViewBag.Nome"
-                   asp-route-especialidadeId="@ViewBag.EspecialidadeSelecionada"
-                   asp-route-ativo="@ViewBag.Ativo">
-                    @i
-                </a>
-            </li>
-        }
-
-        <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
-            <a class="page-link"
-               asp-action="Index"
-               asp-route-page="@(ViewBag.CurrentPage + 1)"
-               asp-route-nome="@ViewBag.Nome"
-               asp-route-especialidadeId="@ViewBag.EspecialidadeSelecionada"
-               asp-route-ativo="@ViewBag.Ativo">
-                Seguinte
-            </a>
-        </li>
-
-    </ul>
-</nav>

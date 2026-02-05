@@ -4,17 +4,16 @@
     ViewData["Title"] = "Remover Terapeuta";
 }
 
-<h1>Remover Terapeuta</h1>
-<hr />
+<h1 class="mb-4">Remover Terapeuta</h1>
 
 <div class="alert alert-danger">
-    Tens a certeza que queres remover o terapeuta
+    Tem a certeza que pretende remover o terapeuta
     <strong>@Model.Nome</strong>?
 </div>
 
 <form asp-action="Delete">
     <input type="hidden" asp-for="TerapeutaId" />
 
-    <button type="submit" class="btn btn-danger">Confirmar Remoção</button>
+    <button type="submit" class="btn btn-danger">Remover</button>
     <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
 </form>

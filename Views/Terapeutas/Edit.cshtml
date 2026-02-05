@@ -3,61 +3,65 @@
 
 @{
     ViewData["Title"] = "Editar Terapeuta";
-    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Editar Terapeuta</h1>
-<hr />
+<h1 class="mb-4">Editar Terapeuta</h1>
 
-<form asp-action="Edit">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="card shadow-sm">
+    <div class="card-body">
 
-    <input type="hidden" asp-for="TerapeutaId" />
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="TerapeutaId" />
 
-    <div class="form-group">
-        <label asp-for="Nome" class="control-label"></label>
-        <input asp-for="Nome" class="form-control" />
-        <span asp-validation-for="Nome" class="text-danger"></span>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Nome" class="form-label"></label>
+                <input asp-for="Nome" class="form-control" />
+                <span asp-validation-for="Nome" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="EspecialidadeId" class="form-label"></label>
+                <select asp-for="EspecialidadeId"
+                        class="form-select"
+                        asp-items="@(new SelectList(ViewBag.Especialidades, "EspecialidadeId", "Nome"))">
+                    <option value="">-- Selecionar especialidade --</option>
+                </select>
+                <span asp-validation-for="EspecialidadeId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Telefone" class="form-label"></label>
+                <input asp-for="Telefone" class="form-control" />
+                <span asp-validation-for="Telefone" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="AnoEntrada" class="form-label"></label>
+                <input asp-for="AnoEntrada" class="form-control" />
+                <span asp-validation-for="AnoEntrada" class="text-danger"></span>
+            </div>
+
+            <div class="form-check mb-3">
+                <input asp-for="Ativo" class="form-check-input" />
+                <label asp-for="Ativo" class="form-check-label"></label>
+            </div>
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+
     </div>
-
-    <div class="form-group">
-        <label asp-for="EspecialidadeId" class="control-label"></label>
-        <select asp-for="EspecialidadeId"
-                class="form-select"
-                asp-items="@(new SelectList(ViewBag.Especialidades, "EspecialidadeId", "Nome"))">
-            <option value="">-- Selecionar especialidade --</option>
-        </select>
-        <span asp-validation-for="EspecialidadeId" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Telefone" class="control-label"></label>
-        <input asp-for="Telefone" class="form-control" />
-        <span asp-validation-for="Telefone" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Email" class="control-label"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="AnoEntrada" class="control-label"></label>
-        <input asp-for="AnoEntrada" class="form-control" />
-        <span asp-validation-for="AnoEntrada" class="text-danger"></span>
-    </div>
-
-    <div class="form-group form-check">
-        <input class="form-check-input" asp-for="Ativo" />
-        <label class="form-check-label" asp-for="Ativo"></label>
-    </div>
-
-    <div class="form-group mt-3">
-        <input type="submit" value="Guardar Alterações" class="btn btn-primary" />
-        <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
-    </div>
-</form>
+</div>
 
 @section Scripts {
     @{
