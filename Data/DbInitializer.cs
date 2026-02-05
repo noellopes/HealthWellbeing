@@ -261,6 +261,47 @@ namespace HealthWellbeing.Data
             }
 
             // =========================
+            // AGENDAMENTOS
+            // =========================
+            if (!context.Agendamentos.Any())
+            {
+                var hoje = DateTime.Today;
+
+                var terapeutas = context.Terapeutas
+                    .Where(t => t.Ativo)
+                    .ToList();
+
+                // 10 dias úteis
+                for (int d = 0; d < 10; d++)
+                {
+                    var dia = hoje.AddDays(d);
+
+                    if (dia.DayOfWeek == DayOfWeek.Saturday ||
+                        dia.DayOfWeek == DayOfWeek.Sunday)
+                        continue;
+
+                    foreach (var terapeuta in terapeutas)
+                    {
+                        // sessões à hora, das 9 às 19
+                        for (int h = 9; h < 19; h++)
+                        {
+                            var inicio = dia.AddHours(h);
+
+                            context.Agendamentos.Add(new Agendamento
+                            {
+                                TerapeutaId = terapeuta.TerapeutaId,
+                                DataHoraInicio = inicio,
+                                DataHoraFim = inicio.AddHours(1),
+                                Estado = "Disponível"
+                            });
+                        }
+                    }
+                }
+
+                context.SaveChanges();
+            }
+
+            // =========================
             // HISTÓRICO CLÍNICO
             // =========================
             var adminUser = context.Users.FirstOrDefault();
