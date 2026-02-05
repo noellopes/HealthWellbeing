@@ -269,32 +269,42 @@ namespace HealthWellbeing.Data
 
                 var terapeutas = context.Terapeutas
                     .Where(t => t.Ativo)
+                    .Take(8) // poucos terapeutas
                     .ToList();
 
-                // 10 dias úteis
-                for (int d = 0; d < 10; d++)
+                var estados = new[]
                 {
-                    var dia = hoje.AddDays(d);
+                    "Disponível",
+                    "Marcado",
+                    "Concluído",
+                    "Cancelado"
+    };
 
-                    if (dia.DayOfWeek == DayOfWeek.Saturday ||
-                        dia.DayOfWeek == DayOfWeek.Sunday)
-                        continue;
+                int criados = 0;
 
-                    foreach (var terapeuta in terapeutas)
+                foreach (var terapeuta in terapeutas)
+                {
+                    if (criados >= 23)
+                        break;
+
+                    // 1 a 3 sessões por terapeuta
+                    int sessoes = Math.Min(3, 23 - criados);
+
+                    for (int i = 0; i < sessoes; i++)
                     {
-                        // sessões à hora, das 9 às 19
-                        for (int h = 9; h < 19; h++)
-                        {
-                            var inicio = dia.AddHours(h);
+                        var inicio = hoje
+                            .AddDays(i)
+                            .AddHours(9 + i * 2); // horários diferentes
 
-                            context.Agendamentos.Add(new Agendamento
-                            {
-                                TerapeutaId = terapeuta.TerapeutaId,
-                                DataHoraInicio = inicio,
-                                DataHoraFim = inicio.AddHours(1),
-                                Estado = "Disponível"
-                            });
-                        }
+                        context.Agendamentos.Add(new Agendamento
+                        {
+                            TerapeutaId = terapeuta.TerapeutaId,
+                            DataHoraInicio = inicio,
+                            DataHoraFim = inicio.AddHours(1),
+                            Estado = estados[(criados + i) % estados.Length]
+                        });
+
+                        criados++;
                     }
                 }
 
